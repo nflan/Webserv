@@ -6,7 +6,7 @@
 #    By: chillion <chillion@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/09/01 12:07:22 by chillion          #+#    #+#              #
-#    Updated: 2023/03/15 12:16:09 by chillion         ###   ########.fr        #
+#    Updated: 2023/03/15 14:45:10 by chillion         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,7 +15,7 @@
 CXX := c++
 CXXFLAGS := -std=c++98 -Wall -Wextra -Werror -MMD -MP -Isources/
 # CXXFLAGS += -fsanitize=address
-# CXXFLAGS += -g3
+CXXFLAGS += -g3
 SRC_DIR := sources/
 OBJ_DIR := objects/
 RM := rm
@@ -33,7 +33,7 @@ NC = \033[0m
 
 SRCS =	main.cpp	\
 
-SOFT_NAME := Webserv
+SOFT_NAME := webserv
 OBJS = $(SRCS:%.cpp=%.o)
 SRC = $(addprefix $(SRC_DIR),$(SRCS))
 OBJ = $(addprefix $(OBJ_DIR),$(OBJS))
