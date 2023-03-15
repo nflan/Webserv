@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 15:39:03 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/15 17:43:33 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/03/15 17:45:11 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,7 +110,7 @@ int getServerFd()
 
 int	start_server(int new_socket)
 {
-long	valread;
+	long	valread;
 
 	std::string answer = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
 	size_t bytes_read;
@@ -156,8 +156,8 @@ int main(int argc, char const *argv[])
 
 	start_server(new_socket);
 	
-	// if (close(server_fd) == -1) {
-	// 	perror("Failed to close server socket file descriptor");
-	// }
+	if (close(new_socket) == -1) {
+		perror("Failed to close server socket file descriptor");
+	}
 	return 0;
 }
