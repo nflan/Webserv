@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   merge.cpp                                          :+:      :+:    :+:   */
+/*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 15:39:03 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/15 17:45:11 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/03/16 13:04:00 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,8 @@
 #define READ_SIZE 1000
 #define PORT 8082
 
-
+#include "server_configuration.hpp"
+#include "utils.hpp"
 
 int getServerFd()
 {
@@ -110,24 +111,63 @@ int getServerFd()
 
 int	start_server(int new_socket)
 {
-	long	valread;
+	/*
+	epoll() is a high-performance I/O completion notification interface that allows an application to monitor multiple file 
+	descriptors/sockets returning readiness information about them.
+	In other words, it's a system call that monitors multiple input/output events and provides an efficient way to handle a
+	large number of file descriptors compared to select or poll system call.
+	
+	Some resources :	https://kaleid-liner.github.io/blog/2019/06/02/epoll-web-server.html
+						https://suchprogramming.com/epoll-in-3-easy-steps/
+						
+	*/
 
 	std::string answer = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
-	size_t bytes_read;
 	char read_buffer[READ_SIZE + 1];
 	struct epoll_event event, events[MAX_EVENTS];
+	/* on epoll : https://copyconstruct.medium.com/the-method-to-epolls-madness-d9d2d6378642
+	*/
 	int epoll_fd = epoll_create1(0);
 	if (epoll_fd == -1) {
 		fprintf(stderr, "Failed to create epoll file descriptor\n");
 		return 1;
 	}
+
+	/*
+	EPOLLIN means that the associated file descriptor (fd) is available for read operations. 
+	The file descriptor being set here is 0, which typically refers to standard input (stdin).
+	This indicates to the epoll instance that the program wants to be notified whenever there is
+	data available to be read from standard input.
+	*/
 	event.events = EPOLLIN; 
 	event.data.fd = new_socket;
+
+	/*	
+	epoll_ctl() is the function that manages the epoll instance by adding and removing file descriptors from the list to be watched
+	The second parameter EPOLL_CTL_ADD instructs epoll to add a new file descriptor to its watch list.
+	The third parameter 0 refers to the file descriptor itself we want to add/remove.
+	The fourth parameter &event is a pointer to the struct epoll_event which specifies the event types that we want to monitor for this file descriptor.
+
+	In summary, epoll_ctl(epoll_fd, EPOLL_CTL_ADD, 0, &event) is asking the kernel to add a new file descriptor to epoll's event set, where epoll_fd is the epoll file descriptor.
+
+	epoll_ctl() has three operations that we can use:
+
+	EPOLL_CTL_ADD - Add a file descriptor to the monitored set.
+	EPOLL_CTL_MOD - Update and modify the monitored set with new settings data.
+	EPOLL_CTL_DEL - Remove a file descriptor from the monitored set.
+	*/
+
 	if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, new_socket, &event)) {
 		fprintf(stderr, "Failed to add file descriptor to epoll\n");
 		close(epoll_fd);
 		return 1;
 	}
+
+	/*
+	epoll_wait(epoll_fd, events, MAX_EVENTS, 30000). This function blocks until at least one event occurs
+	or the specified timeout (30 seconds in this case) elapses. It returns the number of events that occurred
+	and stores
+	*/
 	int event_count = 0;
 	while (1) {
 		std::cout << "Waiting for new request" << std::endl;
@@ -139,6 +179,7 @@ int	start_server(int new_socket)
 			int bytes_read = read(events[i].data.fd, read_buffer, READ_SIZE);
 			read_buffer[bytes_read] = '\0';
 			std::cout << read_buffer << std::endl;
+			//answer = handle_request(read_buffer);
 			write(new_socket , answer.c_str() , strlen(answer.c_str()));
 		}
 	}
@@ -148,16 +189,30 @@ int	start_server(int new_socket)
 	}	
 }
 
-int main(int argc, char const *argv[])
+int main(int argc, char const **argv)
 {
-	
-
+	if (argc == 2)
+	{
 	int new_socket = getServerFd();
-
-	start_server(new_socket);
 	
+	start_server(new_socket);
 	if (close(new_socket) == -1) {
 		perror("Failed to close server socket file descriptor");
 	}
+	
+	try
+	{
+		server_configuration ServerConfig(argv[1]);
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+	}
 	return 0;
+	}
+	else
+	{
+		std::cout << "Wrong number of arguments" << std::endl;
+	}
+	
 }
