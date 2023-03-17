@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:03:12 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/16 12:50:18 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/03/17 13:47:15 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,12 @@
 
 #include <iostream>
 #include <string>
+#include <cstring>
 #include <fstream>
 #include <sstream>
 #include <algorithm>
+
+#define DEBUG 0
 
 class server_configuration
 {
@@ -34,6 +37,20 @@ class server_configuration
 	server_configuration(server_configuration const &obj);
 	~server_configuration();
 	server_configuration &operator=(server_configuration const &obj);
+
+	std::string findServerName();
+	int findNumberOfPorts(std::string &str);
+	int findPort();
+	std::string convertConfigFile(std::string ConfigFile);
+	std::string findRoot();
+
+	std::string getConfigFile();
+	std::string getServerName();
+	std::string getRoot();
+	int getNumberOfPorts();
+	int getPort();
 };
+
+std::ostream& operator <<(std::ostream &out, server_configuration &ServConfig);
 
 #endif

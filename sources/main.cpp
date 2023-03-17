@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 15:39:03 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/16 13:04:00 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/03/17 13:40:09 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,6 @@
 #define PORT 8082
 
 #include "server_configuration.hpp"
-#include "utils.hpp"
 
 int getServerFd()
 {
@@ -193,26 +192,16 @@ int main(int argc, char const **argv)
 {
 	if (argc == 2)
 	{
-	int new_socket = getServerFd();
+	// int new_socket = getServerFd();
 	
-	start_server(new_socket);
-	if (close(new_socket) == -1) {
-		perror("Failed to close server socket file descriptor");
-	}
+	// start_server(new_socket);
+	// if (close(new_socket) == -1) {
+	// 	perror("Failed to close server socket file descriptor");
+	// }
 	
-	try
-	{
-		server_configuration ServerConfig(argv[1]);
-	}
-	catch(const std::exception& e)
-	{
-		std::cerr << e.what() << '\n';
+	server_configuration ServerConfig(argv[1]);
+	std::cout << ServerConfig << std::endl;
 	}
 	return 0;
-	}
-	else
-	{
-		std::cout << "Wrong number of arguments" << std::endl;
-	}
 	
 }
