@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 15:39:03 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/17 15:18:18 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/03/17 15:23:18 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -192,62 +192,57 @@ int	start_server(int new_socket)
 
 int main(int argc, char const **argv)
 {
-	if (argc == 2)
+	if (argc != 2)
 	{
-		std::ifstream input_file(argv[1]);
-		std::vector<server_configuration*> servers;
-
-		if (!input_file.is_open()) {
-			std::cout << "Failed to open file " << argv[1] << std::endl;
-			return 1;
-		}
-
-		std::string ConfigFileStr;
-		std::getline(input_file, ConfigFileStr, '\0');
-		
-		while (ConfigFileStr.find("server {") != std::string::npos)
+		std::cout << "Wrong number of arguments" << std::endl;
+		return -1;
+	}
+	
+	std::ifstream input_file(argv[1]);
+	std::vector<server_configuration*> servers; // = setupserver
+	if (!input_file.is_open()) {
+		std::cout << "Failed to open file " << argv[1] << std::endl;
+		return 1;
+	}
+	std::string ConfigFileStr;
+	std::getline(input_file, ConfigFileStr, '\0');
+	
+	while (ConfigFileStr.find("server {") != std::string::npos)
+	{
+		server_configuration* myserver = new server_configuration(ConfigFileStr);
+		servers.push_back(myserver);
+		size_t pos1 = ConfigFileStr.find("server {");
+		if (pos1 != std::string::npos)
 		{
-			server_configuration* myserver = new server_configuration(ConfigFileStr);
-			servers.push_back(myserver);
-			size_t pos1 = ConfigFileStr.find("server {");
-			if (pos1 != std::string::npos)
-			{
-				size_t pos2 = ConfigFileStr.find("server {", pos1 + 1);
-				if (pos2 != std::string::npos)
-					ConfigFileStr = ConfigFileStr.substr(pos2);
-				else
-					ConfigFileStr = ConfigFileStr.substr(ConfigFileStr.size());
-				if (DEBUG)
-					std::cout << " main " << ConfigFileStr << std::endl;
-			}
-		}
-		server_configuration ServerConfig(argv[1]);
-		for (size_t i = 0; i < servers.size(); i++)
-		{
-			server_configuration* server = servers[i];
-			std::cout << "Server " << i << ":" << std::endl;
-			std::cout << *server << std::endl;
-		}
-		
-		// ANOTHER WAY OF DOING IT USING ITERATOR
-
-		// for (std::vector<server_configuration*>::iterator it = servers.begin(); it != servers.end(); ++it)
-		// {
-		//     server_configuration* server = *it;
-		//     // std::cout << "Server " << std::distance(servers.begin(), it) << ":" << std::endl;
-		//     std::cout << *server << std::endl;
-		// }
-		for (size_t i = 0; i < servers.size(); i++)
-		{
-			delete servers[i];
+			size_t pos2 = ConfigFileStr.find("server {", pos1 + 1);
+			if (pos2 != std::string::npos)
+				ConfigFileStr = ConfigFileStr.substr(pos2);
+			else
+				ConfigFileStr = ConfigFileStr.substr(ConfigFileStr.size());
+			if (DEBUG)
+				std::cout << " main " << ConfigFileStr << std::endl;
 		}
 	}
-	else
+	server_configuration ServerConfig(argv[1]);
+	
+	for (size_t i = 0; i < servers.size(); i++)
 	{
-		std::cout << " Wrong number of arguments" << std::endl;
+		server_configuration* server = servers[i];
+		std::cout << "Server " << i << ":" << std::endl;
+		std::cout << *server << std::endl;
 	}
-
-
+	
+	// ANOTHER WAY OF DOING IT USING ITERATOR
+	// for (std::vector<server_configuration*>::iterator it = servers.begin(); it != servers.end(); ++it)
+	// {
+	//     server_configuration* server = *it;
+	//     // std::cout << "Server " << std::distance(servers.begin(), it) << ":" << std::endl;
+	//     std::cout << *server << std::endl;
+	// }
+	for (size_t i = 0; i < servers.size(); i++)
+	{
+		delete servers[i];
+	}
 	return 0;
 	
 }
