@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:03:12 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/17 13:47:15 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/03/17 14:52:34 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,6 @@ class server_configuration
 	std::string _ConfigFile;
 	std::string _ServerName;
 	std::string	_Root;
-	int			_NumberOfPorts;
 	int			_Port;
 	
 	public:
@@ -39,7 +38,6 @@ class server_configuration
 	server_configuration &operator=(server_configuration const &obj);
 
 	std::string findServerName();
-	int findNumberOfPorts(std::string &str);
 	int findPort();
 	std::string convertConfigFile(std::string ConfigFile);
 	std::string findRoot();
