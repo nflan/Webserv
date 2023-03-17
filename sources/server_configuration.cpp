@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:06:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/17 14:55:49 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/03/17 15:51:18 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,9 +25,12 @@ _ServerName(findServerName()),
 _Root(findRoot()),
 _Port(findPort())
 {
-	std::cout << "server_configuration Overload Constructor called" << std::endl;
-	std::cout << "server_configuration::server_configuration(std::string ConfigFile)\n" << ConfigFile << std::endl;
-	std::cout << "Server name " << this->_ServerName << std::endl;
+	if (DEBUG)
+	{
+		std::cout << "server_configuration Overload Constructor called" << std::endl;
+		std::cout << "server_configuration::server_configuration(std::string ConfigFile)\n" << ConfigFile << std::endl;
+		std::cout << "Server name " << this->_ServerName << std::endl;
+	}
 }
 
 server_configuration::server_configuration(server_configuration const &obj)
