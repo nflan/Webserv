@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 15:39:03 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/17 15:23:18 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/03/17 15:29:56 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -190,20 +190,16 @@ int	start_server(int new_socket)
 	}	
 }
 
-int main(int argc, char const **argv)
+std::vector<server_configuration*> SetupServers(std::string filename)
 {
-	if (argc != 2)
-	{
-		std::cout << "Wrong number of arguments" << std::endl;
-		return -1;
+	std::ifstream input_file(filename.c_str());
+
+	if (!input_file.is_open()) {
+		std::cout << "Failed to open file " << filename << std::endl;
+		exit (-1) ;
 	}
 	
-	std::ifstream input_file(argv[1]);
-	std::vector<server_configuration*> servers; // = setupserver
-	if (!input_file.is_open()) {
-		std::cout << "Failed to open file " << argv[1] << std::endl;
-		return 1;
-	}
+	std::vector<server_configuration*> servers;
 	std::string ConfigFileStr;
 	std::getline(input_file, ConfigFileStr, '\0');
 	
@@ -223,8 +219,11 @@ int main(int argc, char const **argv)
 				std::cout << " main " << ConfigFileStr << std::endl;
 		}
 	}
-	server_configuration ServerConfig(argv[1]);
-	
+	return (servers);
+}
+
+void PrintServer(std::vector<server_configuration*> servers)
+{
 	for (size_t i = 0; i < servers.size(); i++)
 	{
 		server_configuration* server = servers[i];
@@ -239,10 +238,28 @@ int main(int argc, char const **argv)
 	//     // std::cout << "Server " << std::distance(servers.begin(), it) << ":" << std::endl;
 	//     std::cout << *server << std::endl;
 	// }
+}
+
+void DeleteServers(std::vector<server_configuration*> servers)
+{
 	for (size_t i = 0; i < servers.size(); i++)
 	{
 		delete servers[i];
 	}
+}
+
+int main(int argc, char const **argv)
+{
+	if (argc != 2)
+	{
+		std::cout << "Wrong number of arguments" << std::endl;
+		return -1;
+	}
+	
+	std::vector<server_configuration*> servers = SetupServers(argv[1]);
+	PrintServer(servers);
+	DeleteServers(servers);
+
 	return 0;
 	
 }
