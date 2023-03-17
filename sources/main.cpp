@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 15:39:03 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/17 15:29:56 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/03/17 15:31:22 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -190,7 +190,7 @@ int	start_server(int new_socket)
 	}	
 }
 
-std::vector<server_configuration*> SetupServers(std::string filename)
+std::vector<server_configuration*> SetupNewServers(std::string filename)
 {
 	std::ifstream input_file(filename.c_str());
 
@@ -255,8 +255,7 @@ int main(int argc, char const **argv)
 		std::cout << "Wrong number of arguments" << std::endl;
 		return -1;
 	}
-	
-	std::vector<server_configuration*> servers = SetupServers(argv[1]);
+	std::vector<server_configuration*> servers = SetupNewServers(argv[1]);
 	PrintServer(servers);
 	DeleteServers(servers);
 
