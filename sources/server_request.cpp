@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 14:31:36 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/20 16:53:13 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/03/20 17:16:29 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,6 @@ _ServerRequest(ServerRequest),
 _Method(findMethod()),
 _PathToFile(findPathToFile())
 {
-	std::cout << *this << std::endl;
 }
 
 
@@ -48,10 +47,7 @@ std::string server_request::findMethod()
 	size_t pos = _ServerRequest.find(" ");
 	if (pos == std::string::npos)
 		return ("");
-	std::string tmp = _ServerRequest.substr(0, pos);
-	std::cout << "Before :" << _ServerRequest << std::endl;
-	_ServerRequest.erase(0, pos + 1);
-	std::cout << "After :" << _ServerRequest << std::endl;
+	std::string tmp = _ServerRequest.substr(0, pos);	_ServerRequest.erase(0, pos + 1);
 	return (tmp);
 }
 
@@ -80,8 +76,7 @@ std::string server_request::getPathToFile() const
 
 std::ostream& operator <<(std::ostream &out, server_request &ServRequest)
 {
-	out << "ServRequest :" << ServRequest.getServerRequest() \
-		<< "Method : " << ServRequest.getMethod() \
+	out << "Method : " << ServRequest.getMethod() \
 		<< "\nPathToFile : " << ServRequest.getPathToFile();
 	return (out);
 }

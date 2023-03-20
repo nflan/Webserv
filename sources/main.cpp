@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 15:39:03 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/20 16:40:45 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/03/20 17:15:27 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,6 @@ int setnonblocking(int sockfd) {
 void handle_connection(int conn_sock) {
 	char buffer[1024];
 	int n = read(conn_sock, buffer, 1024);
-	std::cout << "n : " << n << std::endl;
 	if (n <= 0) {
 		// close(conn_sock);
 		return;
@@ -63,9 +62,7 @@ void handle_connection(int conn_sock) {
 	}
 	server_request* ServerRequest = new server_request(request);
 	std::string answer = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
-	// std::cout << "buffer :" << request << std::endl;
-	std::cout << "XOXOXO\n" << *ServerRequest << std::endl;
-	// printf("Received %d bytes: %.*s\n", n, n, buffer);
+	std::cout << *ServerRequest << std::endl;
 	write(conn_sock, answer.c_str() , strlen(answer.c_str()));
 }
 
@@ -78,20 +75,17 @@ int StartServer(std::vector<server_configuration*> servers, int tablen)
 	
 	for (int i = 0; i < tablen; i++)
 	{
-		std::cout << "Test 1 " << i << std::endl;
 		addrlen[i] = sizeof(addr[i]);
 		listen_sock[i] = socket(AF_INET, SOCK_STREAM, 0);
 		if (listen_sock[i] == -1) {
 			perror("socket");
 			exit(EXIT_FAILURE);
 		}
-		std::cout << "port [i]" << servers[i]->getPort() << std::endl;
 		memset(&addr[i], 0, sizeof(addr[i]));
 		addr[i].sin_family = AF_INET;
 		addr[i].sin_addr.s_addr = INADDR_ANY;
 		addr[i].sin_port = htons(servers[i]->getPort());
 
-		std::cout << "listen_sock[i]" << listen_sock[i] << std::endl;
 		if (bind(listen_sock[i], (struct sockaddr *) &addr[i], addrlen[i]) == -1) {
 			perror("bind");
 			exit(EXIT_FAILURE);
@@ -114,8 +108,6 @@ int StartServer(std::vector<server_configuration*> servers, int tablen)
 
 	for (int i = 0; i < tablen; i++)
 	{
-		std::cout << "Test 2 " << i << std::endl;
-		std::cout << "listen_sock[i]" << listen_sock[i] << std::endl;
 		ev.events = EPOLLIN;
 		ev.data.fd = listen_sock[i];
 		if (epoll_ctl(epollfd, EPOLL_CTL_ADD, listen_sock[i], &ev) == -1) 
@@ -126,21 +118,16 @@ int StartServer(std::vector<server_configuration*> servers, int tablen)
 	}
 
 	for (;;) {
-		std::cout << "c0\n" ;
 		nfds = epoll_wait(epollfd, events, MAX_EVENTS, -1);
 		if (nfds == -1) {
 			perror("epoll_wait");
 			exit(EXIT_FAILURE);
 		}
-		std::cout << "nfds " << nfds << std::endl;
 		for (int n = 0; n < nfds; ++n) {
 			for (int i = 0; i < tablen; i++)
 			{
-				std::cout << "events[i].data.fd " << events[n].data.fd << " listen_sock[0] " << listen_sock[0] \
-				<< "\nlisten_sock[1] " << listen_sock[1] << " listen_sock[i] " << listen_sock[i] << std::endl;
 				if (events[n].data.fd == listen_sock[i])
 				{
-					std::cout << "c2\n";
 					conn_sock = accept(listen_sock[i], (struct sockaddr *) &addr[i], &addrlen[i]);
 					if (conn_sock == -1) {
 						perror("accept");
@@ -157,10 +144,8 @@ int StartServer(std::vector<server_configuration*> servers, int tablen)
 						exit(EXIT_FAILURE);
 					}
 				} else {
-					std::cout << "d1\n";
 					handle_connection(events[n].data.fd);
 				}
-				std::cout << "c3\n";
 			}
 		}
 	}
@@ -234,7 +219,7 @@ int main(int argc, char const **argv)
 		return -1;
 	}
 	std::vector<server_configuration*> servers = SetupNewServers(argv[1]);
-	PrintServer(servers);
+	// PrintServer(servers);
 	StartServer(servers, servers.size());
 	DeleteServers(servers);
 	return 0;
