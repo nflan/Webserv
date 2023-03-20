@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 15:39:03 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/17 16:48:29 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/03/20 13:13:44 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,100 +18,141 @@
 #include <string.h>
 #include <iostream>
 #include <string>
-#include <unistd.h>    // for close(), read()
-#include <sys/epoll.h> // for epoll_create1(), epoll_ctl(), struct epoll_event
-#include <string.h>    // for strncmp
+#include <sys/epoll.h>
 #include <iostream>
 #include <vector>
 #include <iterator>
-
-#define MAX_EVENTS 5
-#define READ_SIZE 1000
-#define PORT 8085
-
+#include <arpa/inet.h>
+#include <fcntl.h>
 #include "server_configuration.hpp"
 
-int getServerFd(server_configuration *server)
-{
-	(void)server;
+#define READ_SIZE 1000
+#define MAX_EVENTS 10
+#define PORT 8080
 
-	int		new_socket;
-	struct sockaddr_in address;
-	int addrlen = sizeof(address);
-
-	int server_fd;
-	if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
-	{
-		perror("In socket");
-		exit(EXIT_FAILURE);
-	}
-
-	address.sin_family = AF_INET;
-
-	address.sin_addr.s_addr = INADDR_ANY;
-	std::cout << "server.getPort " << server->getPort() << std::endl;
-	address.sin_port = htons( server->getPort() );
-	memset(address.sin_zero, '\0', sizeof address.sin_zero);
-
-
-	if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0)
-	{
-		perror("In bind");
-		exit(EXIT_FAILURE);
-	}
-
-	if (listen(server_fd, 2) < 0)
-	{
-		perror("In listen");
-		exit(EXIT_FAILURE);
-	}
-
-	std::cout << "Waiting for acception" << std::endl;
-	if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0)
-	{
-		perror("In accept");
-		exit(EXIT_FAILURE);
-	}
-	return (new_socket);
+int setnonblocking(int sockfd) {
+    int flags;
+    flags = fcntl(sockfd, F_GETFL, 0);
+    if (flags == -1) {
+        return -1;
+    }
+    flags |= SOCK_NONBLOCK;
+    if (fcntl(sockfd, F_SETFL, flags) == -1) {
+        return -1;
+    }
+    return 0;
 }
 
-int	start_server(int new_socket)
-{
-
+void handle_connection(int conn_sock) {
+    char buffer[1024];
+    int n = read(conn_sock, buffer, 1024);
+    if (n <= 0) {
+        // close(conn_sock);
+        return;
+    }
 	std::string answer = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
-	char read_buffer[READ_SIZE + 1];
-	struct epoll_event events[MAX_EVENTS];
-	int epoll_fd = epoll_create1(0);
-	if (epoll_fd == -1) {
-		fprintf(stderr, "Failed to create epoll file descriptor\n");
-		return 1;
-	}
-	
-	int i = 0;
-	events[i].events = EPOLLIN; 
-	events[i].data.fd = new_socket;
-	if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, new_socket, &events[i])) {
-		fprintf(stderr, "Failed to add file descriptor to epoll\n");
-		close(epoll_fd);
-		return 1;
-	}
-	int event_count = 0;
-	while (1) {
-		std::cout << "Waiting for new request" << std::endl;
-		event_count = epoll_wait(epoll_fd, events, MAX_EVENTS, 30000);
-		std::cout << "Polling for input..." << event_count << std::endl;
-		std::cout << event_count << " ready_event" << std::endl;
-		std::cout << "Reading file descriptor " << events[i].data.fd << std::endl;
-		int bytes_read = read(events[i].data.fd, read_buffer, READ_SIZE);
-		read_buffer[bytes_read] = '\0';
-		std::cout << read_buffer << std::endl;
-		write(new_socket , answer.c_str() , strlen(answer.c_str()));
-		}
-	if (close(epoll_fd)) {
-		fprintf(stderr, "Failed to close epoll file descriptor\n");
-		return 1;
-	}	
+    printf("Received %d bytes: %.*s\n", n, n, buffer);
+    write(conn_sock, answer.c_str() , strlen(answer.c_str()));
 }
+
+int StartServer(std::vector<server_configuration*> servers, int tablen) {
+    struct sockaddr_in addr[tablen];
+    socklen_t addrlen[tablen];
+    int conn_sock, nfds, epollfd;
+	int listen_sock[tablen];
+	
+	for (int i = 0; i < tablen; i++)
+	{
+		std::cout << "Test 1 " << i << std::endl;
+		addrlen[i] = sizeof(addr[i]);
+		listen_sock[i] = socket(AF_INET, SOCK_STREAM, 0);
+    	if (listen_sock[i] == -1) {
+        	perror("socket");
+        	exit(EXIT_FAILURE);
+    	}
+		std::cout << "port [i]" << servers[i]->getPort() << std::endl;
+    	memset(&addr[i], 0, sizeof(addr[i]));
+    	addr[i].sin_family = AF_INET;
+    	addr[i].sin_addr.s_addr = INADDR_ANY;
+    	addr[i].sin_port = htons(servers[i]->getPort());
+
+		std::cout << "listen_sock[i]" << listen_sock[i] << std::endl;
+    	if (bind(listen_sock[i], (struct sockaddr *) &addr[i], addrlen[i]) == -1) {
+    	    perror("bind");
+    	    exit(EXIT_FAILURE);
+    	}
+	
+    	if (listen(listen_sock[i], SOMAXCONN) == -1) {
+    	    perror("listen");
+    	    exit(EXIT_FAILURE);
+    	}
+	}
+
+    epollfd = epoll_create1(0);
+    if (epollfd == -1) {
+        perror("epoll_create1");
+        exit(EXIT_FAILURE);
+    }
+
+
+    struct epoll_event ev, events[MAX_EVENTS];
+
+	for (int i = 0; i < tablen; i++)
+	{
+		std::cout << "Test 2 " << i << std::endl;
+		std::cout << "listen_sock[i]" << listen_sock[i] << std::endl;
+		ev.events = EPOLLIN;
+		ev.data.fd = listen_sock[i];
+		if (epoll_ctl(epollfd, EPOLL_CTL_ADD, listen_sock[i], &ev) == -1) 
+		{
+			perror("epoll_ctl: listen_sock");
+			exit(EXIT_FAILURE);	
+		}
+	}
+
+    for (;;) {
+		std::cout << "c0\n" ;
+        nfds = epoll_wait(epollfd, events, MAX_EVENTS, -1);
+        if (nfds == -1) {
+            perror("epoll_wait");
+            exit(EXIT_FAILURE);
+        }
+		std::cout << "nfds " << nfds << std::endl;
+        for (int n = 0; n < nfds; ++n) {
+			for (int i = 0; i < tablen; i++)
+			{
+				std::cout << "events[i].data.fd " << events[n].data.fd << " listen_sock[0] " << listen_sock[0] \
+				<< "\nlisten_sock[1] " << listen_sock[1] << " listen_sock[i] " << listen_sock[i] << std::endl;
+            	if (events[n].data.fd == listen_sock[i])
+				{
+					std::cout << "c2\n";
+            	    conn_sock = accept(listen_sock[i], (struct sockaddr *) &addr[i], &addrlen[i]);
+            	    if (conn_sock == -1) {
+            	        perror("accept");
+            	        exit(EXIT_FAILURE);
+            	    }
+            	    if (setnonblocking(conn_sock) == -1) {
+            	        perror("setnonblocking");
+            	        exit(EXIT_FAILURE);
+            	    }
+            	    ev.events = EPOLLIN | EPOLLET;
+            	    ev.data.fd = conn_sock;
+            	    if (epoll_ctl(epollfd, EPOLL_CTL_ADD, conn_sock,
+            	                    &ev) == -1) {
+            	        perror("epoll_ctl: conn_sock");
+            	        exit(EXIT_FAILURE);
+            	    }
+            	} else {
+					std::cout << "d1\n";
+            	    handle_connection(events[n].data.fd);
+            	}
+				std::cout << "c3\n";
+			}
+        }
+    }
+    return 0;
+}
+
 
 std::vector<server_configuration*> SetupNewServers(std::string filename)
 {
@@ -179,14 +220,8 @@ int main(int argc, char const **argv)
 		return -1;
 	}
 	std::vector<server_configuration*> servers = SetupNewServers(argv[1]);
-	// PrintServer(servers);
-	int newsocket[servers.size()];
-	int i = 0;
-	std::cout << "server " << servers[i]->getPort() << std::endl;
-	std::cout << "server2 " << *servers[i] << std::endl;
-	newsocket[i] = getServerFd(servers[i]); // a finir
-	std::cout << "newsocket" << newsocket[i] << std::endl; //4
-	start_server(newsocket[0]);
+	PrintServer(servers);
+	StartServer(servers, servers.size());
 	DeleteServers(servers);
 	return 0;
 }
