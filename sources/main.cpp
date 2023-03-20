@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 15:39:03 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/20 13:13:44 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/03/20 16:40:45 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,41 +24,56 @@
 #include <iterator>
 #include <arpa/inet.h>
 #include <fcntl.h>
+
 #include "server_configuration.hpp"
+#include "server_request.hpp"
 
 #define READ_SIZE 1000
 #define MAX_EVENTS 10
-#define PORT 8080
 
 int setnonblocking(int sockfd) {
-    int flags;
-    flags = fcntl(sockfd, F_GETFL, 0);
-    if (flags == -1) {
-        return -1;
-    }
-    flags |= SOCK_NONBLOCK;
-    if (fcntl(sockfd, F_SETFL, flags) == -1) {
-        return -1;
-    }
-    return 0;
+	int flags;
+	flags = fcntl(sockfd, F_GETFL, 0);
+	if (flags == -1) {
+		return -1;
+	}
+	flags |= SOCK_NONBLOCK;
+	if (fcntl(sockfd, F_SETFL, flags) == -1) {
+		return -1;
+	}
+	return 0;
 }
 
 void handle_connection(int conn_sock) {
-    char buffer[1024];
-    int n = read(conn_sock, buffer, 1024);
-    if (n <= 0) {
-        // close(conn_sock);
-        return;
-    }
+	char buffer[1024];
+	int n = read(conn_sock, buffer, 1024);
+	std::cout << "n : " << n << std::endl;
+	if (n <= 0) {
+		// close(conn_sock);
+		return;
+	}
+	std::string request;
+	request.append(buffer);
+	while (n > 0)
+	{
+		n = read(conn_sock, buffer, 1024);
+		if (n > 0)
+			request.append(buffer);
+
+	}
+	server_request* ServerRequest = new server_request(request);
 	std::string answer = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
-    printf("Received %d bytes: %.*s\n", n, n, buffer);
-    write(conn_sock, answer.c_str() , strlen(answer.c_str()));
+	// std::cout << "buffer :" << request << std::endl;
+	std::cout << "XOXOXO\n" << *ServerRequest << std::endl;
+	// printf("Received %d bytes: %.*s\n", n, n, buffer);
+	write(conn_sock, answer.c_str() , strlen(answer.c_str()));
 }
 
-int StartServer(std::vector<server_configuration*> servers, int tablen) {
-    struct sockaddr_in addr[tablen];
-    socklen_t addrlen[tablen];
-    int conn_sock, nfds, epollfd;
+int StartServer(std::vector<server_configuration*> servers, int tablen)
+{
+	struct sockaddr_in addr[tablen];
+	socklen_t addrlen[tablen];
+	int conn_sock, nfds, epollfd;
 	int listen_sock[tablen];
 	
 	for (int i = 0; i < tablen; i++)
@@ -66,36 +81,36 @@ int StartServer(std::vector<server_configuration*> servers, int tablen) {
 		std::cout << "Test 1 " << i << std::endl;
 		addrlen[i] = sizeof(addr[i]);
 		listen_sock[i] = socket(AF_INET, SOCK_STREAM, 0);
-    	if (listen_sock[i] == -1) {
-        	perror("socket");
-        	exit(EXIT_FAILURE);
-    	}
+		if (listen_sock[i] == -1) {
+			perror("socket");
+			exit(EXIT_FAILURE);
+		}
 		std::cout << "port [i]" << servers[i]->getPort() << std::endl;
-    	memset(&addr[i], 0, sizeof(addr[i]));
-    	addr[i].sin_family = AF_INET;
-    	addr[i].sin_addr.s_addr = INADDR_ANY;
-    	addr[i].sin_port = htons(servers[i]->getPort());
+		memset(&addr[i], 0, sizeof(addr[i]));
+		addr[i].sin_family = AF_INET;
+		addr[i].sin_addr.s_addr = INADDR_ANY;
+		addr[i].sin_port = htons(servers[i]->getPort());
 
 		std::cout << "listen_sock[i]" << listen_sock[i] << std::endl;
-    	if (bind(listen_sock[i], (struct sockaddr *) &addr[i], addrlen[i]) == -1) {
-    	    perror("bind");
-    	    exit(EXIT_FAILURE);
-    	}
+		if (bind(listen_sock[i], (struct sockaddr *) &addr[i], addrlen[i]) == -1) {
+			perror("bind");
+			exit(EXIT_FAILURE);
+		}
 	
-    	if (listen(listen_sock[i], SOMAXCONN) == -1) {
-    	    perror("listen");
-    	    exit(EXIT_FAILURE);
-    	}
+		if (listen(listen_sock[i], SOMAXCONN) == -1) {
+			perror("listen");
+			exit(EXIT_FAILURE);
+		}
 	}
 
-    epollfd = epoll_create1(0);
-    if (epollfd == -1) {
-        perror("epoll_create1");
-        exit(EXIT_FAILURE);
-    }
+	epollfd = epoll_create1(0);
+	if (epollfd == -1) {
+		perror("epoll_create1");
+		exit(EXIT_FAILURE);
+	}
 
 
-    struct epoll_event ev, events[MAX_EVENTS];
+	struct epoll_event ev, events[MAX_EVENTS];
 
 	for (int i = 0; i < tablen; i++)
 	{
@@ -110,47 +125,46 @@ int StartServer(std::vector<server_configuration*> servers, int tablen) {
 		}
 	}
 
-    for (;;) {
+	for (;;) {
 		std::cout << "c0\n" ;
-        nfds = epoll_wait(epollfd, events, MAX_EVENTS, -1);
-        if (nfds == -1) {
-            perror("epoll_wait");
-            exit(EXIT_FAILURE);
-        }
+		nfds = epoll_wait(epollfd, events, MAX_EVENTS, -1);
+		if (nfds == -1) {
+			perror("epoll_wait");
+			exit(EXIT_FAILURE);
+		}
 		std::cout << "nfds " << nfds << std::endl;
-        for (int n = 0; n < nfds; ++n) {
+		for (int n = 0; n < nfds; ++n) {
 			for (int i = 0; i < tablen; i++)
 			{
 				std::cout << "events[i].data.fd " << events[n].data.fd << " listen_sock[0] " << listen_sock[0] \
 				<< "\nlisten_sock[1] " << listen_sock[1] << " listen_sock[i] " << listen_sock[i] << std::endl;
-            	if (events[n].data.fd == listen_sock[i])
+				if (events[n].data.fd == listen_sock[i])
 				{
 					std::cout << "c2\n";
-            	    conn_sock = accept(listen_sock[i], (struct sockaddr *) &addr[i], &addrlen[i]);
-            	    if (conn_sock == -1) {
-            	        perror("accept");
-            	        exit(EXIT_FAILURE);
-            	    }
-            	    if (setnonblocking(conn_sock) == -1) {
-            	        perror("setnonblocking");
-            	        exit(EXIT_FAILURE);
-            	    }
-            	    ev.events = EPOLLIN | EPOLLET;
-            	    ev.data.fd = conn_sock;
-            	    if (epoll_ctl(epollfd, EPOLL_CTL_ADD, conn_sock,
-            	                    &ev) == -1) {
-            	        perror("epoll_ctl: conn_sock");
-            	        exit(EXIT_FAILURE);
-            	    }
-            	} else {
+					conn_sock = accept(listen_sock[i], (struct sockaddr *) &addr[i], &addrlen[i]);
+					if (conn_sock == -1) {
+						perror("accept");
+						exit(EXIT_FAILURE);
+					}
+					if (setnonblocking(conn_sock) == -1) {
+						perror("setnonblocking");
+						exit(EXIT_FAILURE);
+					}
+					ev.events = EPOLLIN | EPOLLET;
+					ev.data.fd = conn_sock;
+					if (epoll_ctl(epollfd, EPOLL_CTL_ADD, conn_sock, &ev) == -1) {
+						perror("epoll_ctl: conn_sock");
+						exit(EXIT_FAILURE);
+					}
+				} else {
 					std::cout << "d1\n";
-            	    handle_connection(events[n].data.fd);
-            	}
+					handle_connection(events[n].data.fd);
+				}
 				std::cout << "c3\n";
 			}
-        }
-    }
-    return 0;
+		}
+	}
+	return 0;
 }
 
 

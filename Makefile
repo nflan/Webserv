@@ -33,7 +33,7 @@ MAGENTA = \033[0;35m
 CYAN = \033[0;36m
 NC = \033[0m
 
-SRCS =	main.cpp server_configuration.cpp \
+SRCS =	main.cpp server_configuration.cpp server_request.cpp \
 
 SOFT_NAME := webserv
 OBJS = $(SRCS:%.cpp=%.o)
