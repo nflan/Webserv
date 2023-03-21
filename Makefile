@@ -6,11 +6,11 @@
 #    By: chillion <chillion@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/09/01 12:07:22 by chillion          #+#    #+#              #
-#    Updated: 2023/03/16 11:44:58 by chillion         ###   ########.fr        #
+#    Updated: 2023/03/16 12:53:50 by chillion         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-.PHONY : all clean fclean re test
+.PHONY : all clean fclean re test client
 
 CXX := c++
 CXXFLAGS := -std=c++98 -Wall -Wextra -Werror -MMD -MP -Isources/
@@ -31,7 +31,11 @@ MAGENTA = \033[0;35m
 CYAN = \033[0;36m
 NC = \033[0m
 
-SRCS =	main.cpp	\
+SRCS =	epollsrv.cpp	\
+
+CLIENT = client.cpp	\
+
+CLIENT_NAME := client
 
 SOFT_NAME := webserv
 OBJS = $(SRCS:%.cpp=%.o)
@@ -57,6 +61,9 @@ ${SOFT_NAME} : ${OBJ}
 	@echo "${NC}"
 
 -include ${DEPS}
+
+client :
+	${CXX} $(SRC_DIR)${CLIENT} ${CXXFLAGS} -o ${CLIENT_NAME}
 
 test : all
 	$(VAL) ./${SOFT_NAME}

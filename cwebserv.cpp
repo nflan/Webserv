@@ -29,13 +29,13 @@ int main()
     addr.sin_port = htons(PORT);// Port d'écoute du serveur 
     if (bind(srv_socket, (sockaddr *)&addr, sizeof(addr)) < 0) // Liaison du socket à l'adresse et au port spécifiés
 	{
-        perror("bind failed");
-        return(1);
+        perror("error: bind failed");
+        return(EXIT_FAILURE);
     }
     if (listen(srv_socket, 3) < 0) // Ecoute sur le port spécifié avec une file d'attente de 3 connexions maximum
 	{
-        perror("In listen");
-        return (1);
+        perror("error: listen failed");
+        return (EXIT_FAILURE);
     }
     int client_socket = 0; // Socket pour les échanges de données entre le client et le serveur 
     socklen_t client_addrlen = 0; // Longueur de l'adresse du client connecté au serveur  
