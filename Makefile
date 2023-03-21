@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: chillion <chillion@student.42.fr>          +#+  +:+       +#+         #
+#    By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/09/01 12:07:22 by chillion          #+#    #+#              #
-#    Updated: 2023/03/16 11:44:58 by chillion         ###   ########.fr        #
+#    Updated: 2023/03/21 13:41:51 by mgruson          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -31,7 +31,7 @@ MAGENTA = \033[0;35m
 CYAN = \033[0;36m
 NC = \033[0m
 
-SRCS =	main.cpp	\
+SRCS =	main.cpp server_configuration.cpp server_request.cpp \
 
 SOFT_NAME := webserv
 OBJS = $(SRCS:%.cpp=%.o)
@@ -72,4 +72,3 @@ fclean : clean
 	@echo "${GREEN}###${NC}Nettoyage OK${GREEN}###${NC}\n"
 
 re : fclean all
-
