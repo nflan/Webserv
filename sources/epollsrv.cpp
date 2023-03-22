@@ -140,6 +140,7 @@ int	start_server(int new_socket)
 			bytes_read = read(events[i].data.fd, read_buffer, READ_SIZE);
 			read_buffer[bytes_read] = '\0';
 			std::cout << read_buffer << std::endl;
+			// parsing Request 
 			send(new_socket , answer.c_str(), answer.size(), 0);
 		}
 	}
@@ -148,6 +149,14 @@ int	start_server(int new_socket)
 		std::fprintf(stderr, "Failed to close epoll file descriptor\n");
 		return 1;
 	}	
+}
+
+
+//Parsing request
+
+int parse_request(char *request)
+{
+	
 }
 
 int main()
