@@ -6,7 +6,7 @@
 #    By: chillion <chillion@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/09/01 12:07:22 by chillion          #+#    #+#              #
-#    Updated: 2023/03/16 12:53:50 by chillion         ###   ########.fr        #
+#    Updated: 2023/03/22 11:34:32 by chillion         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -79,4 +79,3 @@ fclean : clean
 	@echo "${GREEN}###${NC}Nettoyage OK${GREEN}###${NC}\n"
 
 re : fclean all
-

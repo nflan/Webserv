@@ -2,12 +2,16 @@
 	"files.associations": {
 		"span": "cpp",
 		"type_traits": "cpp",
+<<<<<<< HEAD
 		"coroutine": "cpp",
 		"any": "cpp",
+=======
+>>>>>>> 77291470c23c2be32602fde238f8e0d3e40e7b47
 		"array": "cpp",
 		"atomic": "cpp",
 		"bit": "cpp",
 		"*.tcc": "cpp",
+<<<<<<< HEAD
 		"bitset": "cpp",
 		"cctype": "cpp",
 		"cfenv": "cpp",
@@ -23,11 +27,19 @@
 		"condition_variable": "cpp",
 		"csetjmp": "cpp",
 		"csignal": "cpp",
+=======
+		"cctype": "cpp",
+		"clocale": "cpp",
+		"cmath": "cpp",
+		"compare": "cpp",
+		"concepts": "cpp",
+>>>>>>> 77291470c23c2be32602fde238f8e0d3e40e7b47
 		"cstdarg": "cpp",
 		"cstddef": "cpp",
 		"cstdint": "cpp",
 		"cstdio": "cpp",
 		"cstdlib": "cpp",
+<<<<<<< HEAD
 		"cstring": "cpp",
 		"ctime": "cpp",
 		"cuchar": "cpp",
@@ -40,6 +52,12 @@
 		"set": "cpp",
 		"unordered_map": "cpp",
 		"unordered_set": "cpp",
+=======
+		"cwchar": "cpp",
+		"cwctype": "cpp",
+		"deque": "cpp",
+		"unordered_map": "cpp",
+>>>>>>> 77291470c23c2be32602fde238f8e0d3e40e7b47
 		"vector": "cpp",
 		"exception": "cpp",
 		"algorithm": "cpp",
@@ -50,27 +68,38 @@
 		"numeric": "cpp",
 		"optional": "cpp",
 		"random": "cpp",
+<<<<<<< HEAD
 		"ratio": "cpp",
 		"regex": "cpp",
 		"source_location": "cpp",
+=======
+>>>>>>> 77291470c23c2be32602fde238f8e0d3e40e7b47
 		"string": "cpp",
 		"string_view": "cpp",
 		"system_error": "cpp",
 		"tuple": "cpp",
 		"utility": "cpp",
+<<<<<<< HEAD
 		"fstream": "cpp",
 		"future": "cpp",
 		"initializer_list": "cpp",
 		"iomanip": "cpp",
+=======
+		"initializer_list": "cpp",
+>>>>>>> 77291470c23c2be32602fde238f8e0d3e40e7b47
 		"iosfwd": "cpp",
 		"iostream": "cpp",
 		"istream": "cpp",
 		"limits": "cpp",
+<<<<<<< HEAD
 		"mutex": "cpp",
+=======
+>>>>>>> 77291470c23c2be32602fde238f8e0d3e40e7b47
 		"new": "cpp",
 		"numbers": "cpp",
 		"ostream": "cpp",
 		"ranges": "cpp",
+<<<<<<< HEAD
 		"scoped_allocator": "cpp",
 		"shared_mutex": "cpp",
 		"sstream": "cpp",
@@ -110,4 +139,13 @@
 		"titleBar.inactiveForeground": "#15202b99"
 	},
 	"peacock.color": "#dacb86"
+=======
+		"stdexcept": "cpp",
+		"streambuf": "cpp",
+		"typeinfo": "cpp",
+		"fstream": "cpp",
+		"sstream": "cpp",
+		"cstring": "cpp"
+	}
+>>>>>>> 77291470c23c2be32602fde238f8e0d3e40e7b47
 }
