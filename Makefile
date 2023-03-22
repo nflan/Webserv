@@ -6,7 +6,7 @@
 #    By: chillion <chillion@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/09/01 12:07:22 by chillion          #+#    #+#              #
-#    Updated: 2023/03/22 11:34:32 by chillion         ###   ########.fr        #
+#    Updated: 2023/03/22 15:06:31 by chillion         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,7 +19,8 @@ CXXFLAGS += -g3
 SRC_DIR := sources/
 OBJ_DIR := objects/
 RM := rm
-VAL := valgrind --leak-check=full --track-origins=yes
+VAL := valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes
+VAL += --track-fds=yes
 
 BLACK = \033[1;30m
 REDBG = \033[30;41m
@@ -31,17 +32,24 @@ MAGENTA = \033[0;35m
 CYAN = \033[0;36m
 NC = \033[0m
 
-SRCS =	epollsrv.cpp	\
+SRCS =	main.cpp server_configuration.cpp server_request.cpp \
+
+SRCS2 =	epollsrv.cpp	\
 
 CLIENT = client.cpp	\
 
 CLIENT_NAME := client
 
 SOFT_NAME := webserv
+SOFT_NAME2 := webserv2
 OBJS = $(SRCS:%.cpp=%.o)
+OBJS2 = $(SRCS2:%.cpp=%.o)
 SRC = $(addprefix $(SRC_DIR),$(SRCS))
+SRC2 = $(addprefix $(SRC_DIR),$(SRCS2))
 OBJ = $(addprefix $(OBJ_DIR),$(OBJS))
+OBJ2 = $(addprefix $(OBJ_DIR),$(OBJS2))
 DEPS = $(OBJ:%.o=%.d)
+DEPS2 = $(OBJ2:%.o=%.d)
 OBJF := ${OBJ_DIR}.cache_exists
 
 all : ${SOFT_NAME}
@@ -60,13 +68,23 @@ ${SOFT_NAME} : ${OBJ}
 	${CXX} ${OBJ} ${CXXFLAGS} -o ${SOFT_NAME}
 	@echo "${NC}"
 
--include ${DEPS}
+-include ${DEPS} ${DEPS2}
+
+tmp : ${SOFT_NAME2}
+
+${SOFT_NAME2} : ${OBJ2}
+	@echo "${BLUE}###${NC}Creation du fichier ${SOFT_NAME2}${BLUE}###${ORANGE}"
+	${CXX} ${OBJ2} ${CXXFLAGS} -o ${SOFT_NAME2}
+	@echo "${NC}"
 
 client :
 	${CXX} $(SRC_DIR)${CLIENT} ${CXXFLAGS} -o ${CLIENT_NAME}
 
 test : all
-	$(VAL) ./${SOFT_NAME}
+	$(VAL) ./${SOFT_NAME} sources/server.conf
+
+test2 : all
+	$(VAL) ./${SOFT_NAME2}
 
 clean : 
 	@echo "${RED}###${NC}Nettoyage des fichiers .o${RED}###"
@@ -75,7 +93,7 @@ clean :
 
 fclean : clean
 	@echo "${RED}###${NC}Nettoyage d'archives et de Softs${RED}###"
-	${RM} -f ${SOFT_NAME}
+	${RM} -f ${SOFT_NAME} ${SOFT_NAME2}
 	@echo "${GREEN}###${NC}Nettoyage OK${GREEN}###${NC}\n"
 
 re : fclean all
