@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 14:29:37 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/20 16:33:48 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/03/23 15:30:32 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,14 +14,23 @@
 #define SERVER_REQUEST_HPP
 
 #include <iostream>
+#include <string>
+#include <cstring>
+#include <fstream>
+#include <sstream>
+#include <algorithm>
+
+#define DEBUG 0
 
 class server_request
 {
 	private:
 	std::string _ServerRequest;
 	std::string _Method;
-	std::string _RequestURI;
 	std::string _PathToFile;
+	std::string _Host;
+	std::string _ContentType;
+	unsigned int _ContentLength;
 	server_request();
 
 	public:
@@ -32,9 +41,13 @@ class server_request
 	
 	std::string findPathToFile();
 	std::string findMethod();
+	std::string findContentType();
+	unsigned int findContentLength();
 	std::string getServerRequest() const;
 	std::string getMethod() const;
 	std::string getPathToFile() const;
+	std::string getContentType() const;
+	unsigned int getContentLength() const;
 };
 
 std::ostream& operator <<(std::ostream &out, server_request &ServRequest);
