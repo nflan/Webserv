@@ -6,59 +6,78 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/22 12:30:55 by chillion         ###   ########.fr       */
+/*   Updated: 2023/03/23 15:41:13 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERVER_RESPONSE_HPP
 #define SERVER_RESPONSE_HPP
 
+#include <stdio.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <netinet/in.h>
+#include <string.h>
+#include <iostream>
+#include <string>
+#include <sys/epoll.h>
+#include <iostream>
+#include <vector>
+#include <iterator>
+#include <arpa/inet.h>
+#include <fcntl.h>
+#include <csignal>
+
 #include <iostream>
 #include <string>
 #include <sstream>
+#include "server_request.hpp"
+
+class server_request;
 
 class server_response
 {
 	private:
-	std::string	_ServerResponse;
-	std::string	_body;
 	int			_status_code;
+	std::string	_body;
+	std::string	_ServerResponse;
 	
 	public:
 	server_response();
-	server_response(const std::string& body, int status_code);
 	server_response(server_response const &obj);
 	~server_response();
 	server_response &operator=(server_response const &obj);
 
-  // Définition de la méthode pour générer une réponse GET
-	void generate_get_response(const std::string& request_uri) {
-		// Code ici pour traiter la requête GET
-	}
+	void	todo(const server_request& Server_Request, int conn_sock, std::string Root);
+//   // Définition de la méthode pour générer une réponse GET
+// 	void generate_get_response(const std::string& request_uri) {
+// 		// Code ici pour traiter la requête GET
+// 	}
 
-	// Définition de la méthode pour générer une réponse POST
-	void generate_post_response(const std::string& request_uri, const std::string& data) {
-		// Code ici pour traiter la requête POST
-	}
+	// // Définition de la méthode pour générer une réponse POST
+	// void generate_post_response(const std::string& request_uri, const std::string& data) {
+	// 	// Code ici pour traiter la requête POST
+	// }
 
-	// Définition de la méthode pour générer une réponse DELETE
-	void generate_delete_response(const std::string& request_uri) {
-		// Code ici pour traiter la requête DELETE
-	}
-
-	// Définition de la méthode pour obtenir la réponse _ServerResponse
-	std::string get_body() const { return _body; }
+	// // Définition de la méthode pour générer une réponse DELETE
+	// void generate_delete_response(const std::string& request_uri) {
+	// 	// Code ici pour traiter la requête DELETE
+	// }
 
 	// Définition de la méthode pour obtenir le corps de la réponse
 	std::string get_body() const { return _body; }
 
+	// Définition de la méthode pour obtenir la réponse _ServerResponse
+	std::string get_ServerResponse() const { return _ServerResponse; }
+
 	// Définition de la méthode pour obtenir le code d'état de la réponse
 	int get_status_code() const { return _status_code; }
 
-	// Fonction pour envoyer la réponse au client
-    void send_response_to_client(const std::string& response) {
-        // Code ici pour envoyer la réponse au client
-    }
+	// // Fonction pour envoyer la réponse au client
+    // void send_response_to_client(const std::string& response) {
+    //     // Code ici pour envoyer la réponse au client
+    // }
 };
 
 #endif

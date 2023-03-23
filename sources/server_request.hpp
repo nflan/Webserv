@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server_request.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
+/*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 14:29:37 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/20 16:33:48 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/03/23 12:04:42 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,6 @@ class server_request
 	std::string _ServerRequest;
 	std::string _Method;
 	std::string _RequestURI;
-	std::string _PathToFile;
 	server_request();
 
 	public:
@@ -30,11 +29,11 @@ class server_request
 	~server_request();
 	server_request &operator=(server_request const &obj);
 	
-	std::string findPathToFile();
+	std::string findRequestURI();
 	std::string findMethod();
 	std::string getServerRequest() const;
 	std::string getMethod() const;
-	std::string getPathToFile() const;
+	std::string getRequestURI() const;
 };
 
 std::ostream& operator <<(std::ostream &out, server_request &ServRequest);

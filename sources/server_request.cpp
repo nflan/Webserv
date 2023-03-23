@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server_request.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
+/*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 14:31:36 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/20 17:16:29 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/03/23 17:29:38 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,21 +37,21 @@ server_request &server_request::operator=(server_request const &obj)
 server_request::server_request(std::string ServerRequest) :
 _ServerRequest(ServerRequest),
 _Method(findMethod()),
-_PathToFile(findPathToFile())
+_RequestURI(findRequestURI())
 {
 }
-
 
 std::string server_request::findMethod()
 {
 	size_t pos = _ServerRequest.find(" ");
 	if (pos == std::string::npos)
 		return ("");
-	std::string tmp = _ServerRequest.substr(0, pos);	_ServerRequest.erase(0, pos + 1);
+	std::string tmp = _ServerRequest.substr(0, pos);
+	_ServerRequest.erase(0, pos + 1);
 	return (tmp);
 }
 
-std::string server_request::findPathToFile()
+std::string server_request::findRequestURI()
 {
 	size_t pos = _ServerRequest.find(" ");
 	if (pos == std::string::npos)
@@ -69,14 +69,15 @@ std::string server_request::getMethod() const
 {
 	return (_Method);
 }
-std::string server_request::getPathToFile() const
+std::string server_request::getRequestURI() const
 {
-	return (_PathToFile);
+	return (_RequestURI);
 }
 
 std::ostream& operator <<(std::ostream &out, server_request &ServRequest)
 {
 	out << "Method : " << ServRequest.getMethod() \
-		<< "\nPathToFile : " << ServRequest.getPathToFile();
+		<< "\nRequestURI : " << ServRequest.getRequestURI() \
+		<< "\nServerRequest : " << ServRequest.getServerRequest() << "\n";
 	return (out);
 }

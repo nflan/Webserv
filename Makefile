@@ -6,7 +6,7 @@
 #    By: chillion <chillion@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/09/01 12:07:22 by chillion          #+#    #+#              #
-#    Updated: 2023/03/22 15:06:31 by chillion         ###   ########.fr        #
+#    Updated: 2023/03/23 12:55:20 by chillion         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,7 +32,7 @@ MAGENTA = \033[0;35m
 CYAN = \033[0;36m
 NC = \033[0m
 
-SRCS =	main.cpp server_configuration.cpp server_request.cpp \
+SRCS =	main.cpp server_configuration.cpp server_request.cpp server_response.cpp \
 
 SRCS2 =	epollsrv.cpp	\
 
