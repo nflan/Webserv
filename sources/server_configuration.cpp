@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:06:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/28 16:17:33 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/03/28 16:47:28 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,7 +131,8 @@ size_t server_configuration::findClientMaxBodySize()
 			if (DEBUG)
 				std::cout << "server_configuration::findPort() " << port.substr(0, space_pos).c_str() << std::endl;
 			int ClientBodySize = atoi(port.substr(0, space_pos).c_str());
-			std::cout << "DEBUG : " << port.at(space_pos - 1) << std::endl;
+			if (DEBUG)
+				std::cout << "DEBUG : " << port.at(space_pos - 1) << std::endl;
 			if (port.at(space_pos - 1) == 'M')
 				return (ClientBodySize * 1048576);
 			else if (port.at(space_pos - 1) == 'K')

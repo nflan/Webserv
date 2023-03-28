@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 15:39:03 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/28 16:18:00 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/03/28 16:47:45 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,7 @@ void handle_connection(int conn_sock) {
 			request.append(buffer);
 
 	}
+	std::cout << "Request :\n" << request << std::endl;
 	server_request* ServerRequest = new server_request(request);
 	std::string answer = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
 	std::cout << *ServerRequest << std::endl;
@@ -180,7 +181,8 @@ std::vector<server_configuration*> SetupNewServers(std::string filename)
 		size_t pos1 = ConfigFileStr.find("server {");
 		size_t pos2 = ConfigFileStr.find("server {", pos1 + 1);
 		server_configuration* myserver = new server_configuration(ConfigFileStr.substr(pos1, pos2));
-		std::cout << "test\n" << ConfigFileStr.substr(pos1, pos2) << std::endl;
+		if (DEBUG)
+			std::cout << "test\n" << ConfigFileStr.substr(pos1, pos2) << std::endl;
 		servers.push_back(myserver);
 		ConfigFileStr.erase(pos1, pos2);
 	}
@@ -221,7 +223,7 @@ int main(int argc, char const **argv)
 		return -1;
 	}
 	std::vector<server_configuration*> servers = SetupNewServers(argv[1]);
-	PrintServer(servers);
+	// PrintServer(servers);
 	StartServer(servers, servers.size());
 	DeleteServers(servers);
 	return 0;
