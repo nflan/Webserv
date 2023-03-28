@@ -6,7 +6,7 @@
 /*   By: nflan <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/27 15:47:23 by nflan             #+#    #+#             */
-/*   Updated: 2023/03/27 19:13:52 by nflan            ###   ########.fr       */
+/*   Updated: 2023/03/28 15:34:08 by nflan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 #include <sys/wait.h>
 #include <fstream>
 
-Cgi::Cgi(std::string & cgi_path, std::string & file_path, std::vector<std::string> & env)
+Cgi::Cgi(std::string & cgi_path, std::string & file_path, std::vector<std::string> & env, int input_fd)
 {
 	_cmd = new char*[3];
 	_cmd[0] = &(cgi_path[0]);
@@ -27,7 +27,10 @@ Cgi::Cgi(std::string & cgi_path, std::string & file_path, std::vector<std::strin
 	for (std::vector<std::string>::iterator it = env.begin(); it != env.end(); it++, i++)
 		_envp[i] = &((*it)[0]);
 	_envp[env.size()] = NULL;
+	_input_fd = input_fd;
 	_pid = -1;
+	setPdes();
+	setPid();
 }
 
 Cgi::~Cgi()
@@ -86,6 +89,20 @@ void	Cgi::print() const
 		printf("envp = '%s'\n", _envp[i]);
 }
 
+void	Cgi::dupping()
+{
+	if (_input_fd != -1)
+	{
+		if (dup2(_input_fd, STDIN_FILENO) == -1)
+			exit (1);
+		close (_input_fd);
+	}
+//	if (dup2(_pdes[1], STDOUT_FILENO) == -1) // uncom quand good
+//		exit (1);
+	close (_pdes[1]);
+	close (_pdes[0]);
+}
+
 const char *	PipeException::what() const throw()
 {
 	return ("Pipe Error!");
@@ -93,17 +110,28 @@ const char *	PipeException::what() const throw()
 
 const char *	ForkException::what() const throw()
 {
-	return ("Pipe Error!");
+	return ("Fork Error!");
 }
 
 const char *	ExecveException::what() const throw()
 {
-	return ("Pipe Error!");
+	return ("Execve Error!");
+}
+
+void	exeCgi(Cgi & test)
+{
+	int	status;
+	if (test.getPid() == 0)
+	{
+		test.dupping();
+		if (execve((test.getCmd())[0], test.getCmd(), test.getEnvp()))
+			throw ExecveException();
+	}
+	waitpid(test.getPid(), &status, 0);
 }
 
 int	main(int ac, char **av, char **envp)
 {
-	int	status;
 	if (ac != 2)
 		return (1);
 	std::vector<std::string>	env;
@@ -111,23 +139,9 @@ int	main(int ac, char **av, char **envp)
 		env.push_back(envp[i]);
 	std::string a("/usr/bin/php-cgi");
 	std::string cmd(av[1]);
-	std::string	tmp;
-	std::string	tmp2;
+	Cgi	test(a, cmd, env, -1);
 	try {
-		Cgi	test(a, cmd, env);
-		test.setPdes();
-		test.setPid();
-	//	dup2(test.getPdes()[1], STDOUT_FILENO);
-		if (test.getPid() == 0)
-		{
-			if (execve((test.getCmd())[0], test.getCmd(), test.getEnvp()))
-				throw ExecveException();
-		}
-		waitpid(test.getPid(), &status, 0);
-		while (read(test.getPdes()[1], &tmp, 10))
-			tmp2 += tmp;
-		test.closePdes();
-		std::cout << tmp2 << std::endl;
+		exeCgi(test);
 	}
 	catch ( std::exception& e )
 	{
