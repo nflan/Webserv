@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 15:39:03 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/28 12:49:03 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/03/28 16:18:00 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,26 +161,28 @@ std::vector<server_configuration*> SetupNewServers(std::string filename)
 		std::cout << "Failed to open file " << filename << std::endl;
 		exit (-1) ;
 	}
-	
 	std::vector<server_configuration*> servers;
 	std::string ConfigFileStr;
 	std::getline(input_file, ConfigFileStr, '\0');
-	
-	while (ConfigFileStr.find("server {") != std::string::npos)
+	int count = 0;
+	size_t i = 0;
+	while (ConfigFileStr.find("server {", i) != std::string::npos)
 	{
-		server_configuration* myserver = new server_configuration(ConfigFileStr);
-		servers.push_back(myserver);
-		size_t pos1 = ConfigFileStr.find("server {");
-		if (pos1 != std::string::npos)
+		i = ConfigFileStr.find("server {", i);
+		if (i != std::string::npos)
 		{
-			size_t pos2 = ConfigFileStr.find("server {", pos1 + 1);
-			if (pos2 != std::string::npos)
-				ConfigFileStr = ConfigFileStr.substr(pos2);
-			else
-				ConfigFileStr = ConfigFileStr.substr(ConfigFileStr.size());
-			if (DEBUG)
-				std::cout << " main " << ConfigFileStr << std::endl;
+			count ++;
+			i++;
 		}
+	}
+	for (int i = 0; i < count; i++)
+	{
+		size_t pos1 = ConfigFileStr.find("server {");
+		size_t pos2 = ConfigFileStr.find("server {", pos1 + 1);
+		server_configuration* myserver = new server_configuration(ConfigFileStr.substr(pos1, pos2));
+		std::cout << "test\n" << ConfigFileStr.substr(pos1, pos2) << std::endl;
+		servers.push_back(myserver);
+		ConfigFileStr.erase(pos1, pos2);
 	}
 	return (servers);
 }

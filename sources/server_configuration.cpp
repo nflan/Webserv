@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:06:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/28 12:50:03 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/03/28 16:17:33 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,8 @@ _ConfigFile(convertConfigFile(ConfigFile)),
 _ServerName(findServerName()),
 _Root(findRoot()),
 _Port(findPort()),
-_ClientMaxBodySize(findClientMaxBodySize())
+_ClientMaxBodySize(findClientMaxBodySize()),
+_ErrorPage(findErrorPage())
 {
 	if (DEBUG)
 	{
@@ -88,15 +89,32 @@ std::string server_configuration::findRoot()
 
 int server_configuration::findPort()
 {
-	size_t pos = _ConfigFile.find("listen 0.0.0.0:");
-	if (pos != std::string::npos) {
-		pos += strlen("listen 0.0.0.0:");
-		std::string port = _ConfigFile.substr(pos);
-		size_t space_pos = port.find_first_of(" \n");
-		if (space_pos != std::string::npos) {
-			if (DEBUG)
-				std::cout << "server_configuration::findPort() " << port.substr(0, space_pos).c_str() << std::endl;
-			return (atoi(port.substr(0, space_pos).c_str()));
+	if (_ConfigFile.find("listen 0.0.0.0:") != std::string::npos)
+	{
+		size_t pos = _ConfigFile.find("listen 0.0.0.0:");
+		if (pos != std::string::npos) {
+			pos += strlen("listen 0.0.0.0:");
+			std::string port = _ConfigFile.substr(pos);
+			size_t space_pos = port.find_first_of(" \n");
+			if (space_pos != std::string::npos) {
+				if (DEBUG)
+					std::cout << "server_configuration::findPort() " << port.substr(0, space_pos).c_str() << std::endl;
+				return (atoi(port.substr(0, space_pos).c_str()));
+			}
+		}
+	}
+	else if (_ConfigFile.find("listen") != std::string::npos)
+	{
+		size_t pos = _ConfigFile.find("listen");
+		if (pos != std::string::npos) {
+			pos += strlen("listen");
+			std::string port = _ConfigFile.substr(pos + 1);
+			size_t space_pos = port.find_first_of(" \n");
+			if (space_pos != std::string::npos) {
+				if (DEBUG)
+					std::cout << "server_configuration::findPort() " << port.substr(0, space_pos).c_str() << std::endl;
+				return (atoi(port.substr(0, space_pos).c_str()));
+			}
 		}
 	}
 	return (0);
@@ -125,18 +143,36 @@ size_t server_configuration::findClientMaxBodySize()
 	return (1048576);
 }
 
+std::string server_configuration::findErrorPage()
+{
+	size_t pos = _ConfigFile.find("error_page");
+	if (pos != std::string::npos) {
+		pos += strlen("error_page");
+		std::string port = _ConfigFile.substr(pos + 5);
+		size_t space_pos = port.find_first_of(" \n");
+		if (space_pos != std::string::npos) {
+			if (DEBUG)
+				std::cout << "server_configuration::findPort() " << port.substr(0, space_pos).c_str() << std::endl;
+			return (port.substr(0, space_pos).c_str());
+		}
+	}
+	return ("");
+}
+
 std::string server_configuration::getConfigFile() { return _ConfigFile;}
 std::string server_configuration::getServerName() { return _ServerName;}
 std::string server_configuration::getRoot() { return _Root;}
 int server_configuration::getPort() { return _Port;}
 size_t server_configuration::getClientMaxBodySize() { return _ClientMaxBodySize;}
+std::string server_configuration::getErrorPage() { return _ErrorPage;}
 
 std::ostream& operator <<(std::ostream &out, server_configuration &ServConfig)
 {
 	out << "Server name : " << ServConfig.getServerName() \
 		<< "\nRoot : " << ServConfig.getRoot() \
 		<< "\nPort : " << ServConfig.getPort() \
-		<< "\nCliend Body Limit : " << ServConfig.getClientMaxBodySize();
+		<< "\nCliend Body Limit : " << ServConfig.getClientMaxBodySize() \
+		<< "\nError page : " << ServConfig.getErrorPage();
 		
 	return (out);
 }
