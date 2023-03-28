@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:06:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/17 15:51:18 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/03/28 12:50:03 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,8 @@ server_configuration::server_configuration(std::string ConfigFile) :
 _ConfigFile(convertConfigFile(ConfigFile)),
 _ServerName(findServerName()),
 _Root(findRoot()),
-_Port(findPort())
+_Port(findPort()),
+_ClientMaxBodySize(findClientMaxBodySize())
 {
 	if (DEBUG)
 	{
@@ -101,16 +102,41 @@ int server_configuration::findPort()
 	return (0);
 }
 
+size_t server_configuration::findClientMaxBodySize()
+{
+	size_t pos = _ConfigFile.find("client_max_body_size");
+	if (pos != std::string::npos) {
+		pos += strlen("client_max_body_size");
+		std::string port = _ConfigFile.substr(pos + 1);
+		size_t space_pos = port.find_first_of(" \n");
+		if (space_pos != std::string::npos) {
+			if (DEBUG)
+				std::cout << "server_configuration::findPort() " << port.substr(0, space_pos).c_str() << std::endl;
+			int ClientBodySize = atoi(port.substr(0, space_pos).c_str());
+			std::cout << "DEBUG : " << port.at(space_pos - 1) << std::endl;
+			if (port.at(space_pos - 1) == 'M')
+				return (ClientBodySize * 1048576);
+			else if (port.at(space_pos - 1) == 'K')
+				return (ClientBodySize * 1024);
+			else
+				return (ClientBodySize);
+		}
+	}
+	return (1048576);
+}
+
 std::string server_configuration::getConfigFile() { return _ConfigFile;}
 std::string server_configuration::getServerName() { return _ServerName;}
 std::string server_configuration::getRoot() { return _Root;}
 int server_configuration::getPort() { return _Port;}
+size_t server_configuration::getClientMaxBodySize() { return _ClientMaxBodySize;}
 
 std::ostream& operator <<(std::ostream &out, server_configuration &ServConfig)
 {
 	out << "Server name : " << ServConfig.getServerName() \
 		<< "\nRoot : " << ServConfig.getRoot() \
-		<< "\nPort : " << ServConfig.getPort();
+		<< "\nPort : " << ServConfig.getPort() \
+		<< "\nCliend Body Limit : " << ServConfig.getClientMaxBodySize();
 		
 	return (out);
 }

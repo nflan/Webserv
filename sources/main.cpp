@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 15:39:03 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/20 17:15:27 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/03/28 12:49:03 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -219,7 +219,7 @@ int main(int argc, char const **argv)
 		return -1;
 	}
 	std::vector<server_configuration*> servers = SetupNewServers(argv[1]);
-	// PrintServer(servers);
+	PrintServer(servers);
 	StartServer(servers, servers.size());
 	DeleteServers(servers);
 	return 0;

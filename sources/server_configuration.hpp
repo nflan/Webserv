@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:03:12 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/17 14:52:34 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/03/28 12:45:14 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ class server_configuration
 	std::string _ServerName;
 	std::string	_Root;
 	int			_Port;
+	size_t		_ClientMaxBodySize;
 	
 	public:
 	server_configuration();
@@ -37,16 +38,17 @@ class server_configuration
 	~server_configuration();
 	server_configuration &operator=(server_configuration const &obj);
 
+	std::string convertConfigFile(std::string ConfigFile);
 	std::string findServerName();
 	int findPort();
-	std::string convertConfigFile(std::string ConfigFile);
 	std::string findRoot();
+	size_t findClientMaxBodySize();
 
 	std::string getConfigFile();
 	std::string getServerName();
 	std::string getRoot();
-	int getNumberOfPorts();
 	int getPort();
+	size_t getClientMaxBodySize();
 };
 
 std::ostream& operator <<(std::ostream &out, server_configuration &ServConfig);
