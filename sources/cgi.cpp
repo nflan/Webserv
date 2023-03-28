@@ -6,7 +6,7 @@
 /*   By: nflan <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/27 15:47:23 by nflan             #+#    #+#             */
-/*   Updated: 2023/03/28 15:34:08 by nflan            ###   ########.fr       */
+/*   Updated: 2023/03/28 18:18:59 by nflan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,16 +118,16 @@ const char *	ExecveException::what() const throw()
 	return ("Execve Error!");
 }
 
-void	exeCgi(Cgi & test)
+void	exeCgi(Cgi & cgi)
 {
 	int	status;
-	if (test.getPid() == 0)
+	if (cgi.getPid() == 0)
 	{
-		test.dupping();
-		if (execve((test.getCmd())[0], test.getCmd(), test.getEnvp()))
+		cgi.dupping();
+		if (execve((cgi.getCmd())[0], cgi.getCmd(), cgi.getEnvp()))
 			throw ExecveException();
 	}
-	waitpid(test.getPid(), &status, 0);
+	waitpid(cgi.getPid(), &status, 0);
 }
 
 int	main(int ac, char **av, char **envp)
@@ -139,9 +139,9 @@ int	main(int ac, char **av, char **envp)
 		env.push_back(envp[i]);
 	std::string a("/usr/bin/php-cgi");
 	std::string cmd(av[1]);
-	Cgi	test(a, cmd, env, -1);
+	Cgi	cgi(a, cmd, env, -1);
 	try {
-		exeCgi(test);
+		exeCgi(cgi);
 	}
 	catch ( std::exception& e )
 	{

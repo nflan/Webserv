@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:06:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/28 18:12:44 by nflan            ###   ########.fr       */
+/*   Updated: 2023/03/28 18:16:25 by nflan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,8 +112,8 @@ void server_configuration::setCgi()
 		throw CgiException();
 	for (; _ConfigFile[pos] != ';' && _ConfigFile[pos] != '\n';)
 		pos = fillCgi(pos);
-	for (std::map<std::string, std::string>::iterator it = _cgi.begin(); it != _cgi.end(); it++)
-		std::cout << "first = '" << it->first << "' && second = '" << it->second << "'" << std::endl;
+//	for (std::map<std::string, std::string>::iterator it = _cgi.begin(); it != _cgi.end(); it++) // Print CGI
+//		std::cout << "first = '" << it->first << "' && second = '" << it->second << "'" << std::endl; // Print CGI
 }
 
 int server_configuration::findPort()
