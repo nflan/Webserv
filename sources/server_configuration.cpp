@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:06:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/29 16:25:31 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/03/29 16:50:36 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,7 @@ std::string server_configuration::findRoot()
 	if (pos != std::string::npos) {
 		pos += strlen("root");
 		std::string root = _ConfigFile.substr(pos + 1);
-		size_t space_pos = root.find_first_of(" \n");
+		size_t space_pos = root.find_first_of(" \n;");
 		if (space_pos != std::string::npos) {
 			return (root.substr(0, space_pos));
 		}
@@ -128,7 +128,7 @@ int server_configuration::findPort()
 		if (pos != std::string::npos) {
 			pos += strlen("listen 0.0.0.0:");
 			std::string port = _ConfigFile.substr(pos);
-			size_t space_pos = port.find_first_of(" \n");
+			size_t space_pos = port.find_first_of(" \n;");
 			if (space_pos != std::string::npos) {
 				if (DEBUG)
 					std::cout << "server_configuration::findPort() " << port.substr(0, space_pos).c_str() << std::endl;
@@ -142,7 +142,7 @@ int server_configuration::findPort()
 		if (pos != std::string::npos) {
 			pos += strlen("listen");
 			std::string port = _ConfigFile.substr(pos + 1);
-			size_t space_pos = port.find_first_of(" \n");
+			size_t space_pos = port.find_first_of(" \n;");
 			if (space_pos != std::string::npos) {
 				if (DEBUG)
 					std::cout << "server_configuration::findPort() " << port.substr(0, space_pos).c_str() << std::endl;
@@ -159,7 +159,7 @@ size_t server_configuration::findClientMaxBodySize()
 	if (pos != std::string::npos) {
 		pos += strlen("client_max_body_size");
 		std::string port = _ConfigFile.substr(pos + 1);
-		size_t space_pos = port.find_first_of(" \n");
+		size_t space_pos = port.find_first_of(" \n;");
 		if (space_pos != std::string::npos) {
 			if (DEBUG)
 				std::cout << "server_configuration::findPort() " << port.substr(0, space_pos).c_str() << std::endl;
@@ -183,7 +183,7 @@ std::string server_configuration::findErrorPage()
 	if (pos != std::string::npos) {
 		pos += strlen("error_page");
 		std::string port = _ConfigFile.substr(pos + 5);
-		size_t space_pos = port.find_first_of(" \n");
+		size_t space_pos = port.find_first_of(" \n;");
 		if (space_pos != std::string::npos) {
 			if (DEBUG)
 				std::cout << "server_configuration::findPort() " << port.substr(0, space_pos).c_str() << std::endl;
