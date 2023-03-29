@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 15:39:03 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/29 15:56:36 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/03/29 16:18:09 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,6 @@ void sigint_handler(int signum)
 	close(9); // accept AF_INET socket conn_sock ev.data.fd Conf2
 	// close(0); // bind listen
 	// close(1); // nfds
-
 }
 
 void DeleteServers(std::vector<server_configuration*> servers)
@@ -260,7 +259,7 @@ int main(int argc, char const **argv)
 	signal(SIGINT, sigint_handler);
 
 	std::vector<server_configuration*> servers = SetupNewServers(argv[1]);
-	// PrintServer(servers);
+	PrintServer(servers);
 	StartServer(servers, servers.size());
 	DeleteServers(servers);
 	return 0;
