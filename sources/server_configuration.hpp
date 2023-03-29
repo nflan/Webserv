@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:03:12 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/29 15:18:06 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/03/29 17:03:33 by nflan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,11 +48,13 @@ class server_configuration
 	void setCgi();
 	int fillCgi(size_t pos);
 
+	void	printCgi();
+
 	size_t findClientMaxBodySize();
 	std::string findErrorPage();
-	
 	std::string getConfigFile();
 	std::string getServerName();
+	std::map<std::string, std::string> getCgi();
 	std::string getRoot();
 	int getPort();
 

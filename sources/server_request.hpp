@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server_request.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 14:29:37 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/23 15:30:32 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/03/29 16:44:36 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,10 +27,6 @@ class server_request
 	private:
 	std::string _ServerRequest;
 	std::string _Method;
-	std::string _PathToFile;
-	std::string _Host;
-	std::string _ContentType;
-	unsigned int _ContentLength;
 	std::string _RequestURI;
 	server_request();
 
@@ -42,13 +38,8 @@ class server_request
 	
 	std::string findRequestURI();
 	std::string findMethod();
-	std::string findContentType();
-	unsigned int findContentLength();
 	std::string getServerRequest() const;
 	std::string getMethod() const;
-	std::string getPathToFile() const;
-	std::string getContentType() const;
-	unsigned int getContentLength() const;
 	std::string getRequestURI() const;
 };
 

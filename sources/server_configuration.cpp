@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:06:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/29 15:17:30 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/03/29 17:04:54 by nflan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,13 +74,15 @@ std::string server_configuration::findServerName()
 	return ("Not found");
 }
 
+
+
 std::string server_configuration::findRoot()
 {
 	size_t pos = _ConfigFile.find("root");
 	if (pos != std::string::npos) {
 		pos += strlen("root");
 		std::string root = _ConfigFile.substr(pos + 1);
-		size_t space_pos = root.find_first_of(" \n");
+		size_t space_pos = root.find_first_of(" \n;");
 		if (space_pos != std::string::npos) {
 			return (root.substr(0, space_pos));
 		}
@@ -126,7 +128,7 @@ int server_configuration::findPort()
 		if (pos != std::string::npos) {
 			pos += strlen("listen 0.0.0.0:");
 			std::string port = _ConfigFile.substr(pos);
-			size_t space_pos = port.find_first_of(" \n");
+			size_t space_pos = port.find_first_of(" \n;");
 			if (space_pos != std::string::npos) {
 				if (DEBUG)
 					std::cout << "server_configuration::findPort() " << port.substr(0, space_pos).c_str() << std::endl;
@@ -140,7 +142,7 @@ int server_configuration::findPort()
 		if (pos != std::string::npos) {
 			pos += strlen("listen");
 			std::string port = _ConfigFile.substr(pos + 1);
-			size_t space_pos = port.find_first_of(" \n");
+			size_t space_pos = port.find_first_of(" \n;");
 			if (space_pos != std::string::npos) {
 				if (DEBUG)
 					std::cout << "server_configuration::findPort() " << port.substr(0, space_pos).c_str() << std::endl;
@@ -157,7 +159,7 @@ size_t server_configuration::findClientMaxBodySize()
 	if (pos != std::string::npos) {
 		pos += strlen("client_max_body_size");
 		std::string port = _ConfigFile.substr(pos + 1);
-		size_t space_pos = port.find_first_of(" \n");
+		size_t space_pos = port.find_first_of(" \n;");
 		if (space_pos != std::string::npos) {
 			if (DEBUG)
 				std::cout << "server_configuration::findPort() " << port.substr(0, space_pos).c_str() << std::endl;
@@ -181,7 +183,7 @@ std::string server_configuration::findErrorPage()
 	if (pos != std::string::npos) {
 		pos += strlen("error_page");
 		std::string port = _ConfigFile.substr(pos + 5);
-		size_t space_pos = port.find_first_of(" \n");
+		size_t space_pos = port.find_first_of(" \n;");
 		if (space_pos != std::string::npos) {
 			if (DEBUG)
 				std::cout << "server_configuration::findPort() " << port.substr(0, space_pos).c_str() << std::endl;
@@ -191,11 +193,18 @@ std::string server_configuration::findErrorPage()
 	return ("");
 }
 
+void	server_configuration::printCgi()
+{
+		for (std::map<std::string, std::string>::iterator it = _cgi.begin(); it != _cgi.end(); it++) // Print CGI
+			std::cout << "- extension = '" << it->first << "' && root = '" << it->second << "'" << std::endl; // Print CGI
+}
+
 std::string server_configuration::getConfigFile() { return _ConfigFile;}
 std::string server_configuration::getServerName() { return _ServerName;}
 std::string server_configuration::getRoot() { return _Root;}
 int server_configuration::getPort() { return _Port;}
 size_t server_configuration::getClientMaxBodySize() { return _ClientMaxBodySize;}
+std::map<std::string, std::string> server_configuration::getCgi() { return (_cgi); }
 std::string server_configuration::getErrorPage() { return _ErrorPage;}
 
 const char *	server_configuration::CgiException::what() const throw()
@@ -209,7 +218,9 @@ std::ostream& operator <<(std::ostream &out, server_configuration &ServConfig)
 		<< "\nRoot : " << ServConfig.getRoot() \
 		<< "\nPort : " << ServConfig.getPort() \
 		<< "\nCliend Body Limit : " << ServConfig.getClientMaxBodySize() \
-		<< "\nError page : " << ServConfig.getErrorPage();
+		<< "\nError page : " << ServConfig.getErrorPage() \
+		<< "\nCGI :" << std::endl;
+	ServConfig.printCgi();
 		
 	return (out);
 }
