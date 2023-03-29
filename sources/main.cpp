@@ -6,11 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 15:39:03 by mgruson           #+#    #+#             */
-<<<<<<< HEAD
-/*   Updated: 2023/03/29 15:16:25 by mgruson          ###   ########.fr       */
-=======
-/*   Updated: 2023/03/27 12:33:58 by chillion         ###   ########.fr       */
->>>>>>> bekx
+/*   Updated: 2023/03/29 15:56:36 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,11 +86,7 @@ void handle_connection(server_configuration *servers, int conn_sock) {
 		if (n > 0)
 			request.append(buffer);
 	}
-<<<<<<< HEAD
 	std::cout << "Request :\n" << request << std::endl;
-=======
-	std::cout << request << std::endl; // tmp
->>>>>>> bekx
 	server_request* ServerRequest = new server_request(request);
 	server_response ServerResponse;
 	ServerResponse.todo(*ServerRequest, conn_sock, servers->getRoot());

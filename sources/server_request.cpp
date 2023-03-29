@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server_request.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 14:31:36 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/29 15:37:09 by chillion         ###   ########.fr       */
+/*   Updated: 2023/03/29 16:00:47 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,13 +41,22 @@ _PathToFile(findPathToFile())
 {
 }
 
-
 std::string server_request::findMethod()
 {
 	size_t pos = _ServerRequest.find(" ");
 	if (pos == std::string::npos)
 		return ("");
 	std::string tmp = _ServerRequest.substr(0, pos);	_ServerRequest.erase(0, pos + 1);
+	return (tmp);
+}
+
+std::string server_request::findPathToFile()
+{
+	size_t pos = _ServerRequest.find(" ");
+	if (pos == std::string::npos)
+		return ("");
+	std::string tmp = _ServerRequest.substr(0, pos);
+	_ServerRequest.erase(0, pos);
 	return (tmp);
 }
 
@@ -77,6 +86,11 @@ std::string server_request::getRequestURI() const
 std::string server_request::getContentType() const
 {
 	return (_ContentType);
+}
+
+std::string server_request::getPathToFile() const
+{
+	return (_PathToFile);
 }
 
 unsigned int server_request::getContentLength() const
