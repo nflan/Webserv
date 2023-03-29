@@ -6,7 +6,7 @@
 /*   By: nflan <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/27 15:47:23 by nflan             #+#    #+#             */
-/*   Updated: 2023/03/28 18:18:59 by nflan            ###   ########.fr       */
+/*   Updated: 2023/03/29 15:24:25 by nflan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,6 +130,8 @@ void	exeCgi(Cgi & cgi)
 	waitpid(cgi.getPid(), &status, 0);
 }
 
+int	re
+
 int	main(int ac, char **av, char **envp)
 {
 	if (ac != 2)
@@ -139,8 +141,9 @@ int	main(int ac, char **av, char **envp)
 		env.push_back(envp[i]);
 	std::string a("/usr/bin/php-cgi");
 	std::string cmd(av[1]);
-	Cgi	cgi(a, cmd, env, -1);
 	try {
+		//ajout d'une commande conditionnee pour voir si on fait un cgi ou pas (si le cgi en question est precise dans le fichier de configue. Sinon, on renvoie la reponse en dur, sans traitement)
+		Cgi	cgi(a, cmd, env, -1);
 		exeCgi(cgi);
 	}
 	catch ( std::exception& e )
