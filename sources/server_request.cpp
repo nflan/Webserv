@@ -36,8 +36,8 @@ server_request &server_request::operator=(server_request const &obj)
 
 server_request::server_request(std::string ServerRequest) :
 _ServerRequest(ServerRequest),
-_Method(findMethod()),
-_PathToFile(findPathToFile())
+_Method(findMethod())
+//_PathToFile(findPathToFile())
 {
 }
 
@@ -86,7 +86,7 @@ unsigned int server_request::getContentLength() const
 
 std::ostream& operator <<(std::ostream &out, server_request &ServRequest)
 {
-	out << "Method : " << ServRequest.getMethod() \
-		<< "\nPathToFile : " << ServRequest.getPathToFile();
+	out << "Method : " << ServRequest.getMethod() << std::endl;//\
+//		<< "\nPathToFile : " << ServRequest.getPathToFile();
 	return (out);
 }

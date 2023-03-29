@@ -6,11 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 14:29:37 by mgruson           #+#    #+#             */
-<<<<<<< HEAD
 /*   Updated: 2023/03/23 15:30:32 by mgruson          ###   ########.fr       */
-=======
-/*   Updated: 2023/03/23 12:04:42 by chillion         ###   ########.fr       */
->>>>>>> bekx
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,14 +27,11 @@ class server_request
 	private:
 	std::string _ServerRequest;
 	std::string _Method;
-<<<<<<< HEAD
 	std::string _PathToFile;
 	std::string _Host;
 	std::string _ContentType;
 	unsigned int _ContentLength;
-=======
 	std::string _RequestURI;
->>>>>>> bekx
 	server_request();
 
 	public:
@@ -53,13 +46,10 @@ class server_request
 	unsigned int findContentLength();
 	std::string getServerRequest() const;
 	std::string getMethod() const;
-<<<<<<< HEAD
 	std::string getPathToFile() const;
 	std::string getContentType() const;
 	unsigned int getContentLength() const;
-=======
 	std::string getRequestURI() const;
->>>>>>> bekx
 };
 
 std::ostream& operator <<(std::ostream &out, server_request &ServRequest);
