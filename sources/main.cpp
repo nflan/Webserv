@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 15:39:03 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/28 15:19:03 by nflan            ###   ########.fr       */
+/*   Updated: 2023/03/29 15:16:25 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,7 @@ void handle_connection(int conn_sock) {
 		if (n > 0)
 			request.append(buffer);
 	}
-	std::cout << request << std::endl;
+	std::cout << "Request :\n" << request << std::endl;
 	server_request* ServerRequest = new server_request(request);
 	std::string answer = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
 	std::cout << *ServerRequest << std::endl;
@@ -203,26 +203,29 @@ std::vector<server_configuration*> SetupNewServers(std::string filename)
 		std::cout << "Failed to open file " << filename << std::endl;
 		exit (-1) ;
 	}
-	
 	std::vector<server_configuration*> servers;
 	std::string ConfigFileStr;
 	std::getline(input_file, ConfigFileStr, '\0');
-	
-	while (ConfigFileStr.find("server {") != std::string::npos)
+	int count = 0;
+	size_t i = 0;
+	while (ConfigFileStr.find("server {", i) != std::string::npos)
 	{
-		server_configuration* myserver = new server_configuration(ConfigFileStr);
-		servers.push_back(myserver);
-		size_t pos1 = ConfigFileStr.find("server {");
-		if (pos1 != std::string::npos)
+		i = ConfigFileStr.find("server {", i);
+		if (i != std::string::npos)
 		{
-			size_t pos2 = ConfigFileStr.find("server {", pos1 + 1);
-			if (pos2 != std::string::npos)
-				ConfigFileStr = ConfigFileStr.substr(pos2);
-			else
-				ConfigFileStr = ConfigFileStr.substr(ConfigFileStr.size());
-			if (DEBUG)
-				std::cout << " main " << ConfigFileStr << std::endl;
+			count ++;
+			i++;
 		}
+	}
+	for (int i = 0; i < count; i++)
+	{
+		size_t pos1 = ConfigFileStr.find("server {");
+		size_t pos2 = ConfigFileStr.find("server {", pos1 + 1);
+		server_configuration* myserver = new server_configuration(ConfigFileStr.substr(pos1, pos2));
+		if (DEBUG)
+			std::cout << "test\n" << ConfigFileStr.substr(pos1, pos2) << std::endl;
+		servers.push_back(myserver);
+		ConfigFileStr.erase(pos1, pos2);
 	}
 	return (servers);
 }

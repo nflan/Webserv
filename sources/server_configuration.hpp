@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:03:12 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/28 16:37:04 by nflan            ###   ########.fr       */
+/*   Updated: 2023/03/29 15:18:06 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,8 @@ class server_configuration
 	std::string	_Root;
 	std::map<std::string, std::string>	_cgi;
 	int			_Port;
+	size_t		_ClientMaxBodySize;
+	std::string _ErrorPage;
 	
 	public:
 	server_configuration();
@@ -39,23 +41,27 @@ class server_configuration
 	~server_configuration();
 	server_configuration &operator=(server_configuration const &obj);
 
+	std::string convertConfigFile(std::string ConfigFile);
 	std::string findServerName();
 	int findPort();
-	std::string convertConfigFile(std::string ConfigFile);
 	std::string findRoot();
 	void setCgi();
 	int fillCgi(size_t pos);
 
+	size_t findClientMaxBodySize();
+	std::string findErrorPage();
+	
 	std::string getConfigFile();
 	std::string getServerName();
 	std::string getRoot();
-	int getNumberOfPorts();
 	int getPort();
 
 	class CgiException: public std::exception {
 		public:
 			virtual const char *	what() const throw();
 	};
+	size_t getClientMaxBodySize();
+	std::string getErrorPage();
 };
 
 std::ostream& operator <<(std::ostream &out, server_configuration &ServConfig);
