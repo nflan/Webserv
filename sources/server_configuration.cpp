@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:06:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/17 15:51:18 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/03/29 16:23:59 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,8 @@ std::string server_configuration::findServerName()
 	return ("Not found");
 }
 
+
+
 std::string server_configuration::findRoot()
 {
 	size_t pos = _ConfigFile.find("root");
@@ -84,6 +86,8 @@ std::string server_configuration::findRoot()
 	}
 	return ("Not found");
 }
+
+
 
 int server_configuration::findPort()
 {
