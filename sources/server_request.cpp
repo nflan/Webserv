@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 14:31:36 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/29 16:00:47 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/03/29 16:42:43 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ server_request &server_request::operator=(server_request const &obj)
 server_request::server_request(std::string ServerRequest) :
 _ServerRequest(ServerRequest),
 _Method(findMethod()),
-_PathToFile(findPathToFile())
+_RequestURI(findRequestURI())
 {
 }
 
@@ -46,17 +46,8 @@ std::string server_request::findMethod()
 	size_t pos = _ServerRequest.find(" ");
 	if (pos == std::string::npos)
 		return ("");
-	std::string tmp = _ServerRequest.substr(0, pos);	_ServerRequest.erase(0, pos + 1);
-	return (tmp);
-}
-
-std::string server_request::findPathToFile()
-{
-	size_t pos = _ServerRequest.find(" ");
-	if (pos == std::string::npos)
-		return ("");
 	std::string tmp = _ServerRequest.substr(0, pos);
-	_ServerRequest.erase(0, pos);
+	_ServerRequest.erase(0, pos + 1);
 	return (tmp);
 }
 
@@ -83,24 +74,10 @@ std::string server_request::getRequestURI() const
 	return (_RequestURI);
 }
 
-std::string server_request::getContentType() const
-{
-	return (_ContentType);
-}
-
-std::string server_request::getPathToFile() const
-{
-	return (_PathToFile);
-}
-
-unsigned int server_request::getContentLength() const
-{
-	return (_ContentLength);
-}
-
 std::ostream& operator <<(std::ostream &out, server_request &ServRequest)
 {
 	out << "Method : " << ServRequest.getMethod() \
-		<< "\nPathToFile : " << ServRequest.getPathToFile();
+		<< "\nRequestURI : " << ServRequest.getRequestURI() \
+		<< "\nServerRequest : " << ServRequest.getServerRequest() << "\n";
 	return (out);
 }

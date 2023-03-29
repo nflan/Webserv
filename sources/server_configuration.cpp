@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:06:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/29 15:17:30 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/03/29 16:25:31 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,8 @@ std::string server_configuration::findServerName()
 	}
 	return ("Not found");
 }
+
+
 
 std::string server_configuration::findRoot()
 {
