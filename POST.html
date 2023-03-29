@@ -1,5 +1,3 @@
-Content-type: text/html; charset=UTF-8
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -18,7 +16,16 @@ Content-type: text/html; charset=UTF-8
 
 	<h2>Liste des fichiers uploadés :</h2>
 	<ul>
-		<li> "teSTEUR.txt" - <a href="download.php?file=teSTEUR.txt">Télécharger</a> - <a href="delete.php?file=teSTEUR.txt">Supprimer</a></li>	</ul>
+		<?php
+			$dir = "uploads/";
+			$files = scandir($dir);
+			foreach($files as $file){
+				if($file !== '.' && $file !== '..'){
+					echo '<li> "'.$file.'" - <a href="download.php?file='.$file.'">Télécharger</a> - <a href="delete.php?file='.$file.'">Supprimer</a></li>';
+				}
+			}
+		?>
+	</ul>
 
 </body>
 </html>

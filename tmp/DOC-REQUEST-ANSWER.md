@@ -1,3 +1,4 @@
+//////////////// 
 // Pour télécharger un fichier envoyé via une requête POST, votre serveur web en C++98 doit lire les données envoyées dans le corps de la requête et les écrire dans un fichier. Pour savoir si le fichier a été reçu entièrement, vous pouvez comparer la longueur du fichier avec la longueur indiquée dans l'en-tête Content-Length de la requête HTTP.
 
 // Voici un exemple de code qui peut être utilisé pour traiter une requête POST contenant des données binaires dans le corps de la requête :
@@ -50,7 +51,7 @@ void handle_post_request(int client_socket) {
 
 // Dans cet exemple de code, les données binaires sont extraites du corps de la requête POST à partir de la position de la séquence ```\r\n\r\n```. Ensuite, elles sont écrites dans un fichier nommé ```file.bin```. Le programme vérifie également si la taille des données binaires correspond à la longueur indiquée dans l'en-tête Content-Length de la requête POST. Si ce n'est pas le cas, il affiche une erreur. Finalement, une réponse avec un code d'état 200 est envoyée au client pour indiquer que la requête POST a réussi.
 
-/*
+//////////////// 
 Pour différencier une requête POST contenant un identifiant et mot de passe à tester dans une base de données et une requête POST demandant l'upload d'un fichier, vous pouvez analyser l'en-tête "Content-Type" de la requête HTTP.
 
 Dans le cas où il s'agit d'une requête POST pour envoyer un fichier, l'en-tête Content-Type aura la valeur "multipart/form-data". Dans ce cas, les données du formulaire seront contenues dans le corps de la requête, divisées en plusieurs parties, chacune ayant son propre en-tête Content-Type. L'une de ces parties contiendra le fichier que vous souhaitez télécharger.
@@ -58,9 +59,8 @@ Dans le cas où il s'agit d'une requête POST pour envoyer un fichier, l'en-têt
 Dans le cas où il s'agit d'une requête POST contenant un identifiant et un mot de passe, l'en-tête Content-Type aura la valeur "application/x-www-form-urlencoded". Les données du formulaire seront également contenues dans le corps de la requête, mais dans ce cas, elles auront été encodées en tant que chaîne de caractères.
 
 En analysant donc l'en-tête Content-Type, vous pouvez différencier les deux types de requêtes POST et traiter chaque type de manière appropriée.
-*/
 
-/* EN TETE REQUETE POST
+////////////////  EN TETE REQUETE POST Content-Type
 L'en-tête Content-Type indique le type de données envoyées dans la requête ou dans la réponse. Voici une liste non exhaustive des types MIME (Multipurpose Internet Mail Extension) qui peuvent être utilisés avec cette en-tête et leur signification :
 
 application/json : données JSON ;
@@ -73,9 +73,8 @@ text/html : page HTML ;
 text/plain : texte brut ;
 multipart/form-data : utilisé pour envoyer des fichiers sur un serveur.
 Il est important de noter que l'utilisation de l'en-tête Content-Type varie selon les besoins de l'application web, il existe donc de nombreux autres types MIME qui peuvent être utilisés.
-*/
 
-/* EN TETE REQUETE GET
+////////////////  EN TETE REQUETE GET
 Lors d'une requête GET, vous pouvez recevoir différents en-têtes HTTP en réponse. Les en-têtes que vous pouvez recevoir sont :
 
 - `Accept-Ranges` : indique si l'entité peut être satisfaite avec une partie de la ressource.
@@ -89,9 +88,8 @@ Lors d'une requête GET, vous pouvez recevoir différents en-têtes HTTP en rép
 - `Last-Modified` : la date et l'heure à laquelle la ressource a été modifiée pour la dernière fois.
 
 Il existe également d'autres en-têtes qui peuvent être renvoyés en réponse à une requête GET, mais cela dépend du serveur Web et de l'application Web utilisée.
-*/
 
-/* EN TETE REQUETE DELETE
+////////////////  EN TETE REQUETE DELETE
 Voici une liste d'en-têtes couramment utilisés pour une requête de méthode DELETE :
 
 - **Host** : ce champ indique le nom de domaine du serveur sur lequel la ressource demandée doit être supprimée.
@@ -107,9 +105,8 @@ Voici une liste d'en-têtes couramment utilisés pour une requête de méthode D
 - **Content-Length** : si une charge utile est incluse dans la demande, ce champ spécifie la longueur de la charge utile en octets.
 
 Notez que ces en-têtes sont facultatifs et peuvent ne pas être inclus dans toutes les requêtes DELETE.
-*/
 
-/* 2 types de requetes DELETE : 1 - DELETE FILE / 2 - DELETE USER IN BDD
+//////////////// 2 types de requetes DELETE : 1 - DELETE FILE / 2 - DELETE USER IN BDD
 Voici un exemple de requête DELETE demandant la suppression d'un fichier :
 
 DELETE /documents/mon_fichier.doc HTTP/1.1
@@ -129,9 +126,8 @@ Accept-Language: en-US,en;q=0.5
 Connection: keep-alive
 
 Notez que l'en-tête `Authorization` est utilisé pour s'authentifier auprès du serveur pour pouvoir effectuer cette opération. Aussi, le chemin diffère selon ce que nous souhaitons supprimer.
-*/
 
-/* Voici deux exemples de requêtes GET:
+////////////////  Voici deux exemples de requêtes GET:
 
 1. Requête pour obtenir la page d'accueil d'un site web:
 
@@ -144,10 +140,8 @@ GET /api/users/123 HTTP/1.1
 Host: api.example.com
 Accept: application/json
 Authorization: Bearer <token>
-*/
 
-
-/* Voici trois exemples de requête POST :
+////////////////  Voici trois exemples de requête POST :
 
 1. Requête POST pour ajouter un utilisateur à la base de données
 
@@ -180,10 +174,7 @@ Content-Type: text/plain
 Hello World!
 ------WebKitFormBoundaryuL67FWkv1CA--
 
-*/
-
-
-/*
+//////////////// 
 
 Voici les principaux éléments pouvant être présents dans une requête HTTP et leur signification :
 
@@ -205,9 +196,8 @@ Voici les principaux éléments pouvant être présents dans une requête HTTP e
 
 9. **Authentification** : optionnelle, elle permet d'identifier le client auprès du serveur, généralement en utilisant un nom d'utilisateur et un mot de passe.
 
-*/
+//////////////// 
 
-//
 Voici un exemple de requête GET :
 
 GET /search?q=example HTTP/1.1
@@ -242,3 +232,31 @@ Ceci est une requête GET qui demande à un serveur web de retourner les résult
 - Sec-Fetch-Site, Sec-Fetch-Mode, Sec-Fetch-User, et Sec-Fetch-Dest : des en-têtes ajoutés pour améliorer la sécurité des requêtes en évitant les attaques CSRF et en empêchant les fuites d'informations utilisateur via les en-têtes Referrer
 - Accept-Encoding : indique les types de compression de contenu supportés par le client
 - Accept-Language : indique les langues préférées de l'utilisateur pour les réponses
+
+
+//////////////// CODE ERREURS HTTP
+
+
+Les codes d'erreurs HTTP (ou status codes) sont utilisés par les serveurs pour répondre aux requêtes des clients. Les codes d'erreurs commencent tous par un chiffre indiquant une catégorie: 
+- 1xx : Informationnel
+- 2xx : Succès
+- 3xx : Redirection
+- 4xx : Erreur client
+- 5xx : Erreur serveur
+
+Voici une liste de certains des codes d'erreurs HTTP ainsi qu'une brève description :
+
+- **200 OK** : la requête a été réalisée avec succès.
+- **201 Created** : la requête a été réalisée avec succès, une nouvelle ressource a été créée.
+- **204 No Content** : la requête a été réalisée avec succès, mais il n'y a pas de contenu à renvoyer.
+- **301 Moved Permanently** : l'URI de la ressource demandée a été modifié. La nouvelle URI est fournie en réponse.
+- **302 Found** : l'URI de la ressource demandée a été temporairement déplacé vers un autre emplacement fourni en réponse.
+- **304 Not Modified** : la ressource n'a pas été modifiée depuis la dernière demande. Aucune donnée n'est retournée.
+- **400 Bad Request** : la requête du client était mal formée ou invalide.
+- **401 Unauthorized** : le client doit s'authentifier pour accéder à la ressource.
+- **403 Forbidden** : le client est authentifié mais n'a pas les droits d'accès nécessaires à la ressource demandée.
+- **404 Not Found** : la ressource demandée n'a pas été trouvée sur le serveur.
+- **500 Internal Server Error** : erreur interne du serveur. Cette réponse est générique et peut être renvoyée dans plusieurs situations différentes.
+- **503 Service Unavailable** : Le serveur n'est pas disponible temporairement. Cela peut être dû à une maintenance programmée ou à une charge trop élevée sur le serveur.
+
+Il existe d'autres codes d'erreurs HTTP qui peuvent indiquer différents problèmes rencontrés lors de l'utilisation d'un serveur web. Les clients HTTP (navigateurs web, etc.) traitent chacun de ces codes différemment, ce qui permet aux utilisateurs de savoir si leur requête a été réalisée avec succès ou non.
