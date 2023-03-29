@@ -307,5 +307,95 @@ La commande Curl utilise l'option -F pour spécifier un formulaire à envoyer vi
 Remarque : les requêtes POST multipart peuvent être plus complexes à créer manuellement avec Telnet que les requêtes POST standard. Il est recommandé d'utiliser Curl ou une bibliothèque HTTP pour créer des requêtes POST multipart.
 
 
+#################DELETE REQUEST AND RETURN###########################################################
+
+Bien sûr, voici un exemple de requête DELETE et des réponses du serveur en cas de succès ou d'échec :
+
+**Requête DELETE :**
+//////
+DELETE /users/123 HTTP/1.1
+Host: example.com
+//////
+Cette requête supprime la ressource "users/123" sur le serveur.
+
+**Réponse du serveur en cas de succès :**
+//////
+HTTP/1.1 204 No Content
+Date: Wed, 22 Sep 2021 14:30:00 GMT
+Server: Apache/2.4.46 (Unix)
+//////
+La réponse 204 No Content indique que la suppression de la ressource a été effectuée avec succès et qu'il n'y a pas de contenu supplémentaire à renvoyer. La date et le serveur peuvent varier selon le contexte.
+
+**Réponse du serveur en cas d'échec :**
+//////
+HTTP/1.1 404 Not Found
+Date: Wed, 22 Sep 2021 14:31:00 GMT
+Server: Apache/2.4.46 (Unix)
+
+{"message": "La ressource demandée est introuvable."}
+//////
+La réponse 404 Not Found indique que la ressource spécifiée dans la requête n'a pas été trouvée sur le serveur. Le message d'erreur peut varier selon le contexte.
+
+#################POST PHP###########################################################
+
+En HTML pur, il n'est pas possible de lister les fichiers présents dans un répertoire et de les supprimer avec une requête DELETE. Il est également difficile de télécharger des fichiers avec une requête POST en utilisant uniquement HTML.
+
+Cependant, il est possible de créer un formulaire HTML pour télécharger des fichiers à partir d'un répertoire spécifique sur le serveur. Voici un exemple simple :
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Télécharger un fichier</title>
+</head>
+<body>
+	<h1>Télécharger un fichier</h1>
+	<form action="/path/to/download.php" method="POST">
+		<select name="file">
+			<option value="">Sélectionnez un fichier</option>
+			<?php 
+				$dir = "path/to/files";
+				$files = scandir($dir);
+				foreach($files as $file){
+					if($file !== '.' && $file !== '..'){
+						echo '<option value="'.$file.'">'.$file.'</option>';
+					}
+				}
+			?>
+		</select>
+		<input type="submit" value="Télécharger">
+	</form>
+</body>
+</html>
+
+Ce code utilise la fonction PHP `scandir()` pour récupérer la liste des fichiers dans le dossier spécifié (`path/to/files`), puis génère des options de sélection pour chacun de ces fichiers. Lorsque l'utilisateur soumet le formulaire, le fichier sélectionné est envoyé via une requête POST au script PHP spécifié dans l'attribut `action` du formulaire (`/path/to/download.php`).
+
+Pour supprimer des fichiers, vous devez utiliser une requête DELETE à l'aide de JavaScript ou de tout autre langage de programmation côté client. Le serveur doit également être configuré pour répondre aux requêtes DELETE. En utilisant des langages de programmation côté client tels que JavaScript, vous pouvez envoyer une requête DELETE en utilisant l'objet XMLHttpRequest ou jQuery.ajax().
+
+#################DELETE javascript###########################################################
+
+En JavaScript, les requêtes HTTP (y compris les requêtes DELETE) peuvent être effectuées à l'aide de l'API Fetch. Voici un exemple de code pour effectuer une requête DELETE avec Fetch :
+
+fetch('ma-page.php', {
+  method: 'DELETE',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    id: 1234
+  })
+})
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.error(error));
+
+Dans cet exemple, nous envoyons une requête DELETE à la page PHP `ma-page.php`. Nous définissons la méthode HTTP `DELETE` en utilisant l'option `method` de l'objet de configuration de la requête.
+
+Nous spécifions également le type de contenu de la charge utile à l'aide de l'en-tête `Content-Type`. Dans cet exemple, nous utilisons le format JSON pour la charge utile.
+
+Ensuite, nous définissons la charge utile elle-même en utilisant l'option `body` et en convertissant notre objet JavaScript `{id: 1234}` en une chaîne JSON à l'aide de `JSON.stringify()`.
+
+Enfin, nous traitons la réponse de la requête à l'aide des fonctions `then()` et `catch()`. Dans cet exemple, nous supposons que la réponse est également au format JSON et nous affichons son contenu dans la console.
+
+
 
 

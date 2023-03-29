@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server_request.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
+/*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 14:31:36 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/20 17:16:29 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/03/29 15:37:09 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ std::string server_request::findMethod()
 	return (tmp);
 }
 
-std::string server_request::findPathToFile()
+std::string server_request::findRequestURI()
 {
 	size_t pos = _ServerRequest.find(" ");
 	if (pos == std::string::npos)
@@ -69,9 +69,19 @@ std::string server_request::getMethod() const
 {
 	return (_Method);
 }
-std::string server_request::getPathToFile() const
+std::string server_request::getRequestURI() const
 {
-	return (_PathToFile);
+	return (_RequestURI);
+}
+
+std::string server_request::getContentType() const
+{
+	return (_ContentType);
+}
+
+unsigned int server_request::getContentLength() const
+{
+	return (_ContentLength);
 }
 
 std::ostream& operator <<(std::ostream &out, server_request &ServRequest)

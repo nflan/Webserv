@@ -3,10 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 15:39:03 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/28 15:19:03 by nflan            ###   ########.fr       */
+<<<<<<< HEAD
+/*   Updated: 2023/03/29 15:16:25 by mgruson          ###   ########.fr       */
+=======
+/*   Updated: 2023/03/27 12:33:58 by chillion         ###   ########.fr       */
+>>>>>>> bekx
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +31,7 @@
 #include <csignal>
 
 #include "server_configuration.hpp"
-#include "server_request.hpp"
+#include "server_response.hpp"
 
 #define READ_SIZE 1000
 #define MAX_EVENTS 10
@@ -70,7 +74,7 @@ int setnonblocking(int sockfd) {
 	return 0;
 }
 
-void handle_connection(int conn_sock) {
+void handle_connection(server_configuration *servers, int conn_sock) {
 	char buffer[1024];
 	int n = read(conn_sock, buffer, 1024);
 	if (n <= 0) {
@@ -86,11 +90,17 @@ void handle_connection(int conn_sock) {
 		if (n > 0)
 			request.append(buffer);
 	}
-	std::cout << request << std::endl;
+<<<<<<< HEAD
+	std::cout << "Request :\n" << request << std::endl;
+=======
+	std::cout << request << std::endl; // tmp
+>>>>>>> bekx
 	server_request* ServerRequest = new server_request(request);
-	std::string answer = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
-	std::cout << *ServerRequest << std::endl;
-	write(conn_sock, answer.c_str() , strlen(answer.c_str()));
+	server_response ServerResponse;
+	ServerResponse.todo(*ServerRequest, conn_sock, servers->getRoot());
+	// std::string answer = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
+	// std::cout << *ServerRequest << std::endl;
+	// write(conn_sock, answer.c_str() , strlen(answer.c_str()));
 	delete ServerRequest;
 }
 
@@ -127,7 +137,7 @@ int StartServer(std::vector<server_configuration*> servers, int tablen)
 		int val = 1;
 		if (setsockopt(listen_sock[i], SOL_SOCKET, SO_REUSEPORT, &val, sizeof(val)) < 0) {
 			std::fprintf(stderr, "Error: setsockopt() failed: %s\n", strerror(errno));
-			exit(EXIT_FAILURE);
+			return(CloseSockets(listen_sock, tablen, servers, addr), EXIT_FAILURE);
 		}
 		if (bind(listen_sock[i], (struct sockaddr *) &addr[i], addrlen[i]) == -1) {
 			std::fprintf(stderr, "Error: bind failed: %s\n", strerror(errno));
@@ -186,7 +196,7 @@ int StartServer(std::vector<server_configuration*> servers, int tablen)
 						return(CloseSockets(listen_sock, tablen, servers, addr), EXIT_FAILURE);
 					}
 				} else {
-					handle_connection(events[n].data.fd);
+					handle_connection(servers[i], events[n].data.fd);
 				}
 			}
 		}
@@ -203,26 +213,29 @@ std::vector<server_configuration*> SetupNewServers(std::string filename)
 		std::cout << "Failed to open file " << filename << std::endl;
 		exit (-1) ;
 	}
-	
 	std::vector<server_configuration*> servers;
 	std::string ConfigFileStr;
 	std::getline(input_file, ConfigFileStr, '\0');
-	
-	while (ConfigFileStr.find("server {") != std::string::npos)
+	int count = 0;
+	size_t i = 0;
+	while (ConfigFileStr.find("server {", i) != std::string::npos)
 	{
-		server_configuration* myserver = new server_configuration(ConfigFileStr);
-		servers.push_back(myserver);
-		size_t pos1 = ConfigFileStr.find("server {");
-		if (pos1 != std::string::npos)
+		i = ConfigFileStr.find("server {", i);
+		if (i != std::string::npos)
 		{
-			size_t pos2 = ConfigFileStr.find("server {", pos1 + 1);
-			if (pos2 != std::string::npos)
-				ConfigFileStr = ConfigFileStr.substr(pos2);
-			else
-				ConfigFileStr = ConfigFileStr.substr(ConfigFileStr.size());
-			if (DEBUG)
-				std::cout << " main " << ConfigFileStr << std::endl;
+			count ++;
+			i++;
 		}
+	}
+	for (int i = 0; i < count; i++)
+	{
+		size_t pos1 = ConfigFileStr.find("server {");
+		size_t pos2 = ConfigFileStr.find("server {", pos1 + 1);
+		server_configuration* myserver = new server_configuration(ConfigFileStr.substr(pos1, pos2));
+		if (DEBUG)
+			std::cout << "test\n" << ConfigFileStr.substr(pos1, pos2) << std::endl;
+		servers.push_back(myserver);
+		ConfigFileStr.erase(pos1, pos2);
 	}
 	return (servers);
 }
