@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 15:39:03 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/23 17:25:43 by chillion         ###   ########.fr       */
+/*   Updated: 2023/03/27 12:33:58 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,7 @@ void handle_connection(server_configuration *servers, int conn_sock) {
 		if (n > 0)
 			request.append(buffer);
 	}
-	// std::cout << request << std::endl;
+	std::cout << request << std::endl; // tmp
 	server_request* ServerRequest = new server_request(request);
 	server_response ServerResponse;
 	ServerResponse.todo(*ServerRequest, conn_sock, servers->getRoot());
