@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:03:12 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/04 13:13:21 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/04 15:02:11 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,16 @@
 
 struct server_location
 {
-	std::string root;
+
+	std::string	URI;
+	std::string	HTTP_accepted;
+	std::string	HTTP_redirection;
+	std::string	root;
+	bool		directory_listing;
+	std::string	directory_request;
+	std::map<std::string, std::string>	_cgi; // To SEE
+	std::string Method;
+	std::string Upload_file;
 	
 };
 
@@ -38,8 +47,8 @@ class server_configuration
 	std::map<std::string, std::string>	_cgi;
 	int			_Port;
 	size_t		_ClientMaxBodySize;
-	std::string _ErrorPage; // refaire cela avec map
-	std::map<std::string, std::string> _Location; 
+	std::string _ErrorPage; // refaire cela avec map TODO
+	std::map<std::string, std::string> _Location;
 	
 	public:
 	server_configuration();

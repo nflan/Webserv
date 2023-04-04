@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:06:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/04 13:22:10 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/04 14:05:18 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -198,30 +198,44 @@ std::map<std::string, std::string> server_configuration::findLocation()
 {
 	std::map<std::string, std::string> location_map;
 	std::pair<std::string, std::string> location_pair;
-
-	size_t pos = _ConfigFile.find("location");
-	if (pos == std::string::npos)
+	size_t pos = 0;
+	size_t end_loc = 0;
+	
+	while (pos != std::string::npos)
 	{
-		location_map["NULL"] = "NULL";
-		return (location_map);
+		pos = _ConfigFile.find("location /", pos);
+		if (pos != std::string::npos)
+		{
+			pos += strlen("location"); 
+			std::cout << "pos: " << pos << std::endl;
+			std::string location_path = _ConfigFile.substr(pos + 1); 
+			size_t space_pos = location_path.find_first_of(" \n{"); 
+			if (space_pos == std::string::npos) 
+			{
+				location_pair.first = "NULL";
+				location_pair.second = "NULL";
+			}
+			location_pair.first = location_path.substr(0, space_pos);
+			end_loc = location_path.find_first_of("}"); 
+			std::cout << "end_loc: " << end_loc << std::endl;
+			if (end_loc == std::string::npos)
+			{
+				location_pair.first = "NULL";
+				location_pair.second = "NULL";
+			}
+			location_pair.second = location_path.substr(space_pos + 1, end_loc);
+			std::cout << "pos 0: " << pos << std::endl;
+			pos = pos + end_loc;
+			std::cout << "pos 1: " << pos << std::endl;
+			end_loc = 0;
+		}
+		else
+		{
+			location_pair.first = "NULL";
+			location_pair.second = "NULL";
+		}
+		location_map.insert(location_pair);
 	}
-	pos += strlen("location"); 
-	std::string location_path = _ConfigFile.substr(pos + 1); 
-	size_t space_pos = location_path.find_first_of(" \n{"); 
-	if (space_pos == std::string::npos) 
-	{
-		location_map["NULL"] = "NULL";
-		return (location_map);
-	}
-	location_pair.first = location_path.substr(0, space_pos);
-	size_t end_loc = location_path.find_first_of("}"); 
-	if (end_loc == std::string::npos)
-	{
-		location_map["NULL"] = "NULL";
-		return (location_map);
-	}
-	location_pair.second = location_path.substr(space_pos + 1, end_loc);
-	location_map.insert(location_pair);
 	return (location_map);
 }
 
