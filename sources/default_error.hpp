@@ -6,22 +6,21 @@
 /*   By: nflan <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/30 12:18:43 by nflan             #+#    #+#             */
-/*   Updated: 2023/04/04 12:19:20 by nflan            ###   ########.fr       */
+/*   Updated: 2023/04/04 18:40:01 by nflan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+//Sources: https://www.rfc-editor.org/rfc/rfc9110.html (rfc9110 status codes) and https://http.cat/ (examples and pictures)
+
 #ifndef DEFAULT_ERROR_HPP
 #define DEFAULT_ERROR_HPP
-//Sources: https://kb.iu.edu/d/bfrc (common error) and https://http.cat/ (examples and pictures)
+
 //1XX --> status code d'information (requete recu et continue son cours)
 # define STATUS100 "Continue"
 # define HTML100 "<html><head><meta name=\"viewport\" content=\"width=device-width, minimum-scale=0.1\"><title>100 Continue</title></head><body style=\"background: #0e0e0e; height: 100%;text-align:center;color:white;\"><h1>100 Continue</h1><img src=\"https://http.cat/100\" style=\"display: block;margin: auto;\" alt=\"100 Continue\"g><p>webserv</p></body></html>"
 
 # define STATUS101 "Switching Protocols"
 # define HTML101 "<html><head><meta name=\"viewport\" content=\"width=device-width, minimum-scale=0.1\"><title>101 Switching Protocols</title></head><body style=\"background: #0e0e0e; height: 100%;text-align:center;color:white;\"><h1>101 Switching Protocols</h1><img src=\"https://http.cat/101\" style=\"display: block;margin: auto;\" alt=\"101 Switching Protocols\"g><p>webserv</p></body></html>"
-
-# define STATUS102 "Processing"
-# define HTML102 "<html><head><meta name=\"viewport\" content=\"width=device-width, minimum-scale=0.1\"><title>102 Processing</title></head><body style=\"background: #0e0e0e; height: 100%;text-align:center;color:white;\"><h1>102 Processing</h1><img src=\"https://http.cat/102\" style=\"display: block;margin: auto;\" alt=\"102 Processing\"g><p>webserv</p></body></html>"
 
 //2XX --> Success (requete recu, comprise, acceptee)
 # define STATUS200 "OK"
@@ -38,6 +37,9 @@
 
 # define STATUS204 "No Content"
 # define HTML204 "<html><head><meta name=\"viewport\" content=\"width=device-width, minimum-scale=0.1\"><title>204 No Content</title></head><body style=\"background: #0e0e0e; height: 100%;text-align:center;color:white;\"><h1>204 No Content</h1><img src=\"https://http.cat/204\" style=\"display: block;margin: auto;\" alt=\"204 No Content\"g><p>webserv</p></body></html>"
+
+# define STATUS205 "Reset Content"
+# define HTML205 "<html><head><meta name=\"viewport\" content=\"width=device-width, minimum-scale=0.1\"><title>205 Reset Content</title></head><body style=\"background: #0e0e0e; height: 100%;text-align:center;color:white;\"><h1>205 Reset Content</h1><img src=\"https://us.123rf.com/450wm/upixel123/upixel1231405/upixel123140500085/28651041-signe-de-l-ordinateur-205-r%C3%A9initialiser-contenu.jpg?ver=6\" style=\"display: block;margin: auto;\" alt=\"205 Reset Content\"g><p>webserv</p></body></html>"
 
 # define STATUS206 "Partial Content"
 # define HTML206 "<html><head><meta name=\"viewport\" content=\"width=device-width, minimum-scale=0.1\"><title>206 Partial Content</title></head><body style=\"background: #0e0e0e; height: 100%;text-align:center;color:white;\"><h1>206 Partial Content</h1><img src=\"https://http.cat/206\" style=\"display: block;margin: auto;\" alt=\"206 Partial Content\"><p>webserv</p></body></html>"
@@ -110,13 +112,18 @@
 # define STATUS415 "Unsupported Media Type"
 # define HTML415 "<html><head><meta name=\"viewport\" content=\"width=device-width, minimum-scale=0.1\"><title>415 Unsupported Media Type</title></head><body style=\"background: #0e0e0e; height: 100%;text-align:center;color:white;\"><h1>415 Unsupported Media Type</h1><img src=\"https://http.cat/415\" style=\"display: block;margin: auto;\" alt=\"415 Unsupported Media Type\"><p>webserv</p></body></html>"
 
+# define STATUS416 "Request Range Not Satisfiable"
+# define HTML416 "<html><head><meta name=\"viewport\" content=\"width=device-width, minimum-scale=0.1\"><title>416 Requested Range Not Satisfiable</title></head><body style=\"background: #0e0e0e; height: 100%;text-align:center;color:white;\"><h1>416 Requested Range Not Satisfiable</h1><img src=\"https://http.cat/416\" style=\"display: block;margin: auto;\" alt=\"416 Requested Range Not Satisfiable\"g><p>webserv</p></body></html>"
+
+# define STATUS417 "Expectation Failed"
+# define HTML417 "<html><head><meta name=\"viewport\" content=\"width=device-width, minimum-scale=0.1\"><title>417 Expectation Failed</title></head><body style=\"background: #0e0e0e; height: 100%;text-align:center;color:white;\"><h1>417 Expectation Failed</h1><img src=\"https://http.cat/417\" style=\"display: block;margin: auto;\" alt=\"417 Expectation Failed\"g><p>webserv</p></body></html>"
 
 //5XX --> Server error
 # define STATUS500 "Internal Server Error"
 # define HTML500 "<html><head><meta name=\"viewport\" content=\"width=device-width, minimum-scale=0.1\"><title>500 Internal Server Error</title></head><body style=\"background: #0e0e0e; height: 100%;text-align:center;color:white;\"><h1>500 Internal Server Error</h1><img src=\"https://http.cat/500\" style=\"display: block;margin: auto;\" alt=\"500 Internal Server Error\"><p>webserv</p></body></html>"
 
 # define STATUS501 "Not Implemented"
-# define HTNL501 "<html><head><meta name=\"viewport\" content=\"width=device-width, minimum-scale=0.1\"><title>501 Not Implemented</title></head><body style=\"background: #0e0e0e; height: 100%;text-align:center;color:white;\"><h1>501 Not Implemented</h1><img src=\"https://http.cat/501\" style=\"display: block;margin: auto;\" alt=\"501 Not Implemented\"><p>webserv</p></body></html>"
+# define HTML501 "<html><head><meta name=\"viewport\" content=\"width=device-width, minimum-scale=0.1\"><title>501 Not Implemented</title></head><body style=\"background: #0e0e0e; height: 100%;text-align:center;color:white;\"><h1>501 Not Implemented</h1><img src=\"https://http.cat/501\" style=\"display: block;margin: auto;\" alt=\"501 Not Implemented\"><p>webserv</p></body></html>"
 
 # define STATUS502 "Bad Gateway"
 # define HTML502 "<html><head><meta name=\"viewport\" content=\"width=device-width, minimum-scale=0.1\"><title>502 Bad Gateway</title></head><body style=\"background: #0e0e0e; height: 100%;text-align:center;color:white;\"><h1>502 Bad Gateway</h1><img src=\"https://http.cat/502\" style=\"display: block;margin: auto;\" alt=\"502 Bad Gateway\"><p>webserv</p></body></html>"
@@ -126,5 +133,8 @@
 
 # define STATUS504 "Gateway Timeout"
 # define HTML504 "<html><head><meta name=\"viewport\" content=\"width=device-width, minimum-scale=0.1\"><title>504 Gateway Timeout</title></head><body style=\"background: #0e0e0e; height: 100%;text-align:center;color:white;\"><h1>504 Gateway Timeout</h1><img src=\"https://http.cat/504\" style=\"display: block;margin: auto;\" alt=\"504 Gateway Timeout\"><p>webserv</p></body></html>"
+
+# define STATUS505 "HTTP Version Not Supported"
+# define HTML505 "<html><head><meta name=\"viewport\" content=\"width=device-width, minimum-scale=0.1\"><title>505 HTTP Version Not Supported</title></head><body style=\"background: #0e0e0e; height: 100%;text-align:center;color:white;\"><h1>505 HTTP Version Not Supported</h1><img src=\"https://www.redeszone.net/app/uploads-redeszone.net/2021/10/error-505-01.jpg\" style=\"display: block;margin: auto;\" alt=\"505 HTTP Version Not Supported\"g><p>webserv</p></body></html>"
 
 #endif

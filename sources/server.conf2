@@ -1,27 +1,27 @@
 server {
-	server_name webserv.com
-		listen 8083
+	server_name webserv.com;
+		listen 8083;
 
-		root ./
-		index index.html
-		client_max_body_size 2M
-		error_page 404 error.html
+		root ./;
+		index index.html;
+		client_max_body_size 2M;
+		error_page 404 error.html 405 error.html 406 e;
 
 		location / {
-			index index.html index.htm default.html
+			index index.html index.htm default.html;
 		}
 
-	allow_methods GET
+	allow_methods GET;
 }
 
 server {
-	server_name webserv2.com
-		listen 0.0.0.0:8080
+	server_name webserv2.com;
+		listen 0.0.0.0:8080;
 
-		root ./test
-		index index.html
+		root ./test;
+		index index.html;
 
-		allow_methods GET
+		allow_methods GET;
 }
 
 server {
@@ -36,11 +36,11 @@ server {
 }
 
 server {
-	server_name webserv3
-		listen 0.0.0.0:8084
+	server_name webserv3;
+		listen 0.0.0.0:8084;
 
-		root ../
-		index index.php
+		root ../;
+		index index.php;
 
-		allow_methods GET
+		allow_methods GET;
 }

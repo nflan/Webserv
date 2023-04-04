@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:46 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/29 16:47:11 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/04 19:18:32 by nflan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ server_response &server_response::operator=(server_response const &obj)
 #include <sstream>
 #include <string>
 #include <cstring>
+#include "server_configuration.hpp"
 
 // void handle_post_request(int client_socket)
 // {
@@ -99,6 +100,8 @@ server_response &server_response::operator=(server_response const &obj)
 void	server_response::todo(const server_request& Server_Request, int conn_sock, std::string Root)
 {
 	enum imethod {GET, POST, DELETE};
+	server_configuration	test;
+	test.setDefErrorPage();
 	int n = 0;
 	const std::string ftab[3] = {"GET", "POST", "DELETE"};
 	(void)Root;
@@ -133,25 +136,14 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 			if (!file.is_open())
 			{
 				std::cerr << "\nERROR IS_OPEN\r\n" << std::endl;
-				std::ifstream file("test404.html");
 				response << "HTTP/1.1 404 Not Found\r\n";
-				if (!file.is_open())
-				{
-					// response << "Content-Type: text/plain; charset=UTF-8\r\n";
-					response << "Content-Length: 28\r\n";
-					response << "\r\n";
-					response << "ERROR 404 : Page Not Found\r\n";
-				}
-				else
-				{
-					buffer << file.rdbuf();
-					std::string content = buffer.str();
-					// response << "Content-Type: text/plain; charset=UTF-8\r\n";
-					response << "Content-Length: " << content.size() << "\r\n";
-					response << "\r\n";
-					response << content << "\r\n";
-					// response << "Content-Type: text/html\r\n";
-				}
+				buffer << test.getDefErrorPage().find("Not Found")->second;//file.rdbuf(); --> Actuellement j'utilise la page erreur 404 mais il va falloir trouver comment automatiser pour afficher la page d'erreur qu'il faut. De plus, il faudra check si la page erreur est precisee dans le fichier de config, sachant qu'on ne donne pas le serveur qui recoit la requete (du coup pour l'instant on ne peut pas)
+				std::string content = buffer.str();
+				// response << "Content-Type: text/plain; charset=UTF-8\r\n";
+				response << "Content-Length: " << content.size() << "\r\n";
+				response << "\r\n";
+				response << content << "\r\n";
+				// response << "Content-Type: text/html\r\n";
 			}
 			else
 			{
