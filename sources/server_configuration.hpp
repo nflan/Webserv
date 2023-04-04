@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:03:12 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/04 15:02:11 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/04 17:09:32 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,23 +20,8 @@
 #include <sstream>
 #include <algorithm>
 #include <map>
-
+#include "server_location_configuration.hpp"
 #define DEBUG 0
-
-struct server_location
-{
-
-	std::string	URI;
-	std::string	HTTP_accepted;
-	std::string	HTTP_redirection;
-	std::string	root;
-	bool		directory_listing;
-	std::string	directory_request;
-	std::map<std::string, std::string>	_cgi; // To SEE
-	std::string Method;
-	std::string Upload_file;
-	
-};
 
 class server_configuration
 {
@@ -49,6 +34,8 @@ class server_configuration
 	size_t		_ClientMaxBodySize;
 	std::string _ErrorPage; // refaire cela avec map TODO
 	std::map<std::string, std::string> _Location;
+	std::map<std::string, struct server_location> _Loc;
+	
 	
 	public:
 	server_configuration();

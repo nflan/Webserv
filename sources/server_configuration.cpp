@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:06:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/04 16:41:43 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/04 17:10:12 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,8 @@ _Root(findRoot()),
 _Port(findPort()),
 _ClientMaxBodySize(findClientMaxBodySize()),
 _ErrorPage(findErrorPage()),
-_Location(findLocation())
+_Location(findLocation()),
+_Loc(findLoc())
 {
 	setCgi();
 	if (DEBUG)
@@ -222,12 +223,10 @@ std::map<std::string, std::string> server_configuration::findLocation()
 			{
 				j++;
 				end_loc = location_path.find_first_of("{}", end_loc + 1);
-				std::cout << "c1" << std::endl;
 			}
 			for (int i = 0; i < j; i++)
 			{
 				end_loc = location_path.find_first_of("}", end_loc + 1);
-				std::cout << "c2" << std::endl;
 			}
 			std::cout << "end_loc: " << end_loc << std::endl;
 			if (end_loc == std::string::npos)
@@ -251,6 +250,21 @@ std::map<std::string, std::string> server_configuration::findLocation()
 	return (location_map);
 }
 
+std::map<std::string, struct server_location> server_configuration::findLocation()
+{
+	std::map<std::string, struct server_location>	map_location;
+	std::map<std::string, struct server_location>	pair_location;
+	
+	struct server_location							struct_location;
+	
+	
+
+	pair_location.first = _Location
+	
+	
+} //TO CONTINUE
+
+
 void	server_configuration::printCgi()
 {
 		for (std::map<std::string, std::string>::iterator it = _cgi.begin(); it != _cgi.end(); it++) // Print CGI
@@ -263,7 +277,6 @@ std::ostream&	server_configuration::printLocation(std::ostream &out)
 			out << "\npath : " << it->first << "\nconf : " << it->second ;
 		return (out);
 }
-
 
 std::string server_configuration::getConfigFile() { return _ConfigFile;}
 std::string server_configuration::getServerName() { return _ServerName;}
