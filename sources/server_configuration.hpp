@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:03:12 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/29 17:03:33 by nflan            ###   ########.fr       */
+/*   Updated: 2023/04/04 13:13:21 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,12 @@
 
 #define DEBUG 0
 
+struct server_location
+{
+	std::string root;
+	
+};
+
 class server_configuration
 {
 	private:
@@ -32,7 +38,8 @@ class server_configuration
 	std::map<std::string, std::string>	_cgi;
 	int			_Port;
 	size_t		_ClientMaxBodySize;
-	std::string _ErrorPage;
+	std::string _ErrorPage; // refaire cela avec map
+	std::map<std::string, std::string> _Location; 
 	
 	public:
 	server_configuration();
@@ -45,11 +52,13 @@ class server_configuration
 	std::string findServerName();
 	int findPort();
 	std::string findRoot();
+	std::map<std::string, std::string> findLocation();
 	void setCgi();
 	int fillCgi(size_t pos);
 
 	void	printCgi();
-
+	std::ostream&	printLocation(std::ostream &out);
+	
 	size_t findClientMaxBodySize();
 	std::string findErrorPage();
 	std::string getConfigFile();

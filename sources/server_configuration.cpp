@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:06:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/29 17:04:54 by nflan            ###   ########.fr       */
+/*   Updated: 2023/04/04 13:22:10 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,8 @@ _ServerName(findServerName()),
 _Root(findRoot()),
 _Port(findPort()),
 _ClientMaxBodySize(findClientMaxBodySize()),
-_ErrorPage(findErrorPage())
+_ErrorPage(findErrorPage()),
+_Location(findLocation())
 {
 	setCgi();
 	if (DEBUG)
@@ -193,11 +194,50 @@ std::string server_configuration::findErrorPage()
 	return ("");
 }
 
+std::map<std::string, std::string> server_configuration::findLocation()
+{
+	std::map<std::string, std::string> location_map;
+	std::pair<std::string, std::string> location_pair;
+
+	size_t pos = _ConfigFile.find("location");
+	if (pos == std::string::npos)
+	{
+		location_map["NULL"] = "NULL";
+		return (location_map);
+	}
+	pos += strlen("location"); 
+	std::string location_path = _ConfigFile.substr(pos + 1); 
+	size_t space_pos = location_path.find_first_of(" \n{"); 
+	if (space_pos == std::string::npos) 
+	{
+		location_map["NULL"] = "NULL";
+		return (location_map);
+	}
+	location_pair.first = location_path.substr(0, space_pos);
+	size_t end_loc = location_path.find_first_of("}"); 
+	if (end_loc == std::string::npos)
+	{
+		location_map["NULL"] = "NULL";
+		return (location_map);
+	}
+	location_pair.second = location_path.substr(space_pos + 1, end_loc);
+	location_map.insert(location_pair);
+	return (location_map);
+}
+
 void	server_configuration::printCgi()
 {
 		for (std::map<std::string, std::string>::iterator it = _cgi.begin(); it != _cgi.end(); it++) // Print CGI
 			std::cout << "- extension = '" << it->first << "' && root = '" << it->second << "'" << std::endl; // Print CGI
 }
+
+std::ostream&	server_configuration::printLocation(std::ostream &out)
+{
+		for (std::map<std::string, std::string>::iterator it = _Location.begin(); it != _Location.end(); it++)
+			out << "\npath : " << it->first << "\nconf : " << it->second ;
+		return (out);
+}
+
 
 std::string server_configuration::getConfigFile() { return _ConfigFile;}
 std::string server_configuration::getServerName() { return _ServerName;}
@@ -219,8 +259,7 @@ std::ostream& operator <<(std::ostream &out, server_configuration &ServConfig)
 		<< "\nPort : " << ServConfig.getPort() \
 		<< "\nCliend Body Limit : " << ServConfig.getClientMaxBodySize() \
 		<< "\nError page : " << ServConfig.getErrorPage() \
-		<< "\nCGI :" << std::endl;
-	ServConfig.printCgi();
-		
+		<< "\nCGI : " \
+		<< "\nLocation : " << ServConfig.printLocation(out) << std::endl;
 	return (out);
 }
