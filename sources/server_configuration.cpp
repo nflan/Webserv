@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:06:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/04 14:05:18 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/04 16:41:43 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -209,14 +209,26 @@ std::map<std::string, std::string> server_configuration::findLocation()
 			pos += strlen("location"); 
 			std::cout << "pos: " << pos << std::endl;
 			std::string location_path = _ConfigFile.substr(pos + 1); 
-			size_t space_pos = location_path.find_first_of(" \n{"); 
+			size_t space_pos = location_path.find_first_of("{"); 
 			if (space_pos == std::string::npos) 
 			{
 				location_pair.first = "NULL";
 				location_pair.second = "NULL";
 			}
 			location_pair.first = location_path.substr(0, space_pos);
-			end_loc = location_path.find_first_of("}"); 
+			end_loc = location_path.find_first_of("{}", space_pos + 1);
+			int j = 0;
+			while (location_path[end_loc] == '{')
+			{
+				j++;
+				end_loc = location_path.find_first_of("{}", end_loc + 1);
+				std::cout << "c1" << std::endl;
+			}
+			for (int i = 0; i < j; i++)
+			{
+				end_loc = location_path.find_first_of("}", end_loc + 1);
+				std::cout << "c2" << std::endl;
+			}
 			std::cout << "end_loc: " << end_loc << std::endl;
 			if (end_loc == std::string::npos)
 			{
