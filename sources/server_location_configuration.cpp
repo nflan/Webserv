@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 17:08:06 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/05 14:46:39 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/05 16:02:29 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,8 @@
 
 server_location_configuration::server_location_configuration()
 {
-	std::cout << "server_location_configuration Default Constructor called" << std::endl;
+	if (DEBUG)
+		std::cout << "server_location_configuration Default Constructor called" << std::endl;
 }
 
 server_location_configuration::server_location_configuration(std::string location_conf) :
@@ -26,7 +27,8 @@ _DirectoryRequest(findDirectoryRequest(location_conf)),
 _UploadStore(findUploadStore(location_conf))
 {
 	setCgi(location_conf);
-	std::cout << "server_location_configuration Overload Constructor called" << std::endl;
+	if (DEBUG)
+		std::cout << "server_location_configuration Overload Constructor called" << std::endl;
 }
 
 server_location_configuration::server_location_configuration(server_location_configuration const &obj)
@@ -37,13 +39,15 @@ server_location_configuration::server_location_configuration(server_location_con
 
 server_location_configuration::~server_location_configuration()
 {
-	std::cout << "server_location_configuration Destructor called" << std::endl;
+	if (DEBUG)
+		std::cout << "server_location_configuration Destructor called" << std::endl;
 }
 
 server_location_configuration &server_location_configuration::operator=(server_location_configuration const &obj)
 {
 	(void)obj;
-	std::cout << "server_location_configuration Copy assignment operator called" << std::endl;
+	if (DEBUG)
+		std::cout << "server_location_configuration Copy assignment operator called" << std::endl;
 	return *this;
 }
 
@@ -167,3 +171,8 @@ std::string server_location_configuration::findUploadStore(std::string location_
 	}
 	return ("Not found");
 }
+
+std::string server_location_configuration::getDirectoryListing() { return _DirectoryListing;}
+std::string server_location_configuration::getRoot() { return _Root;}
+std::string server_location_configuration::getDirectoryRequest() { return _DirectoryRequest;}
+std::string server_location_configuration::getUploadStore() { return _UploadStore;}

@@ -8,9 +8,9 @@ server {
 		error_page 404 error.html
 		error_page 502 errot.html
 
-		location / {
+		location /upload {
 
-			limit_except POST {
+			limit_except POST GET {
 				deny all;
 			}
 			
@@ -58,9 +58,7 @@ server {
 server {
 	server_name webserv3
 		listen 0.0.0.0:8084
-
 		root ../
 		index index.php
-
 		allow_methods GET
 }

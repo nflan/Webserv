@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:03:12 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/05 14:39:04 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/05 15:29:41 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,7 @@ class server_configuration
 
 	void	printCgi();
 	std::ostream&	printLocation(std::ostream &out);
+	std::ostream&	printLoc(std::ostream &out);
 	
 	size_t findClientMaxBodySize();
 	std::string findErrorPage();

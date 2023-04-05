@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:06:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/05 14:56:28 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/05 16:06:26 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -279,6 +279,21 @@ std::ostream&	server_configuration::printLocation(std::ostream &out)
 		return (out);
 }
 
+std::ostream&	server_configuration::printLoc(std::ostream &out)
+{
+		
+		for (std::map<std::string, class server_location_configuration*>::iterator it = _Loc.begin(); it != _Loc.end(); it++)
+		{
+			out << "\nLocation configurations  for " << it->first \
+			<< "\nRoot : " << it->second->getRoot() \
+			<< "\nDirectoryListing : " << it->second->getDirectoryListing() \
+			<< "\nDirectoryRequest : " << it->second->getDirectoryRequest() \
+			<< "\nCGI : " \
+			<< "\n UploadStore : " << it->second->getUploadStore();
+		}
+		return (out);
+}
+
 std::string server_configuration::getConfigFile() { return _ConfigFile;}
 std::string server_configuration::getServerName() { return _ServerName;}
 std::string server_configuration::getRoot() { return _Root;}
@@ -300,7 +315,10 @@ std::ostream& operator <<(std::ostream &out, server_configuration &ServConfig)
 		<< "\nCliend Body Limit : " << ServConfig.getClientMaxBodySize() \
 		<< "\nError page : " << ServConfig.getErrorPage() \
 		<< "\nCGI : " \
-		<< "\nLocation : " << ServConfig.printLocation(out) \
-		<< "\nLocation : " << Serv.Config.printLoc(out) << std::endl;
+		// << "\nLocation : " << ServConfig.printLocation(out) 
+		<< "\nLocation : " << ServConfig.printLoc(out) << std::endl;
+
 	return (out);
 }
+
+// 	std::map<std::string, class server_location_configuration*> _Loc;

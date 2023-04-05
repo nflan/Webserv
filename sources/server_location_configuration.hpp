@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 17:07:36 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/05 14:47:08 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/05 16:05:34 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 #include <algorithm>
 #include <map>
 #include <vector>
-
+#define DEBUG 0
 class server_location_configuration
 {
 	private:
@@ -48,7 +48,13 @@ class server_location_configuration
 	void setCgi(std::string location_conf);
 	std::string findUploadStore(std::string location_conf);
 
+	std::string getRoot();
+	std::string getDirectoryListing();
+	std::string getDirectoryRequest();
 	
+	std::string getUploadStore();
+	
+
 };
 
 
