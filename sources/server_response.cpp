@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server_response.cpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
+/*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:46 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/29 16:47:11 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/05 14:37:32 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,9 +123,13 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 			std::cout << "\nC0 = '" << tmp << "'\n" << std::endl;
 			if (tmp.size() == 3 && tmp.find(".//") != std::string::npos)
 			{
-				tmp.erase();
+				// tmp.erase();
 				std::cout << "\nC1\n" << std::endl;
-				tmp = "./index.html";
+				tmp += "index.html";
+			}
+			if (tmp[tmp.size() - 1] == '/')
+			{
+				tmp += "index.html";
 			}
 			std::ifstream file(tmp.c_str());
 			std::stringstream buffer;
