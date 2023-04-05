@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 15:39:03 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/05 16:22:46 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/05 16:47:42 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,7 +173,7 @@ int StartServer(std::vector<server_configuration*> servers, int tablen)
 				if (events[n].data.fd == listen_sock[i])
 				{
 					temp_fd = i;
-					std::fprintf(stderr, "\nEVENTS I = %d ET N = %d\n", i, n);
+					// std::fprintf(stderr, "\nEVENTS I = %d ET N = %d\n", i, n);
 					conn_sock = accept(listen_sock[i], (struct sockaddr *) &addr[i], &addrlen[i]);
 					if (conn_sock == -1) {
 						std::fprintf(stderr, "Error: server accept failed: %s\n", strerror(errno));
@@ -189,9 +189,10 @@ int StartServer(std::vector<server_configuration*> servers, int tablen)
 						std::fprintf(stderr, "Error: epoll_ctl: conn_sock, %s\n", strerror(errno));
 						return(CloseSockets(listen_sock, tablen, servers, addr), EXIT_FAILURE);
 					}
-				} else {
-					std::fprintf(stderr, "\nBALISE I = %d ET N = %d ET TMP_fd = %d\n", i, n, temp_fd);
 				}
+				// else {
+				// 	std::fprintf(stderr, "\nBALISE I = %d ET N = %d ET TMP_fd = %d\n", i, n, temp_fd);
+				// }
 					handle_connection(servers[temp_fd], events[n].data.fd);
 			}
 		}
