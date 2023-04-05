@@ -6,7 +6,7 @@
 #    By: chillion <chillion@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/09/01 12:07:22 by chillion          #+#    #+#              #
-#    Updated: 2023/03/27 17:39:26 by chillion         ###   ########.fr        #
+#    Updated: 2023/04/05 15:42:13 by chillion         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -83,8 +83,8 @@ client :
 test : all
 	$(VAL) ./${SOFT_NAME} sources/server.conf
 
-test2 : all
-	$(VAL) ./${SOFT_NAME2}
+t2 : all
+	$(VAL) ./${SOFT_NAME} sources/server.conf2
 
 clean : 
 	@echo "${RED}###${NC}Nettoyage des fichiers .o${RED}###"

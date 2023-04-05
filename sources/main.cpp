@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
+/*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 15:39:03 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/05 12:50:53 by nflan            ###   ########.fr       */
+/*   Updated: 2023/04/05 16:22:46 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,7 @@ void handle_connection(server_configuration *servers, int conn_sock) {
 	std::cout << "Request :\n" << request << std::endl;
 	server_request* ServerRequest = new server_request(request);
 	server_response ServerResponse;
-	ServerResponse.todo(*ServerRequest, conn_sock, servers->getRoot());
+	ServerResponse.todo(*ServerRequest, conn_sock, servers);
 	// std::string answer = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
 	// std::cout << *ServerRequest << std::endl;
 	// write(conn_sock, answer.c_str() , strlen(answer.c_str()));
@@ -160,6 +160,7 @@ int StartServer(std::vector<server_configuration*> servers, int tablen)
 		}
 	}
 
+	int temp_fd = 0;
 	for (;;) {
 		nfds = epoll_wait(epollfd, events, MAX_EVENTS, -1);
 		if (nfds == -1) {
@@ -171,6 +172,8 @@ int StartServer(std::vector<server_configuration*> servers, int tablen)
 			{
 				if (events[n].data.fd == listen_sock[i])
 				{
+					temp_fd = i;
+					std::fprintf(stderr, "\nEVENTS I = %d ET N = %d\n", i, n);
 					conn_sock = accept(listen_sock[i], (struct sockaddr *) &addr[i], &addrlen[i]);
 					if (conn_sock == -1) {
 						std::fprintf(stderr, "Error: server accept failed: %s\n", strerror(errno));
@@ -187,8 +190,9 @@ int StartServer(std::vector<server_configuration*> servers, int tablen)
 						return(CloseSockets(listen_sock, tablen, servers, addr), EXIT_FAILURE);
 					}
 				} else {
-					handle_connection(servers[i], events[n].data.fd);
+					std::fprintf(stderr, "\nBALISE I = %d ET N = %d ET TMP_fd = %d\n", i, n, temp_fd);
 				}
+					handle_connection(servers[temp_fd], events[n].data.fd);
 			}
 		}
 	}

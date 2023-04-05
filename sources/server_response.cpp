@@ -6,13 +6,13 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:46 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/05 15:18:11 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/05 16:32:05 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "server_response.hpp"
 
-server_response::server_response() : _status_code(0), _body(""), _ServerResponse("")
+server_response::server_response() : _status_code(200), _body(""), _ServerResponse("")
 {
 	std::cout << "server_response Default Constructor called" << std::endl;
 }
@@ -97,11 +97,10 @@ server_response &server_response::operator=(server_response const &obj)
 // }
 
 
-void	server_response::todo(const server_request& Server_Request, int conn_sock, std::string Root)
+void	server_response::todo(const server_request& Server_Request, int conn_sock, server_configuration *server)
 {
 	enum imethod {GET, POST, DELETE};
-	server_configuration	test; //Avoir le vrai serveur dans fonction pour enlever celui-ci
-	test.setDefErrorPage(); // same
+	std::string	Root = server->getRoot();
 	int n = 0;
 	const std::string ftab[3] = {"GET", "POST", "DELETE"};
 	(void)Root;
@@ -142,11 +141,11 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 				std::cerr << "\nERROR IS_OPEN\r\n" << std::endl;
 				response << "HTTP/1.1 404 Not Found\r\n";
 			//	Ne peut pas fonctionner si on ne sait pas quel serveur recoit et du coup que les pages ne sont pas initialisees
-				if (test.getErrorPage().size() != 0 && test.getErrorPage().find("404") != test.getErrorPage().end())
-					buffer << test.getErrorPage().find("404")->second;
+				if (server->getErrorPage().size() != 0 && server->getErrorPage().find("404") != server->getErrorPage().end())
+					buffer << server->getErrorPage().find("404")->second;
 				else
 				//Actuellement j'utilise la page erreur 404 mais il va falloir trouver comment automatiser pour afficher la page d'erreur qu'il faut. De plus, il faudra check si la page erreur est precisee dans le fichier de config, sachant qu'on ne donne pas le serveur qui recoit la requete (du coup pour l'instant on ne peut pas)
-					buffer << test.getDefErrorPage().find("Not Found")->second;//file.rdbuf();
+					buffer << server->getDefErrorPage().find("Not Found")->second;//file.rdbuf();
 				std::string content = buffer.str();
 				// response << "Content-Type: text/plain; charset=UTF-8\r\n";
 				response << "Content-Length: " << content.size() << "\r\n";
