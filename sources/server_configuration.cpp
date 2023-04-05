@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:06:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/05 13:08:28 by nflan            ###   ########.fr       */
+/*   Updated: 2023/04/05 14:43:06 by nflan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ _ClientMaxBodySize(findClientMaxBodySize())
 	setCgi();
 	setErrorPage();
 	setDefErrorPage();
-			std::cout << "check pair de mes trois couilles -> '" << _ErrorPage.begin()->first << "' et '" << _ErrorPage.begin()->second << "'" << std::endl;
 	if (DEBUG)
 	{
 		std::cout << "server_configuration Overload Constructor called" << std::endl;
@@ -155,12 +154,8 @@ void server_configuration::setErrorPage()
 		for (tmp = pos; _ConfigFile[pos] != ' ' && _ConfigFile[pos] != ';'; pos++) {}
 		file = _ConfigFile.substr(tmp, pos - tmp);
 		second = readingFileEP(file);
-		std::cout << "second.size() = '" << second.size() << "'" << std::endl;
 		if (second.size() > 0)
-		{
-			std::cout << std::endl << "COUCOU" << std::endl;
 			_ErrorPage.insert(std::make_pair<std::string, std::string>(first, second));
-		}
 	}
 }
 
@@ -266,7 +261,7 @@ size_t server_configuration::findClientMaxBodySize()
 	return (1048576);
 }
 
-std::string server_configuration::findErrorPage()
+/*std::string server_configuration::findErrorPage()
 {
 	size_t pos = _ConfigFile.find("error_page");
 	if (pos != std::string::npos) {
@@ -280,13 +275,13 @@ std::string server_configuration::findErrorPage()
 		}
 	}
 	return ("");
-}
+}*/
 
 template<class T>
 void	server_configuration::printMap(std::map<T, T> map)
 {
-	for (std::map<std::string, std::string>::iterator it = map.begin(); it != map.end(); it++) // Print CGI
-		std::cout << "- first = '" << it->first << "' && second = '" << it->second << "'" << std::endl; // Print CGI
+	for (std::map<std::string, std::string>::iterator it = map.begin(); it != map.end(); it++)
+		std::cout << "- first = '" << it->first << "' && second = '" << it->second << "'" << std::endl;
 }
 
 std::string server_configuration::getConfigFile() { return _ConfigFile;}
