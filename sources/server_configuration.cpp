@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:06:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/05 17:34:45 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/05 18:42:47 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ std::string server_configuration::findServerName()
 			return(server_name.substr(0, space_pos)); // extract the substring before the space character
 		}
 	}
-	return ("Not found");
+	return ("");
 }
 
 std::string server_configuration::findRoot()
@@ -87,7 +87,7 @@ std::string server_configuration::findRoot()
 			return (root.substr(0, space_pos));
 		}
 	}
-	return ("Not found");
+	return ("");
 }
 
 int server_configuration::fillCgi(size_t pos)
@@ -295,8 +295,8 @@ std::map<std::string, std::string> server_configuration::findLocation()
 			size_t space_pos = location_path.find_first_of("{"); 
 			if (space_pos == std::string::npos) 
 			{
-				location_pair.first = "NULL";
-				location_pair.second = "NULL";
+				location_pair.first = "";
+				location_pair.second = "";
 			}
 			location_pair.first = location_path.substr(0, space_pos);
 			end_loc = location_path.find_first_of("{}", space_pos + 1);
@@ -312,8 +312,8 @@ std::map<std::string, std::string> server_configuration::findLocation()
 			}
 			if (end_loc == std::string::npos)
 			{
-				location_pair.first = "NULL";
-				location_pair.second = "NULL";
+				location_pair.first = "";
+				location_pair.second = "";
 			}
 			location_pair.second = location_path.substr(space_pos + 1, end_loc);
 			pos = pos + end_loc;
@@ -321,8 +321,8 @@ std::map<std::string, std::string> server_configuration::findLocation()
 		}
 		else
 		{
-			location_pair.first = "NULL";
-			location_pair.second = "NULL";
+			location_pair.first = "";
+			location_pair.second = "";
 		}
 		location_map.insert(location_pair);
 	}

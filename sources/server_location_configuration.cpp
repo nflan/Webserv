@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 17:08:06 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/05 17:31:48 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/05 18:43:27 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ server_location_configuration::server_location_configuration()
 
 server_location_configuration::server_location_configuration(std::string location_conf) :
 _HttpMethodAccepted(findHttpMethodAccepted(location_conf)),
-_HttpRedirection("NULL"),
+_HttpRedirection(""),
 _Root(findRoot(location_conf)),
 _DirectoryListing(findDirectoryListing(location_conf)),
 _DirectoryRequest(findDirectoryRequest(location_conf)),
@@ -68,7 +68,7 @@ std::vector<std::string> server_location_configuration::findHttpMethodAccepted(s
 	}
 	else
 	{
-		MethodAccepted.push_back("NULL");
+		MethodAccepted.push_back("");
 		return (MethodAccepted);
 	}
 	
@@ -96,7 +96,7 @@ std::string server_location_configuration::findRoot(std::string location_conf)
 			return (root.substr(0, space_pos));
 		}
 	}
-	return ("Not found");
+	return ("");
 }
 
 std::string server_location_configuration::findDirectoryListing(std::string location_conf)
@@ -110,7 +110,7 @@ std::string server_location_configuration::findDirectoryListing(std::string loca
 			return (root.substr(0, space_pos));
 		}
 	}
-	return ("Not found");
+	return ("");
 }
 
 std::string server_location_configuration::findDirectoryRequest(std::string location_conf)
@@ -125,7 +125,7 @@ std::string server_location_configuration::findDirectoryRequest(std::string loca
 			return (root.substr(0, space_pos));
 		}
 	}
-	return ("Not found");
+	return ("");
 }
 
 int server_location_configuration::fillCgi(size_t pos, std::string location_conf)
@@ -170,7 +170,7 @@ std::string server_location_configuration::findUploadStore(std::string location_
 			return (root.substr(0, space_pos));
 		}
 	}
-	return ("Not found");
+	return ("");
 }
 
 std::vector<std::string>& server_location_configuration::getHttpMethodAccepted() {return _HttpMethodAccepted;}
