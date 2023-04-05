@@ -20,7 +20,7 @@ server {
 
 			autoindex on;
 
-			index index.html default.html
+			index index.html;
 
 			cgi .php /usr/bin/php-cgi ;
 

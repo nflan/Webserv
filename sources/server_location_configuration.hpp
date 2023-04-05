@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 17:07:36 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/04 17:14:29 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/05 14:47:08 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,30 +14,42 @@
 #define SERVER_LOCATION_CONFIGURATION_HPP
 
 #include <iostream>
+#include <string>
+#include <cstring>
+#include <fstream>
+#include <sstream>
+#include <algorithm>
+#include <map>
+#include <vector>
 
 class server_location_configuration
 {
 	private:
-	std::string	_Uri;
-	std::string	_HttpAccepted;
-	std::string	_HttpRedirection;
+	std::vector<std::string>	_HttpMethodAccepted;
+	std::string	_HttpRedirection; // A VOIR CAR PAS COMPRIS
 	std::string	_Root;
-	bool		_DirectoryListing;
+	std::string	_DirectoryListing;
 	std::string	_DirectoryRequest;
-	std::map<std::string, std::string>	_Cgi; // To SEE
-	std::string Method;
-	std::string UploadStore;
+	std::map<std::string, std::string>	_Cgi;
+	std::string _UploadStore;
 
 	public:
 	server_location_configuration();
+	server_location_configuration(std::string location_conf);
 	server_location_configuration(server_location_configuration const &obj);
 	~server_location_configuration();
 	server_location_configuration &operator=(server_location_configuration const &obj);
 
-	std::string findRoot();
-	std::string findUploadStore();
+	std::vector<std::string> findHttpMethodAccepted(std::string location_conf);
+	std::string findRoot(std::string location_conf);
+	std::string findDirectoryListing(std::string location_conf);
+	std::string findDirectoryRequest(std::string location_conf);
+	int	fillCgi(size_t pos, std::string location_conf);
+	void setCgi(std::string location_conf);
+	std::string findUploadStore(std::string location_conf);
 
-
+	
 };
+
 
 #endif

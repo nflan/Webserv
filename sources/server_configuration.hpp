@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:03:12 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/04 17:09:32 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/05 14:39:04 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 #include <algorithm>
 #include <map>
 #include "server_location_configuration.hpp"
+#include <vector>
 #define DEBUG 0
 
 class server_configuration
@@ -34,7 +35,7 @@ class server_configuration
 	size_t		_ClientMaxBodySize;
 	std::string _ErrorPage; // refaire cela avec map TODO
 	std::map<std::string, std::string> _Location;
-	std::map<std::string, struct server_location> _Loc;
+	std::map<std::string, class server_location_configuration*> _Loc;
 	
 	
 	public:
@@ -51,6 +52,8 @@ class server_configuration
 	std::map<std::string, std::string> findLocation();
 	void setCgi();
 	int fillCgi(size_t pos);
+	std::map<std::string, class server_location_configuration*> findLoc();
+
 
 	void	printCgi();
 	std::ostream&	printLocation(std::ostream &out);

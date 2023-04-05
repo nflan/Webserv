@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: chillion <chillion@student.42.fr>          +#+  +:+       +#+         #
+#    By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/09/01 12:07:22 by chillion          #+#    #+#              #
-#    Updated: 2023/03/27 17:39:26 by chillion         ###   ########.fr        #
+#    Updated: 2023/04/05 14:32:22 by mgruson          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -33,6 +33,7 @@ CYAN = \033[0;36m
 NC = \033[0m
 
 SRCS =	main.cpp server_configuration.cpp server_request.cpp server_response.cpp \
+		server_location_configuration.cpp
 
 SRCS2 =	epollsrv.cpp	\
 

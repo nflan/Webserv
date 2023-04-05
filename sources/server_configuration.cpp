@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:06:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/04 17:10:12 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/05 14:56:28 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@ server_configuration::server_configuration()
 	if (DEBUG)
 		std::cout << "server_configuration Default Constructor called" << std::endl;
 }
-
 
 server_configuration::server_configuration(std::string ConfigFile) : 
 _ConfigFile(convertConfigFile(ConfigFile)),
@@ -250,19 +249,21 @@ std::map<std::string, std::string> server_configuration::findLocation()
 	return (location_map);
 }
 
-std::map<std::string, struct server_location> server_configuration::findLocation()
+std::map<std::string, class server_location_configuration*> server_configuration::findLoc()
 {
-	std::map<std::string, struct server_location>	map_location;
-	std::map<std::string, struct server_location>	pair_location;
+	std::map<std::string, class server_location_configuration*>	map_location;
+	std::pair<std::string, class server_location_configuration*>	pair_location;
 	
-	struct server_location							struct_location;
+	for (std::map<std::string, std::string>::iterator it = _Location.begin(); it != _Location.end(); it++)
+	{
+		pair_location.first = it->first;
+		server_location_configuration* tmp = new server_location_configuration(it->second);
+		pair_location.second = tmp;
+		map_location.insert(pair_location);
+	}
+	return (map_location);
 	
-	
-
-	pair_location.first = _Location
-	
-	
-} //TO CONTINUE
+}
 
 
 void	server_configuration::printCgi()
@@ -299,6 +300,7 @@ std::ostream& operator <<(std::ostream &out, server_configuration &ServConfig)
 		<< "\nCliend Body Limit : " << ServConfig.getClientMaxBodySize() \
 		<< "\nError page : " << ServConfig.getErrorPage() \
 		<< "\nCGI : " \
-		<< "\nLocation : " << ServConfig.printLocation(out) << std::endl;
+		<< "\nLocation : " << ServConfig.printLocation(out) \
+		<< "\nLocation : " << Serv.Config.printLoc(out) << std::endl;
 	return (out);
 }
