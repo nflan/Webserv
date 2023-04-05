@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 14:29:37 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/05 17:44:55 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/05 18:52:13 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,9 +26,9 @@ class server_request
 {
 	private:
 	std::string _ServerRequest;
-	std::string _Method;
+	std::string _Method; //old
 	std::string _method;
-	std::string _RequestURI;
+	std::string _RequestURI; //old
 	std::string _path;
 	std::string _version;
 	std::string _host;

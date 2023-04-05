@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 14:31:36 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/05 17:51:20 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/05 18:49:55 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,9 +35,7 @@ server_request &server_request::operator=(server_request const &obj)
 }
 
 server_request::server_request(std::string ServerRequest) :
-_ServerRequest(ServerRequest),
-_Method(findMethod()),
-_RequestURI(findRequestURI())
+_ServerRequest(ServerRequest) //, _Method(findMethod()), _RequestURI(findRequestURI())
 {
 }
 
@@ -84,44 +82,51 @@ std::ostream& operator <<(std::ostream &out, server_request &ServRequest)
 
 void server_request::request_parser()
 {
-    std::string request = "GET /index.html HTTP/1.1\r\nHost: www.example.com\r\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8\r\nAccept-Language: en-US,en;q=0.5\r\nAccept-Encoding: gzip, deflate, br\r\nConnection: keep-alive\r\n\r\n";
+    // std::string request = "GET /index.html HTTP/1.1\r\nHost: www.example.com\r\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8\r\nAccept-Language: en-US,en;q=0.5\r\nAccept-Encoding: gzip, deflate, br\r\nConnection: keep-alive\r\n\r\n";
     
     // Extraire la méthode HTTP (GET/POST/DELETE)
-    std::string::size_type method_end = request.find(' ');
-    this->_method = request.substr(0, method_end);
+    std::string::size_type method_end = _ServerRequest.find(' ');
+    this->_method = _ServerRequest.substr(0, method_end);
+    this->_Method = this->_method;
 
     // Extraire le chemin de la ressource (/index.html)
-    std::string::size_type path_end = request.find(' ', method_end + 1);
-    this->_path = request.substr(method_end + 1, path_end - method_end - 1);
+    std::string::size_type path_end = _ServerRequest.find(' ', method_end + 1);
+    this->_path = _ServerRequest.substr(method_end + 1, path_end - method_end - 1);
+    this->_RequestURI = this->_path;
 
     // Extraire la version HTTP (HTTP/1.1)
-    std::string::size_type version_end = request.find("\r\n", path_end + 1);
-    this->_version = request.substr(path_end + 1, version_end - path_end - 1);
+    std::string::size_type version_end = _ServerRequest.find("\r\n", path_end + 1);
+    this->_version = _ServerRequest.substr(path_end + 1, version_end - path_end - 1);
 
     // Extraire l'en-tête Host (www.example.com)
-    std::string::size_type host_start = request.find("Host: ");
-    std::string::size_type host_end = request.find("\r\n", host_start);
-    this->_host = request.substr(host_start + 6, host_end - host_start - 6);
+    std::string::size_type host_start = _ServerRequest.find("Host: ");
+    std::string::size_type host_end = _ServerRequest.find("\r\n", host_start);
+	if (host_start != host_end)
+    	this->_host = _ServerRequest.substr(host_start + 6, host_end - host_start - 6);
 
     // Extraire le type de connexion (keep-alive)
-    std::string::size_type ctype_start = request.find("Connection: ");
-    std::string::size_type ctype_end = request.find("\r\n", ctype_start);
-    this->_connectionType = request.substr(ctype_start + 12, ctype_end - ctype_start - 12);
+    std::string::size_type ctype_start = _ServerRequest.find("Connection: ");
+    std::string::size_type ctype_end = _ServerRequest.find("\r\n", ctype_start);
+	if (ctype_start != ctype_end)
+    	this->_connectionType = _ServerRequest.substr(ctype_start + 12, ctype_end - ctype_start - 12);
 
     // Extraire le type de MIME (image/png) IF GET
-    std::string::size_type mtype_start = request.find("Accept: ");
-    std::string::size_type mtype_end = request.find("\r\n", mtype_start);
-    this->_mimeType = request.substr(mtype_start + 8, mtype_end - mtype_start - 8);
+    std::string::size_type mtype_start = _ServerRequest.find("Accept: ");
+    std::string::size_type mtype_end = _ServerRequest.find("\r\n", mtype_start);
+	if (mtype_start != mtype_end)
+    	this->_mimeType = _ServerRequest.substr(mtype_start + 8, mtype_end - mtype_start - 8);
 
-    // Extraire le type de MIME (multipart/form-data) IF POST
-    std::string::size_type cotype_start = request.find("Content-Type: ");
-    std::string::size_type cotype_end = request.find("\r\n", cotype_start);
-    this->_contentType = request.substr(cotype_start + 14, cotype_end - cotype_start - 14);
+    // Extraire le type de content (multipart/form-data) IF POST
+    std::string::size_type cotype_start = _ServerRequest.find("Content-Type: ");
+    std::string::size_type cotype_end = _ServerRequest.find("\r\n", cotype_start);
+	if (cotype_start != cotype_end)
+    	this->_contentType = _ServerRequest.substr(cotype_start + 14, cotype_end - cotype_start - 14);
 
-    // Extraire le type de MIME (multipart/form-data) IF POST
-    std::string::size_type colength_start = request.find("Content-Length: ");
-    std::string::size_type colength_end = request.find("\r\n", colength_start);
-    this->_contentLength = request.substr(colength_start + 16, colength_end - colength_start - 16);
+    // Extraire la longueur du content (multipart/form-data) IF POST
+    std::string::size_type colength_start = _ServerRequest.find("Content-Length: ");
+    std::string::size_type colength_end = _ServerRequest.find("\r\n", colength_start);
+	if (colength_start != colength_end)
+    	this->_contentLength = _ServerRequest.substr(colength_start + 16, colength_end - colength_start - 16);
 
     // Afficher les résultats
     std::cout << "\nMéthode : " << this->_method << std::endl;
