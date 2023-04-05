@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server_request.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
+/*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 14:29:37 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/29 16:44:36 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/05 17:44:55 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,15 @@ class server_request
 	private:
 	std::string _ServerRequest;
 	std::string _Method;
+	std::string _method;
 	std::string _RequestURI;
+	std::string _path;
+	std::string _version;
+	std::string _host;
+	std::string _connectionType;
+	std::string _mimeType;
+	std::string _contentType;
+	std::string _contentLength;
 	server_request();
 
 	public:
@@ -41,6 +49,7 @@ class server_request
 	std::string getServerRequest() const;
 	std::string getMethod() const;
 	std::string getRequestURI() const;
+	void request_parser();
 };
 
 std::ostream& operator <<(std::ostream &out, server_request &ServRequest);

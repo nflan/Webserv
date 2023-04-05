@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 15:39:03 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/05 16:47:42 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/05 17:21:48 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,7 @@ void handle_connection(server_configuration *servers, int conn_sock) {
 	}
 	std::cout << "Request :\n" << request << std::endl;
 	server_request* ServerRequest = new server_request(request);
+	ServerRequest->request_parser();
 	server_response ServerResponse;
 	ServerResponse.todo(*ServerRequest, conn_sock, servers);
 	// std::string answer = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
@@ -193,13 +194,14 @@ int StartServer(std::vector<server_configuration*> servers, int tablen)
 				// else {
 				// 	std::fprintf(stderr, "\nBALISE I = %d ET N = %d ET TMP_fd = %d\n", i, n, temp_fd);
 				// }
-					handle_connection(servers[temp_fd], events[n].data.fd);
+				handle_connection(servers[temp_fd], events[n].data.fd);
 			}
 		}
 	}
 	return 0;
 }
-
+//function en cpp std++98 pour parser une requete http en gardant les elements principaux
+//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
 
 std::vector<server_configuration*> SetupNewServers(std::string filename)
 {
