@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/05 15:32:52 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/05 18:45:03 by nflan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,8 @@ class server_response
 	// void generate_delete_response(const std::string& request_uri) {
 	// 	// Code ici pour traiter la requête DELETE
 	// }
+
+	void	createResponse(server_configuration*);
 
 	// Définition de la méthode pour obtenir le corps de la réponse
 	std::string get_body() const { return _body; }

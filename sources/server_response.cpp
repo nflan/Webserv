@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:46 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/05 16:32:05 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/05 19:07:08 by nflan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,7 @@ server_response &server_response::operator=(server_response const &obj)
 #include <string>
 #include <cstring>
 #include "server_configuration.hpp"
+void	createResponse(server_configuration* server);
 
 // void handle_post_request(int client_socket)
 // {
@@ -95,7 +96,6 @@ server_response &server_response::operator=(server_response const &obj)
 // 	std::string response_str = response.str();
 // 	send(client_socket, response_str.c_str(), response_str.length(), 0);
 // }
-
 
 void	server_response::todo(const server_request& Server_Request, int conn_sock, server_configuration *server)
 {
@@ -140,11 +140,9 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 			{
 				std::cerr << "\nERROR IS_OPEN\r\n" << std::endl;
 				response << "HTTP/1.1 404 Not Found\r\n";
-			//	Ne peut pas fonctionner si on ne sait pas quel serveur recoit et du coup que les pages ne sont pas initialisees
 				if (server->getErrorPage().size() != 0 && server->getErrorPage().find("404") != server->getErrorPage().end())
 					buffer << server->getErrorPage().find("404")->second;
 				else
-				//Actuellement j'utilise la page erreur 404 mais il va falloir trouver comment automatiser pour afficher la page d'erreur qu'il faut. De plus, il faudra check si la page erreur est precisee dans le fichier de config, sachant qu'on ne donne pas le serveur qui recoit la requete (du coup pour l'instant on ne peut pas)
 					buffer << server->getDefErrorPage().find("Not Found")->second;//file.rdbuf();
 				std::string content = buffer.str();
 				// response << "Content-Type: text/plain; charset=UTF-8\r\n";
@@ -168,8 +166,9 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 			}
 			// response << "Hello world!\r\n";
 			std::cerr << "AFTER RESPONSE IFSTREAM\r\n" << std::endl;
-			std::string response_str = response.str();
-			send(conn_sock, response_str.c_str() , response_str.size(), 0);
+			createResponse(server);
+			_ServerResponse = response.str();
+			send(conn_sock, _ServerResponse.c_str() , _ServerResponse.size(), 0);
 			std::cerr << "\nREPONSE SEND :\n";
 			// std::cerr << response_str << std::endl;
 			break ;
@@ -188,4 +187,214 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 		}
 	}
 	return ;
+}
+
+void	server_response::createResponse(server_configuration * server)
+{
+	(void) server;
+	enum	status { INFO, SUCCESS, REDIRECTION, CLIENT, SERVER };
+	int	n = 0;
+	int	tmp = _status_code / 100 - 1;
+	for (; n != tmp && n < 5; n++) {}
+	switch (n)
+	{
+		case INFO:
+		{
+			std::cout << "JE SUIS DANS INFO" << std::endl;
+			switch (_status_code)
+				case 100:
+				{
+					break;
+				}
+				case 101:
+				{
+					break;
+				}
+			break;
+		}
+		case SUCCESS:
+		{
+			std::cout << "JE SUIS DANS SUCCESS" << std::endl;
+			switch (_status_code)
+			{
+				case 200:
+				{
+					break;
+				}
+				case 201:
+				{
+					break;
+				}
+				case 202:
+				{
+					break;
+				}
+				case 203:
+				{
+					break;
+				}
+				case 204:
+				{
+					break;
+				}
+				case 205:
+				{
+					break;
+				}
+				case 206:
+				{
+					break;
+				}
+			}
+			break;
+		}
+		case REDIRECTION:
+		{
+			std::cout << "JE SUIS DANS REDIRECTION" << std::endl;
+			switch (_status_code)
+				case 300:
+				{
+					break;
+				}
+				case 301:
+				{
+					break;
+				}
+				case 302:
+				{
+					break;
+				}
+				case 303:
+				{
+					break;
+				}
+				case 304:
+				{
+					break;
+				}
+				case 305:
+				{
+					break;
+				}
+				case 307:
+				{
+					break;
+				}
+			break;
+		}
+		case CLIENT:
+		{
+			std::cout << "JE SUIS DANS CLIENT" << std::endl;
+			switch (_status_code)
+			{
+				case 400:
+				{
+					break;
+				}
+				case 401:
+				{
+					break;
+				}
+				case 402:
+				{
+					break;
+				}
+				case 403:
+				{
+					break;
+				}
+				case 404:
+				{
+					break;
+				}
+				case 405:
+				{
+					break;
+				}
+				case 406:
+				{
+					break;
+				}
+				case 407:
+				{
+					break;
+				}
+				case 408:
+				{
+					break;
+				}
+				case 409:
+				{
+					break;
+				}
+				case 410:
+				{
+					break;
+				}
+				case 411:
+				{
+					break;
+				}
+				case 412:
+				{
+					break;
+				}
+				case 413:
+				{
+					break;
+				}
+				case 414:
+				{
+					break;
+				}
+				case 415:
+				{
+					break;
+				}
+				case 416:
+				{
+					break;
+				}
+				case 417:
+				{
+				break;
+				}
+			}
+			break;
+		}
+		case SERVER:
+		{
+			std::cout << "JE SUIS DANS SERVER" << std::endl;
+			switch (_status_code)
+			{
+				case 500:
+				{
+					break;
+				}
+				case 501:
+				{
+						break;
+				}
+				case 502:
+				{
+					break;
+				}
+				case 503:
+				{
+					break;
+				}
+				case 504:
+				{
+					break;
+				}
+				case 505:
+				{
+					break;
+				}
+			}
+			break;
+		}
+		default:
+			std::cout << "default" << std::endl;
+	}
 }

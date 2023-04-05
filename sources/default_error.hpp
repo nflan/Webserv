@@ -6,7 +6,7 @@
 /*   By: nflan <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/30 12:18:43 by nflan             #+#    #+#             */
-/*   Updated: 2023/04/04 18:40:01 by nflan            ###   ########.fr       */
+/*   Updated: 2023/04/05 18:12:46 by nflan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,9 @@
 
 # define STATUS401 "Unauthorized"
 # define HTML401 "<html><head><meta name=\"viewport\" content=\"width=device-width, minimum-scale=0.1\"><title>401 Unauthorized</title></head><body style=\"background: #0e0e0e; height: 100%;text-align:center;color:white;\"><h1>401 Unauthorized</h1><img src=\"https://http.cat/401\" style=\"display: block;margin: auto;\" alt=\"401 Unauthorized\"><p>webserv</p></body></html>"
+
+# define STATUS402 "Payment Required"
+# define HTML402 "<html><head><meta name=\"viewport\" content=\"width=device-width, minimum-scale=0.1\"><title>402 Payment Required</title></head><body style=\"background: #0e0e0e; height: 100%;text-align:center;color:white;\"><h1>402 Payment Required</h1><img src=\"https://http.cat/402\" style=\"display: block;margin: auto;\" alt=\"402 Payment Required\"><p>webserv</p></body></html>"
 
 # define STATUS403 "Forbidden"
 # define HTML403 "<html><head><meta name=\"viewport\" content=\"width=device-width, minimum-scale=0.1\"><title>403 Forbidden</title></head><body style=\"background: #0e0e0e; height: 100%;text-align:center;color:white;\"><h1>403 Forbidden</h1><img src=\"https://http.cat/403\" style=\"display: block;margin: auto;\" alt=\"403 Forbidden\"><p>webserv</p></body></html>"

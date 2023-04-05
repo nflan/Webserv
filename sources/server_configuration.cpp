@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:06:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/05 14:43:06 by nflan            ###   ########.fr       */
+/*   Updated: 2023/04/05 18:13:12 by nflan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -179,6 +179,7 @@ void server_configuration::setDefErrorPage()
 	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS307, HTML307));
 	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS400, HTML400));
 	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS401, HTML401));
+	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS402, HTML402));
 	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS403, HTML403));
 	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS404, HTML404));
 	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS405, HTML405));
