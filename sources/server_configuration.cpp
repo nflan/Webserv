@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:06:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/05 16:06:26 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/05 16:53:02 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -207,7 +207,6 @@ std::map<std::string, std::string> server_configuration::findLocation()
 		if (pos != std::string::npos)
 		{
 			pos += strlen("location"); 
-			std::cout << "pos: " << pos << std::endl;
 			std::string location_path = _ConfigFile.substr(pos + 1); 
 			size_t space_pos = location_path.find_first_of("{"); 
 			if (space_pos == std::string::npos) 
@@ -234,9 +233,7 @@ std::map<std::string, std::string> server_configuration::findLocation()
 				location_pair.second = "NULL";
 			}
 			location_pair.second = location_path.substr(space_pos + 1, end_loc);
-			std::cout << "pos 0: " << pos << std::endl;
 			pos = pos + end_loc;
-			std::cout << "pos 1: " << pos << std::endl;
 			end_loc = 0;
 		}
 		else
@@ -284,12 +281,19 @@ std::ostream&	server_configuration::printLoc(std::ostream &out)
 		
 		for (std::map<std::string, class server_location_configuration*>::iterator it = _Loc.begin(); it != _Loc.end(); it++)
 		{
-			out << "\nLocation configurations  for " << it->first \
+			out << "\nLocation configurations  for " << it->first ;
+			for (std::vector<std::string>::iterator ite = it->second->getHttpMethodAccepted().begin(); ite != it->second->getHttpMethodAccepted().end(); ite++)
+				out << "\nHttpMethodAccepted : " << *ite;
+			out << "\nHttpRedirection " << it->second->getHttpRedirection() \
 			<< "\nRoot : " << it->second->getRoot() \
 			<< "\nDirectoryListing : " << it->second->getDirectoryListing() \
-			<< "\nDirectoryRequest : " << it->second->getDirectoryRequest() \
-			<< "\nCGI : " \
-			<< "\n UploadStore : " << it->second->getUploadStore();
+			<< "\nDirectoryRequest : " << it->second->getDirectoryRequest() ;
+			for (std::map<std::string, std::string>::iterator ite = it->second->getCgi().begin(); ite != it->second->getCgi().end(); ite++)
+			{
+				out << "\nCGI : \n" \
+				<< "path : " << ite->first << "\nconf : " << ite->second ;
+			}
+			out << "\nUploadStore : " << it->second->getUploadStore();
 		}
 		return (out);
 }

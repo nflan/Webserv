@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 17:08:06 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/05 16:02:29 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/05 16:48:55 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,8 +81,7 @@ std::vector<std::string> server_location_configuration::findHttpMethodAccepted(s
 		methods.erase(0, i + delimiter.length());
 	}
 	MethodAccepted.push_back(methods);
-	
-	return (MethodAccepted);
+		return (MethodAccepted);
 }
 
 
@@ -139,6 +138,7 @@ int server_location_configuration::fillCgi(size_t pos, std::string location_conf
 	if (location_conf[pos] == ';')
 		return 0;
 	for (tmp = pos; location_conf[pos] != ' ' && location_conf[pos] != ';'; pos++) {}
+	std::cout << "TEST\n" << location_conf.substr(tmp, pos - tmp) << std::endl;
 	cgi_pair.second = location_conf.substr(tmp, pos - tmp);
 	_Cgi.insert(cgi_pair);
 	return (pos + 1);
@@ -172,7 +172,10 @@ std::string server_location_configuration::findUploadStore(std::string location_
 	return ("Not found");
 }
 
-std::string server_location_configuration::getDirectoryListing() { return _DirectoryListing;}
+std::vector<std::string>& server_location_configuration::getHttpMethodAccepted() {return _HttpMethodAccepted;}
+std::string	server_location_configuration::getHttpRedirection() { return _HttpRedirection;}
 std::string server_location_configuration::getRoot() { return _Root;}
+std::string server_location_configuration::getDirectoryListing() { return _DirectoryListing;}
 std::string server_location_configuration::getDirectoryRequest() { return _DirectoryRequest;}
+std::map<std::string, std::string>&	server_location_configuration::getCgi() { return _Cgi;}
 std::string server_location_configuration::getUploadStore() { return _UploadStore;}
