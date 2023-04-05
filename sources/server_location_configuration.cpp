@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 17:08:06 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/05 16:48:55 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/05 17:31:48 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,7 +138,8 @@ int server_location_configuration::fillCgi(size_t pos, std::string location_conf
 	if (location_conf[pos] == ';')
 		return 0;
 	for (tmp = pos; location_conf[pos] != ' ' && location_conf[pos] != ';'; pos++) {}
-	std::cout << "TEST\n" << location_conf.substr(tmp, pos - tmp) << std::endl;
+	if (DEBUG)
+		std::cout << "TEST\n" << location_conf.substr(tmp, pos - tmp) << std::endl;
 	cgi_pair.second = location_conf.substr(tmp, pos - tmp);
 	_Cgi.insert(cgi_pair);
 	return (pos + 1);

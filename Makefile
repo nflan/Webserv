@@ -6,7 +6,7 @@
 #    By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/09/01 12:07:22 by chillion          #+#    #+#              #
-#    Updated: 2023/04/05 14:32:22 by mgruson          ###   ########.fr        #
+#    Updated: 2023/04/05 17:07:58 by mgruson          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -84,8 +84,8 @@ client :
 test : all
 	$(VAL) ./${SOFT_NAME} sources/server.conf
 
-test2 : all
-	$(VAL) ./${SOFT_NAME2}
+t2 : all
+	$(VAL) ./${SOFT_NAME} sources/server.conf2
 
 clean : 
 	@echo "${RED}###${NC}Nettoyage des fichiers .o${RED}###"

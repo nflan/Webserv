@@ -6,13 +6,13 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:46 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/04 14:23:54 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/05 17:14:12 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "server_response.hpp"
 
-server_response::server_response() : _status_code(0), _body(""), _ServerResponse("")
+server_response::server_response() : _status_code(200), _body(""), _ServerResponse("")
 {
 	std::cout << "server_response Default Constructor called" << std::endl;
 }
@@ -54,6 +54,7 @@ server_response &server_response::operator=(server_response const &obj)
 #include <sstream>
 #include <string>
 #include <cstring>
+#include "server_configuration.hpp"
 
 // void handle_post_request(int client_socket)
 // {
@@ -96,9 +97,10 @@ server_response &server_response::operator=(server_response const &obj)
 // }
 
 
-void	server_response::todo(const server_request& Server_Request, int conn_sock, std::string Root)
+void	server_response::todo(const server_request& Server_Request, int conn_sock, server_configuration *server)
 {
 	enum imethod {GET, POST, DELETE};
+	std::string	Root = server->getRoot();
 	int n = 0;
 	const std::string ftab[3] = {"GET", "POST", "DELETE"};
 	(void)Root;
@@ -123,9 +125,13 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 			std::cout << "\nC0 = '" << tmp << "'\n" << std::endl;
 			if (tmp.size() == 3 && tmp.find(".//") != std::string::npos)
 			{
-				tmp.erase();
+				// tmp.erase();
 				std::cout << "\nC1\n" << std::endl;
-				tmp = "./index.html"; // mouton
+				tmp += "index.html";
+			}
+			if (tmp[tmp.size() - 1] == '/')
+			{
+				tmp += "index.html";
 			}
 			std::ifstream file(tmp.c_str());
 			std::stringstream buffer;
@@ -133,25 +139,19 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 			if (!file.is_open())
 			{
 				std::cerr << "\nERROR IS_OPEN\r\n" << std::endl;
-				std::ifstream file("test404.html");
 				response << "HTTP/1.1 404 Not Found\r\n";
-				if (!file.is_open())
-				{
-					// response << "Content-Type: text/plain; charset=UTF-8\r\n";
-					response << "Content-Length: 28\r\n";
-					response << "\r\n";
-					response << "ERROR 404 : Page Not Found\r\n";
-				}
+			//	Ne peut pas fonctionner si on ne sait pas quel serveur recoit et du coup que les pages ne sont pas initialisees
+				if (server->getErrorPage().size() != 0 && server->getErrorPage().find("404") != server->getErrorPage().end())
+					buffer << server->getErrorPage().find("404")->second;
 				else
-				{
-					buffer << file.rdbuf();
-					std::string content = buffer.str();
-					// response << "Content-Type: text/plain; charset=UTF-8\r\n";
-					response << "Content-Length: " << content.size() << "\r\n";
-					response << "\r\n";
-					response << content << "\r\n";
-					// response << "Content-Type: text/html\r\n";
-				}
+				//Actuellement j'utilise la page erreur 404 mais il va falloir trouver comment automatiser pour afficher la page d'erreur qu'il faut. De plus, il faudra check si la page erreur est precisee dans le fichier de config, sachant qu'on ne donne pas le serveur qui recoit la requete (du coup pour l'instant on ne peut pas)
+					buffer << server->getDefErrorPage().find("Not Found")->second;//file.rdbuf();
+				std::string content = buffer.str();
+				// response << "Content-Type: text/plain; charset=UTF-8\r\n";
+				response << "Content-Length: " << content.size() << "\r\n";
+				response << "\r\n";
+				response << content << "\r\n";
+				// response << "Content-Type: text/html\r\n";
 			}
 			else
 			{

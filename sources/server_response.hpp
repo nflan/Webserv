@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/23 15:41:13 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/05 15:32:52 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include "server_configuration.hpp"
 #include "server_request.hpp"
 
 class server_request;
@@ -49,7 +50,7 @@ class server_response
 	~server_response();
 	server_response &operator=(server_response const &obj);
 
-	void	todo(const server_request& Server_Request, int conn_sock, std::string Root);
+	void	todo(const server_request& Server_Request, int conn_sock, server_configuration* Root);
 //   // Définition de la méthode pour générer une réponse GET
 // 	void generate_get_response(const std::string& request_uri) {
 // 		// Code ici pour traiter la requête GET
