@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 15:39:03 by mgruson           #+#    #+#             */
-/*   Updated: 2023/03/29 16:18:09 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/05 12:50:53 by nflan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -201,7 +201,7 @@ std::vector<server_configuration*> SetupNewServers(std::string filename)
 	std::ifstream input_file(filename.c_str());
 
 	if (!input_file.is_open()) {
-		std::cout << "Failed to open file " << filename << std::endl;
+		std::cerr << "Failed to open file " << filename << std::endl;
 		exit (-1) ;
 	}
 	std::vector<server_configuration*> servers;
@@ -253,7 +253,7 @@ int main(int argc, char const **argv)
 {
 	if (argc != 2)
 	{
-		std::cout << "Wrong number of arguments" << std::endl;
+		std::cerr << "Wrong number of arguments" << std::endl;
 		return -1;
 	}
 	signal(SIGINT, sigint_handler);

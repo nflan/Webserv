@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:46 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/04 19:18:32 by nflan            ###   ########.fr       */
+/*   Updated: 2023/04/05 13:04:11 by nflan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,7 +137,13 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 			{
 				std::cerr << "\nERROR IS_OPEN\r\n" << std::endl;
 				response << "HTTP/1.1 404 Not Found\r\n";
-				buffer << test.getDefErrorPage().find("Not Found")->second;//file.rdbuf(); --> Actuellement j'utilise la page erreur 404 mais il va falloir trouver comment automatiser pour afficher la page d'erreur qu'il faut. De plus, il faudra check si la page erreur est precisee dans le fichier de config, sachant qu'on ne donne pas le serveur qui recoit la requete (du coup pour l'instant on ne peut pas)
+				if (test.getErrorPage().find("404") != test.getErrorPage().end())
+				{
+					std::cout << test.getErrorPage().find("404")->first << std::endl;
+					buffer << test.getErrorPage().find("404")->second;
+				}
+				else
+					buffer << test.getDefErrorPage().find("Not Found")->second;//file.rdbuf(); --> Actuellement j'utilise la page erreur 404 mais il va falloir trouver comment automatiser pour afficher la page d'erreur qu'il faut. De plus, il faudra check si la page erreur est precisee dans le fichier de config, sachant qu'on ne donne pas le serveur qui recoit la requete (du coup pour l'instant on ne peut pas)
 				std::string content = buffer.str();
 				// response << "Content-Type: text/plain; charset=UTF-8\r\n";
 				response << "Content-Length: " << content.size() << "\r\n";

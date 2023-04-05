@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:06:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/04 19:19:37 by nflan            ###   ########.fr       */
+/*   Updated: 2023/04/05 13:08:28 by nflan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,11 +25,11 @@ _ServerName(findServerName()),
 _Root(findRoot()),
 _Port(findPort()),
 _ClientMaxBodySize(findClientMaxBodySize())
-//_ErrorPage(findErrorPage())
 {
 	setCgi();
 	setErrorPage();
 	setDefErrorPage();
+			std::cout << "check pair de mes trois couilles -> '" << _ErrorPage.begin()->first << "' et '" << _ErrorPage.begin()->second << "'" << std::endl;
 	if (DEBUG)
 	{
 		std::cout << "server_configuration Overload Constructor called" << std::endl;
@@ -118,10 +118,25 @@ void server_configuration::setCgi()
 		pos = fillCgi(pos);
 }
 
+std::string	readingFileEP( std::string file )
+{
+	std::ifstream input_file(file.c_str());
+
+	if (!input_file.is_open()) {
+		std::cout << "Can't open file " << file << " using default error page" << std::endl;
+		return ("");
+	}
+	std::string fileContent;
+	std::getline(input_file, fileContent, '\0');
+	input_file.close();
+	return (fileContent.substr(0, fileContent.size()));
+}
+
 void server_configuration::setErrorPage()
 {
 	std::string	first;
 	std::string	second;
+	std::string	file;
 	size_t pos = _ConfigFile.find("error_page");
 
 	if (pos == std::string::npos)
@@ -138,8 +153,14 @@ void server_configuration::setErrorPage()
 		if (_ConfigFile[pos] == ';')
 			throw ErrorPageException();
 		for (tmp = pos; _ConfigFile[pos] != ' ' && _ConfigFile[pos] != ';'; pos++) {}
-		second = _ConfigFile.substr(tmp, pos - tmp);
-		_ErrorPage.insert(std::make_pair<std::string, std::string>(first, second));
+		file = _ConfigFile.substr(tmp, pos - tmp);
+		second = readingFileEP(file);
+		std::cout << "second.size() = '" << second.size() << "'" << std::endl;
+		if (second.size() > 0)
+		{
+			std::cout << std::endl << "COUCOU" << std::endl;
+			_ErrorPage.insert(std::make_pair<std::string, std::string>(first, second));
+		}
 	}
 }
 
