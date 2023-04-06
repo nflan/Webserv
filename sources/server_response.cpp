@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:46 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/05 17:14:12 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/06 12:59:45 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,45 +133,56 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 			{
 				tmp += "index.html";
 			}
-			std::ifstream file(tmp.c_str());
-			std::stringstream buffer;
+			tmp = "./site/42.jpg";
+			std::cout << "\nC0bis = '" << tmp << "'\n" << std::endl;
+			std::ifstream file(tmp.c_str(), std::ifstream::binary);
+			// std::stringstream buffer;
 			std::stringstream response;
-			if (!file.is_open())
-			{
-				std::cerr << "\nERROR IS_OPEN\r\n" << std::endl;
-				response << "HTTP/1.1 404 Not Found\r\n";
-			//	Ne peut pas fonctionner si on ne sait pas quel serveur recoit et du coup que les pages ne sont pas initialisees
-				if (server->getErrorPage().size() != 0 && server->getErrorPage().find("404") != server->getErrorPage().end())
-					buffer << server->getErrorPage().find("404")->second;
-				else
-				//Actuellement j'utilise la page erreur 404 mais il va falloir trouver comment automatiser pour afficher la page d'erreur qu'il faut. De plus, il faudra check si la page erreur est precisee dans le fichier de config, sachant qu'on ne donne pas le serveur qui recoit la requete (du coup pour l'instant on ne peut pas)
-					buffer << server->getDefErrorPage().find("Not Found")->second;//file.rdbuf();
-				std::string content = buffer.str();
-				// response << "Content-Type: text/plain; charset=UTF-8\r\n";
-				response << "Content-Length: " << content.size() << "\r\n";
-				response << "\r\n";
-				response << content << "\r\n";
-				// response << "Content-Type: text/html\r\n";
-			}
-			else
-			{
-				std::cout << "\nC2\n" << std::endl;
-				buffer << file.rdbuf();
-				// std::cout << "\nBUFFER = " << buffer.str() << "\r\n" << std::endl;
-				std::string content = buffer.str();
-				response << "HTTP/1.1 200 OK\r\n";
-				response << "Content-Type: text/html\r\n";
-				// response << "Content-Type: text/plain; charset=UTF-8\r\n";
-				response << "Content-Length: " << content.size() << "\r\n";
-				response << "\r\n";
-				response << content << "\r\n";
-			}
+			std::filebuf* pbuf = file.rdbuf();
+			std::size_t size = pbuf->pubseekoff(0, file.end, file.in);
+			pbuf->pubseekpos (0,file.in);
+			char *buffer= new char[size];
+			pbuf->sgetn(buffer, size);
+			file.close();
+			std::string content(buffer, size);
+			// std::cout.write (buffer,size);
+			// if (!file.is_open())
+			// {
+			// 	std::cerr << "\nERROR IS_OPEN\r\n" << std::endl;
+			// 	response << "HTTP/1.1 404 Not Found\r\n";
+			// //	Ne peut pas fonctionner si on ne sait pas quel serveur recoit et du coup que les pages ne sont pas initialisees
+			// 	if (server->getErrorPage().size() != 0 && server->getErrorPage().find("404") != server->getErrorPage().end())
+			// 		buffer << server->getErrorPage().find("404")->second;
+			// 	else
+			// 	//Actuellement j'utilise la page erreur 404 mais il va falloir trouver comment automatiser pour afficher la page d'erreur qu'il faut. De plus, il faudra check si la page erreur est precisee dans le fichier de config, sachant qu'on ne donne pas le serveur qui recoit la requete (du coup pour l'instant on ne peut pas)
+			// 		buffer << server->getDefErrorPage().find("Not Found")->second;//file.rdbuf();
+			// 	std::string content = buffer.str();
+			// 	// response << "Content-Type: text/plain; charset=UTF-8\r\n";
+			// 	response << "Content-Length: " << content.size() << "\r\n";
+			// 	response << "\r\n";
+			// 	response << content << "\r\n";
+			// 	// response << "Content-Type: text/html\r\n";
+			// }
+			// else // c'est ici que ça va se passer!
+			// {
+			std::cout << "\nC2\n" << std::endl;
+			// buffer << file.rdbuf();
+			// std::cout << "\nBUFFER = " << buffer.str() << "\r\n" << std::endl;
+			// std::string content = buffer.str();
+			response << "HTTP/1.1 200 OK\r\n";
+			response << "content-Type: image/jpeg\r\n";
+			// response << "Content-Type: text/plain; charset=UTF-8\r\n";
+			response << "content-Length: " << size << "\r\n";
+			response << "\r\n";
+			response << content << '\0' << "\r\n";
+			// }
 			// response << "Hello world!\r\n";
 			std::cerr << "AFTER RESPONSE IFSTREAM\r\n" << std::endl;
+			std::cout << buffer << std::endl;
 			std::string response_str = response.str();
 			send(conn_sock, response_str.c_str() , response_str.size(), 0);
 			std::cerr << "\nREPONSE SEND :\n";
-			// std::cerr << response_str << std::endl;
+			std::cerr << response_str << std::endl;
 			break ;
 		}
 		case POST :
