@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 14:29:37 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/06 15:15:14 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/06 15:43:26 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ class server_request
 	std::string _contentType;
 	std::string _contentLength;
 	std::string _body;
+
 	server_request();
 
 	public:
@@ -52,6 +53,7 @@ class server_request
 	std::string getMethod() const;
 	std::string getRequestURI() const;
 	std::string getType() const;
+	std::string	getBody() const;
 	void request_parser();
 };
 

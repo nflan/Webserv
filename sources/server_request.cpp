@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 14:31:36 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/06 15:23:52 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/06 15:42:48 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,11 @@ std::string server_request::getMethod() const
 std::string server_request::getRequestURI() const
 {
 	return (_RequestURI);
+}
+
+std::string server_request::getBody() const
+{
+	return (_body);
 }
 
 std::ostream& operator <<(std::ostream &out, server_request &ServRequest)

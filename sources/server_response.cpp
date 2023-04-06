@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:46 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/06 13:48:12 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/06 16:32:06 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -193,6 +193,65 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 		}
 		case POST :
 		{
+			// std::string infilename = "./site/42.jpg";
+			// std::ifstream inputFile(infilename.c_str(), std::ios::binary);
+			// std::stringstream response1;
+			std::string outfilename = "./test.jpg";
+			std::ofstream outputFile(outfilename.c_str(), std::ios::binary);
+
+			// // Get the file size
+			// inputFile.seekg(0, std::ios::end);
+			// int fileSize = inputFile.tellg();
+			// inputFile.seekg(0, std::ios::beg);
+			
+			// // Read the contents of the file into a buffer
+			// std::vector<unsigned char> fileBuffer(fileSize);
+			// inputFile.read(reinterpret_cast<char*>(fileBuffer.data()), fileSize);
+			
+			// inputFile.close();
+
+			// outputFile << reinterpret_cast<char*>(fileBuffer.data());
+			// outputFile.close();
+
+			std::string tmp = "./site/42.jpg";
+            std::cout << "\nC0bis = '" << tmp << "'\n" << std::endl;
+            std::ifstream file(tmp.c_str(), std::ifstream::binary);
+            // std::stringstream buffer;
+            std::stringstream response;
+            std::filebuf* pbuf = file.rdbuf();
+            std::size_t size = pbuf->pubseekoff(0, file.end, file.in);
+            pbuf->pubseekpos (0,file.in);
+            char *buffer= new char[size];
+            pbuf->sgetn(buffer, size);
+            file.close();
+            std::string content(buffer, size);
+			std::cout << "\nC2\n" << std::endl;
+            // buffer << file.rdbuf();
+            // std::cout << "\nBUFFER = " << buffer.str() << "\r\n" << std::endl;
+            // std::string content = buffer.str();
+            response << "HTTP/1.1 200 OK\r\n";
+            response << "content-Type: image/jpeg\r\n";
+            // response << "Content-Type: text/plain; charset=UTF-8\r\n";
+            response << "content-Length: " << size << "\r\n";
+            response << "\r\n";
+            response << content << '\0' << "\r\n";
+			outputFile << content ;
+			outputFile.close();
+            // }
+            // response << "Hello world!\r\n";
+            std::cerr << "AFTER RESPONSE IFSTREAM\r\n" << std::endl;
+            std::cout << buffer << std::endl;
+            std::string response_str = response.str();
+            send(conn_sock, response_str.c_str() , response_str.size(), 0);
+/**********************************************************************************/
+			// std::cout << "Successfully wrote to " << outfilename << std::endl;
+			// response1 << "HTTP/1.1 200 OK\r\n";
+			// response1 << "Content-Length: " << fileSize << "\r\n";
+			// response1 << "\r\n";
+			// response1.write(reinterpret_cast<char*>(fileBuffer.data()), fileSize);
+			// std::string response_str1 = response1.str();
+			// send(conn_sock, response_str1.c_str() , response_str1.size(), 0);
+
 			break ;
 		}
 		case DELETE :
