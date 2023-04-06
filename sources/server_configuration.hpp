@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:03:12 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/04 19:04:18 by nflan            ###   ########.fr       */
+/*   Updated: 2023/04/06 16:48:50 by nflan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,10 +20,13 @@
 #include <sstream>
 #include <algorithm>
 #include "default_error.hpp"
+#include "ErrorCorresp.hpp"
 #include <sstream>
 #include <map>
 
 #define DEBUG 0
+
+class ErrorCorresp;
 
 class server_configuration
 {
@@ -33,6 +36,7 @@ class server_configuration
 	std::string	_Root;
 	std::map<std::string, std::string>	_cgi;
 	int			_Port;
+	int			_StatusCode;
 	size_t		_ClientMaxBodySize;
 	std::map<std::string, std::string>	_ErrorPage;
 	std::map<std::string, std::string>	_DefErrorPage;
@@ -51,6 +55,7 @@ class server_configuration
 	void	setCgi();
 	void	setErrorPage();
 	void	setDefErrorPage();
+	void	setStatusCode(int);
 	int fillCgi(size_t pos);
 
 	template<class T>
@@ -60,6 +65,7 @@ class server_configuration
 	std::string findErrorPage();
 	std::string getConfigFile();
 	std::string getServerName();
+	int	getStatusCode();
 	std::map<std::string, std::string>	getCgi();
 	std::map<std::string, std::string>	getErrorPage();
 	std::map<std::string, std::string>&	getDefErrorPage();

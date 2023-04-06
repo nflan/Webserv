@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/05 18:45:03 by nflan            ###   ########.fr       */
+/*   Updated: 2023/04/06 16:50:22 by nflan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,7 @@ class server_response
 	
 	public:
 	server_response();
+	server_response(int);
 	server_response(server_response const &obj);
 	~server_response();
 	server_response &operator=(server_response const &obj);
@@ -66,7 +67,9 @@ class server_response
 	// 	// Code ici pour traiter la requête DELETE
 	// }
 
-	void	createResponse(server_configuration*);
+	void	createResponse(server_configuration*, std::string);
+	std::string	addHeader(std::string statusMsg );
+	std::string	addBody(std::string body);
 
 	// Définition de la méthode pour obtenir le corps de la réponse
 	std::string get_body() const { return _body; }

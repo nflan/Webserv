@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:46 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/05 19:07:08 by nflan            ###   ########.fr       */
+/*   Updated: 2023/04/06 16:54:11 by nflan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,12 @@ server_response::server_response() : _status_code(200), _body(""), _ServerRespon
 {
 	std::cout << "server_response Default Constructor called" << std::endl;
 }
+
+server_response::server_response(int stat) : _status_code(stat), _body(""), _ServerResponse("")
+{
+	std::cout << "server_response int Constructor called" << std::endl;
+}
+
 server_response::server_response(server_response const &obj)
 {
 	*this = obj;
@@ -54,8 +60,6 @@ server_response &server_response::operator=(server_response const &obj)
 #include <sstream>
 #include <string>
 #include <cstring>
-#include "server_configuration.hpp"
-void	createResponse(server_configuration* server);
 
 // void handle_post_request(int client_socket)
 // {
@@ -103,7 +107,9 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 	std::string	Root = server->getRoot();
 	int n = 0;
 	const std::string ftab[3] = {"GET", "POST", "DELETE"};
+	std::string		content;
 	(void)Root;
+
 	for (; n < 4; n++)
 	{
 		if (n != 3 && ftab[n] == Server_Request.getMethod())
@@ -138,36 +144,27 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 			std::stringstream response;
 			if (!file.is_open())
 			{
-				std::cerr << "\nERROR IS_OPEN\r\n" << std::endl;
-				response << "HTTP/1.1 404 Not Found\r\n";
-				if (server->getErrorPage().size() != 0 && server->getErrorPage().find("404") != server->getErrorPage().end())
-					buffer << server->getErrorPage().find("404")->second;
-				else
-					buffer << server->getDefErrorPage().find("Not Found")->second;//file.rdbuf();
-				std::string content = buffer.str();
-				// response << "Content-Type: text/plain; charset=UTF-8\r\n";
-				response << "Content-Length: " << content.size() << "\r\n";
-				response << "\r\n";
-				response << content << "\r\n";
-				// response << "Content-Type: text/html\r\n";
+				if (_status_code == 200)
+					_status_code = 404;
 			}
 			else
 			{
-				std::cout << "\nC2\n" << std::endl;
+		//		std::cout << "\nC2\n" << std::endl;
 				buffer << file.rdbuf();
 				// std::cout << "\nBUFFER = " << buffer.str() << "\r\n" << std::endl;
-				std::string content = buffer.str();
-				response << "HTTP/1.1 200 OK\r\n";
-				response << "Content-Type: text/html\r\n";
+				content = buffer.str();
+		//		response << "HTTP/1.1 200 OK\r\n";
+		//		response << "Content-Type: text/html\r\n";
 				// response << "Content-Type: text/plain; charset=UTF-8\r\n";
-				response << "Content-Length: " << content.size() << "\r\n";
-				response << "\r\n";
-				response << content << "\r\n";
+		//		response << "Content-Length: " << content.size() << "\r\n";
+		//		response << "\r\n";
+		//		response << content << "\r\n";
 			}
 			// response << "Hello world!\r\n";
 			std::cerr << "AFTER RESPONSE IFSTREAM\r\n" << std::endl;
-			createResponse(server);
-			_ServerResponse = response.str();
+			createResponse(server, content);
+		//	_ServerResponse = response.str();
+			std::cout << std::endl << "SERVER RESPONSE CONSTRUITE -> " << std::endl << _ServerResponse << std::endl << std::endl;
 			send(conn_sock, _ServerResponse.c_str() , _ServerResponse.size(), 0);
 			std::cerr << "\nREPONSE SEND :\n";
 			// std::cerr << response_str << std::endl;
@@ -189,9 +186,31 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 	return ;
 }
 
-void	server_response::createResponse(server_configuration * server)
+std::string	server_response::addHeader(std::string statusMsg)
 {
-	(void) server;
+	std::string	header;
+	std::stringstream	response;
+	
+	response << "HTTP/1.1" << " " << _status_code << " " << statusMsg << "\r\n";  /* ajouter la version HTTP (parsing) */ 
+	response << "Content-Type: " << "text/html" << "\r\n"; // modif text/html (parsing) -> peut etre faire map de content type / mime en fonction de .py = /truc .html = /text/html etc.
+	header = response.str();
+	return (header);
+}
+
+std::string	server_response::addBody(std::string msg)
+{
+	std::string	body;
+	std::stringstream	response;
+
+	response << "Content-Length: " << msg.size() << "\r\n\r\n"; // modif text/html (parsing) -> peut etre faire map de content type / mime en fonction de .py = /truc .html = /text/html etc.
+	response << msg << "\r\n";
+	body = response.str();
+	return (body);
+}
+
+void	server_response::createResponse(server_configuration * server, std::string file)
+{
+	std::stringstream	response;
 	enum	status { INFO, SUCCESS, REDIRECTION, CLIENT, SERVER };
 	int	n = 0;
 	int	tmp = _status_code / 100 - 1;
@@ -204,6 +223,8 @@ void	server_response::createResponse(server_configuration * server)
 			switch (_status_code)
 				case 100:
 				{
+					response << addHeader(STATUS100);
+					response << addBody(server->getErrorPage()[STATUS100]);
 					break;
 				}
 				case 101:
@@ -219,6 +240,8 @@ void	server_response::createResponse(server_configuration * server)
 			{
 				case 200:
 				{
+					response << addHeader(STATUS200);
+					response << addBody(file);
 					break;
 				}
 				case 201:
@@ -305,6 +328,8 @@ void	server_response::createResponse(server_configuration * server)
 				}
 				case 404:
 				{
+					response << addHeader(STATUS404);
+					response << addBody(server->getErrorPage()[STATUS404]);
 					break;
 				}
 				case 405:
@@ -369,6 +394,8 @@ void	server_response::createResponse(server_configuration * server)
 			{
 				case 500:
 				{
+					response << addHeader(STATUS500);
+					response << addBody(server->getErrorPage()[STATUS500]);
 					break;
 				}
 				case 501:
@@ -397,4 +424,5 @@ void	server_response::createResponse(server_configuration * server)
 		default:
 			std::cout << "default" << std::endl;
 	}
+	_ServerResponse = response.str();
 }
