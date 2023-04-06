@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 14:31:36 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/06 13:47:11 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/06 15:23:52 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,6 +138,10 @@ void server_request::request_parser()
 	if (colength_start != colength_end)
     	this->_contentLength = _ServerRequest.substr(colength_start + 16, colength_end - colength_start - 16);
 
+    std::string::size_type body_start = _ServerRequest.find("\r\n\0\r\n", colength_end);
+    this->_body = _ServerRequest.substr(body_start + 5);
+
+		
     // Afficher les résultats
     std::cout << "\nMéthode : " << this->_method << std::endl;
     std::cout << "Chemin : " << this->_path << std::endl;
@@ -148,5 +152,6 @@ void server_request::request_parser()
     std::cout << "MIME : " << this->_mimeType <<  std::endl;
     std::cout << "Content Type : " << this->_contentType <<  std::endl;
     std::cout << "Content Length : " << this->_contentLength << "\n" <<  std::endl;
+    std::cout << "Body : " << this->_body << "\n" <<  std::endl;
 }
 
