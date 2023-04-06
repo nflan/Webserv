@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:46 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/06 17:29:00 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/06 18:31:58 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,6 +120,22 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 	int n = 0;
 	const std::string ftab[3] = {"GET", "POST", "DELETE"};
 	(void)Root;
+	std::string tmp;
+	if (Root.size() == 1 && Root.find("/", 0, 1))
+		tmp = "." + Server_Request.getRequestURI();
+	else
+		tmp = Root + Server_Request.getRequestURI();
+	std::cout << "\nC0 = '" << tmp << "'\n" << std::endl;
+	if (tmp.size() == 3 && tmp.find(".//") != std::string::npos)
+	{
+		// tmp.erase();
+		std::cout << "\nC1\n" << std::endl;
+		tmp += "index.html";
+	}
+	if (tmp[tmp.size() - 1] == '/')
+	{
+		tmp += "index.html";
+	}
 	for (; n < 4; n++)
 	{
 		if (n != 3 && ftab[n] == Server_Request.getMethod())
@@ -133,22 +149,6 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 		{
 			// std::string answer = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
 			// send(conn_sock, answer.c_str() , answer.size(), 0);
-			std::string tmp;
-			if (Root.size() == 1 && Root.find("/", 0, 1))
-				tmp = "." + Server_Request.getRequestURI();
-			else
-				tmp = Root + Server_Request.getRequestURI();
-			std::cout << "\nC0 = '" << tmp << "'\n" << std::endl;
-			if (tmp.size() == 3 && tmp.find(".//") != std::string::npos)
-			{
-				// tmp.erase();
-				std::cout << "\nC1\n" << std::endl;
-				tmp += "index.html";
-			}
-			if (tmp[tmp.size() - 1] == '/')
-			{
-				tmp += "index.html";
-			}
 			std::ifstream file(tmp.c_str());
 			std::stringstream buffer;
 			std::stringstream response;
@@ -259,7 +259,20 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 		}
 		case DELETE :
 		{
-			
+			if (std::remove(tmp.c_str()) != 0) { // the remove function returns 0 on success
+        		std::cerr << "Error deleting file: " << '\n';
+    			}
+    			std::cout << "File deleted successfully: " << '\n';
+				
+			std::stringstream response;
+			response << "HTTP/1.1 200 OK\r\n";
+            // response << "Content-Type: text/plain; charset=UTF-8\r\n";
+            response << "content-Length: " << 9 << "\r\n";
+            response << "\r\n";
+            response << "OK delete" << "\r\n";
+			std::string response_str = response.str();
+            send(conn_sock, response_str.c_str() , response_str.size(), 0);
+
 			break ;
 		}
 		default :

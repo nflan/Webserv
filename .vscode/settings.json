@@ -1,17 +1,30 @@
 {
+	"workbench.colorCustomizations": {
+		"activityBar.activeBackground": "#bfd4f9",
+		"activityBar.background": "#bfd4f9",
+		"activityBar.foreground": "#15202b",
+		"activityBar.inactiveForeground": "#15202b99",
+		"activityBarBadge.background": "#ef508a",
+		"activityBarBadge.foreground": "#15202b",
+		"commandCenter.border": "#15202b99",
+		"sash.hoverBorder": "#bfd4f9",
+		"statusBar.background": "#90b5f5",
+		"statusBar.foreground": "#15202b",
+		"statusBarItem.hoverBackground": "#6196f1",
+		"statusBarItem.remoteBackground": "#90b5f5",
+		"statusBarItem.remoteForeground": "#15202b",
+		"titleBar.activeBackground": "#90b5f5",
+		"titleBar.activeForeground": "#15202b",
+		"titleBar.inactiveBackground": "#90b5f599",
+		"titleBar.inactiveForeground": "#15202b99"
+	},
+	"peacock.color": "#90b5f5",
 	"files.associations": {
-		"span": "cpp",
-		"type_traits": "cpp",
-<<<<<<< HEAD
-		"coroutine": "cpp",
 		"any": "cpp",
-=======
->>>>>>> 77291470c23c2be32602fde238f8e0d3e40e7b47
 		"array": "cpp",
 		"atomic": "cpp",
 		"bit": "cpp",
 		"*.tcc": "cpp",
-<<<<<<< HEAD
 		"bitset": "cpp",
 		"cctype": "cpp",
 		"cfenv": "cpp",
@@ -25,21 +38,14 @@
 		"complex": "cpp",
 		"concepts": "cpp",
 		"condition_variable": "cpp",
+		"coroutine": "cpp",
 		"csetjmp": "cpp",
 		"csignal": "cpp",
-=======
-		"cctype": "cpp",
-		"clocale": "cpp",
-		"cmath": "cpp",
-		"compare": "cpp",
-		"concepts": "cpp",
->>>>>>> 77291470c23c2be32602fde238f8e0d3e40e7b47
 		"cstdarg": "cpp",
 		"cstddef": "cpp",
 		"cstdint": "cpp",
 		"cstdio": "cpp",
 		"cstdlib": "cpp",
-<<<<<<< HEAD
 		"cstring": "cpp",
 		"ctime": "cpp",
 		"cuchar": "cpp",
@@ -52,12 +58,6 @@
 		"set": "cpp",
 		"unordered_map": "cpp",
 		"unordered_set": "cpp",
-=======
-		"cwchar": "cpp",
-		"cwctype": "cpp",
-		"deque": "cpp",
-		"unordered_map": "cpp",
->>>>>>> 77291470c23c2be32602fde238f8e0d3e40e7b47
 		"vector": "cpp",
 		"exception": "cpp",
 		"algorithm": "cpp",
@@ -68,40 +68,31 @@
 		"numeric": "cpp",
 		"optional": "cpp",
 		"random": "cpp",
-<<<<<<< HEAD
 		"ratio": "cpp",
 		"regex": "cpp",
 		"source_location": "cpp",
-=======
->>>>>>> 77291470c23c2be32602fde238f8e0d3e40e7b47
 		"string": "cpp",
 		"string_view": "cpp",
 		"system_error": "cpp",
 		"tuple": "cpp",
+		"type_traits": "cpp",
 		"utility": "cpp",
-<<<<<<< HEAD
 		"fstream": "cpp",
 		"future": "cpp",
 		"initializer_list": "cpp",
 		"iomanip": "cpp",
-=======
-		"initializer_list": "cpp",
->>>>>>> 77291470c23c2be32602fde238f8e0d3e40e7b47
 		"iosfwd": "cpp",
 		"iostream": "cpp",
 		"istream": "cpp",
 		"limits": "cpp",
-<<<<<<< HEAD
 		"mutex": "cpp",
-=======
->>>>>>> 77291470c23c2be32602fde238f8e0d3e40e7b47
 		"new": "cpp",
 		"numbers": "cpp",
 		"ostream": "cpp",
 		"ranges": "cpp",
-<<<<<<< HEAD
 		"scoped_allocator": "cpp",
 		"shared_mutex": "cpp",
+		"span": "cpp",
 		"sstream": "cpp",
 		"stdexcept": "cpp",
 		"stop_token": "cpp",
@@ -118,34 +109,5 @@
 		"expected": "cpp",
 		"spanstream": "cpp",
 		"stacktrace": "cpp"
-	},
-	"workbench.colorCustomizations": {
-		"activityBar.activeBackground": "#e6dcad",
-		"activityBar.background": "#e6dcad",
-		"activityBar.foreground": "#15202b",
-		"activityBar.inactiveForeground": "#15202b99",
-		"activityBarBadge.background": "#34ab96",
-		"activityBarBadge.foreground": "#15202b",
-		"commandCenter.border": "#15202b99",
-		"sash.hoverBorder": "#e6dcad",
-		"statusBar.background": "#dacb86",
-		"statusBar.foreground": "#15202b",
-		"statusBarItem.hoverBackground": "#ceba5f",
-		"statusBarItem.remoteBackground": "#dacb86",
-		"statusBarItem.remoteForeground": "#15202b",
-		"titleBar.activeBackground": "#dacb86",
-		"titleBar.activeForeground": "#15202b",
-		"titleBar.inactiveBackground": "#dacb8699",
-		"titleBar.inactiveForeground": "#15202b99"
-	},
-	"peacock.color": "#dacb86"
-=======
-		"stdexcept": "cpp",
-		"streambuf": "cpp",
-		"typeinfo": "cpp",
-		"fstream": "cpp",
-		"sstream": "cpp",
-		"cstring": "cpp"
 	}
->>>>>>> 77291470c23c2be32602fde238f8e0d3e40e7b47
 }
