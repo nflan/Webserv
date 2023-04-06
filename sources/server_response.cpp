@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:46 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/06 16:32:06 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/06 17:29:00 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -196,8 +196,8 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 			// std::string infilename = "./site/42.jpg";
 			// std::ifstream inputFile(infilename.c_str(), std::ios::binary);
 			// std::stringstream response1;
-			std::string outfilename = "./test.jpg";
-			std::ofstream outputFile(outfilename.c_str(), std::ios::binary);
+			std::string outfilename = "./test.jpg"; // OK 1
+			std::ofstream outputFile(outfilename.c_str(), std::ios::binary); // OK 1
 
 			// // Get the file size
 			// inputFile.seekg(0, std::ios::end);
@@ -213,6 +213,7 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 			// outputFile << reinterpret_cast<char*>(fileBuffer.data());
 			// outputFile.close();
 
+			/*OK 1*/
 			std::string tmp = "./site/42.jpg";
             std::cout << "\nC0bis = '" << tmp << "'\n" << std::endl;
             std::ifstream file(tmp.c_str(), std::ifstream::binary);
@@ -226,6 +227,8 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
             file.close();
             std::string content(buffer, size);
 			std::cout << "\nC2\n" << std::endl;
+			/*OK 1*/
+
             // buffer << file.rdbuf();
             // std::cout << "\nBUFFER = " << buffer.str() << "\r\n" << std::endl;
             // std::string content = buffer.str();
@@ -256,6 +259,7 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 		}
 		case DELETE :
 		{
+			
 			break ;
 		}
 		default :
