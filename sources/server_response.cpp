@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:46 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/06 16:54:11 by nflan            ###   ########.fr       */
+/*   Updated: 2023/04/06 18:10:49 by nflan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -229,6 +229,8 @@ void	server_response::createResponse(server_configuration * server, std::string 
 				}
 				case 101:
 				{
+					response << addHeader(STATUS101);
+					response << addBody(server->getErrorPage()[STATUS101]);
 					break;
 				}
 			break;
@@ -246,26 +248,38 @@ void	server_response::createResponse(server_configuration * server, std::string 
 				}
 				case 201:
 				{
+					response << addHeader(STATUS201);
+					response << addBody(server->getErrorPage()[STATUS201]);
 					break;
 				}
 				case 202:
 				{
+					response << addHeader(STATUS202);
+					response << addBody(server->getErrorPage()[STATUS202]);
 					break;
 				}
 				case 203:
 				{
+					response << addHeader(STATUS203);
+					response << addBody(server->getErrorPage()[STATUS203]);
 					break;
 				}
 				case 204:
 				{
+					response << addHeader(STATUS204);
+					response << addBody(server->getErrorPage()[STATUS204]);
 					break;
 				}
 				case 205:
 				{
+					response << addHeader(STATUS205);
+					response << addBody(server->getErrorPage()[STATUS205]);
 					break;
 				}
 				case 206:
 				{
+					response << addHeader(STATUS206);
+					response << addBody(server->getErrorPage()[STATUS206]);
 					break;
 				}
 			}
@@ -277,30 +291,44 @@ void	server_response::createResponse(server_configuration * server, std::string 
 			switch (_status_code)
 				case 300:
 				{
+					response << addHeader(STATUS300);
+					response << addBody(server->getErrorPage()[STATUS300]);
 					break;
 				}
 				case 301:
 				{
+					response << addHeader(STATUS301);
+					response << addBody(server->getErrorPage()[STATUS301]);
 					break;
 				}
 				case 302:
 				{
+					response << addHeader(STATUS302);
+					response << addBody(server->getErrorPage()[STATUS302]);
 					break;
 				}
 				case 303:
 				{
+					response << addHeader(STATUS303);
+					response << addBody(server->getErrorPage()[STATUS303]);
 					break;
 				}
 				case 304:
 				{
+					response << addHeader(STATUS304);
+					response << addBody(server->getErrorPage()[STATUS304]);
 					break;
 				}
 				case 305:
 				{
+					response << addHeader(STATUS305);
+					response << addBody(server->getErrorPage()[STATUS305]);
 					break;
 				}
 				case 307:
 				{
+					response << addHeader(STATUS307);
+					response << addBody(server->getErrorPage()[STATUS307]);
 					break;
 				}
 			break;
@@ -312,18 +340,26 @@ void	server_response::createResponse(server_configuration * server, std::string 
 			{
 				case 400:
 				{
+					response << addHeader(STATUS400);
+					response << addBody(server->getErrorPage()[STATUS400]);
 					break;
 				}
 				case 401:
 				{
+					response << addHeader(STATUS401);
+					response << addBody(server->getErrorPage()[STATUS401]);
 					break;
 				}
 				case 402:
 				{
+					response << addHeader(STATUS402);
+					response << addBody(server->getErrorPage()[STATUS402]);
 					break;
 				}
 				case 403:
 				{
+					response << addHeader(STATUS403);
+					response << addBody(server->getErrorPage()[STATUS403]);
 					break;
 				}
 				case 404:
@@ -334,55 +370,81 @@ void	server_response::createResponse(server_configuration * server, std::string 
 				}
 				case 405:
 				{
+					response << addHeader(STATUS405);
+					response << addBody(server->getErrorPage()[STATUS405]);
 					break;
 				}
 				case 406:
 				{
+					response << addHeader(STATUS406);
+					response << addBody(server->getErrorPage()[STATUS406]);
 					break;
 				}
 				case 407:
 				{
+					response << addHeader(STATUS407);
+					response << addBody(server->getErrorPage()[STATUS407]);
 					break;
 				}
 				case 408:
 				{
+					response << addHeader(STATUS408);
+					response << addBody(server->getErrorPage()[STATUS408]);
 					break;
 				}
 				case 409:
 				{
+					response << addHeader(STATUS409);
+					response << addBody(server->getErrorPage()[STATUS409]);
 					break;
 				}
 				case 410:
 				{
+					response << addHeader(STATUS410);
+					response << addBody(server->getErrorPage()[STATUS410]);
 					break;
 				}
 				case 411:
 				{
+					response << addHeader(STATUS411);
+					response << addBody(server->getErrorPage()[STATUS411]);
 					break;
 				}
 				case 412:
 				{
+					response << addHeader(STATUS412);
+					response << addBody(server->getErrorPage()[STATUS412]);
 					break;
 				}
 				case 413:
 				{
+					response << addHeader(STATUS413);
+					response << addBody(server->getErrorPage()[STATUS413]);
 					break;
 				}
 				case 414:
 				{
+					response << addHeader(STATUS414);
+					response << addBody(server->getErrorPage()[STATUS414]);
 					break;
 				}
 				case 415:
 				{
+					response << addHeader(STATUS415);
+					response << addBody(server->getErrorPage()[STATUS415]);
 					break;
 				}
 				case 416:
 				{
+					response << addHeader(STATUS416);
+					response << addBody(server->getErrorPage()[STATUS416]);
 					break;
 				}
 				case 417:
 				{
-				break;
+					response << addHeader(STATUS417);
+					response << addBody(server->getErrorPage()[STATUS417]);
+					break;
 				}
 			}
 			break;
@@ -400,22 +462,32 @@ void	server_response::createResponse(server_configuration * server, std::string 
 				}
 				case 501:
 				{
-						break;
+					response << addHeader(STATUS501);
+					response << addBody(server->getErrorPage()[STATUS501]);
+					break;
 				}
 				case 502:
 				{
+					response << addHeader(STATUS502);
+					response << addBody(server->getErrorPage()[STATUS502]);
 					break;
 				}
 				case 503:
 				{
+					response << addHeader(STATUS503);
+					response << addBody(server->getErrorPage()[STATUS503]);
 					break;
 				}
 				case 504:
 				{
+					response << addHeader(STATUS504);
+					response << addBody(server->getErrorPage()[STATUS504]);
 					break;
 				}
 				case 505:
 				{
+					response << addHeader(STATUS505);
+					response << addBody(server->getErrorPage()[STATUS505]);
 					break;
 				}
 			}
