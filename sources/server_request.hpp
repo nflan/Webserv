@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 14:29:37 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/05 18:52:13 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/06 13:46:50 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ class server_request
 	std::string _method;
 	std::string _RequestURI; //old
 	std::string _path;
+	std::string _type;
 	std::string _version;
 	std::string _host;
 	std::string _connectionType;
@@ -49,6 +50,7 @@ class server_request
 	std::string getServerRequest() const;
 	std::string getMethod() const;
 	std::string getRequestURI() const;
+	std::string getType() const;
 	void request_parser();
 };
 

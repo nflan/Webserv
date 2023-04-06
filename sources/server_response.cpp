@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:46 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/05 16:32:05 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/06 13:48:12 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 server_response::server_response() : _status_code(200), _body(""), _ServerResponse("")
 {
+	this->addType();
 	std::cout << "server_response Default Constructor called" << std::endl;
 }
 server_response::server_response(server_response const &obj)
@@ -96,6 +97,21 @@ server_response &server_response::operator=(server_response const &obj)
 // 	send(client_socket, response_str.c_str(), response_str.length(), 0);
 // }
 
+void	server_response::addType()
+{
+	_contentType.insert(std::make_pair<std::string, std::string>("html", "Content-Type: text/html\r\n"));
+	_contentType.insert(std::make_pair<std::string, std::string>("jpg", "Content-Type: image/jpeg\r\n"));
+}
+
+std::string server_response::getType(std::string type)
+{
+	for (std::map<std::string, std::string>::iterator it = _contentType.begin(); it != _contentType.end(); it++)
+	{
+		if (type == it->first)
+			return (it->second);
+	}
+	return ("Content-Type: text/plain; charset=UTF-8\r\n");
+}
 
 void	server_response::todo(const server_request& Server_Request, int conn_sock, server_configuration *server)
 {
@@ -160,7 +176,8 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 				// std::cout << "\nBUFFER = " << buffer.str() << "\r\n" << std::endl;
 				std::string content = buffer.str();
 				response << "HTTP/1.1 200 OK\r\n";
-				response << "Content-Type: text/html\r\n";
+				response << this->getType(Server_Request.getType());
+				// response << "Content-Type: text/html\r\n";
 				// response << "Content-Type: text/plain; charset=UTF-8\r\n";
 				response << "Content-Length: " << content.size() << "\r\n";
 				response << "\r\n";

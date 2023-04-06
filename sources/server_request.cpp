@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 14:31:36 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/05 18:49:55 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/06 13:47:11 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,10 @@ std::string server_request::getServerRequest() const
 {
 	return (_ServerRequest);
 }
+std::string server_request::getType() const
+{
+	return (_type);
+}
 std::string server_request::getMethod() const
 {
 	return (_Method);
@@ -93,6 +97,12 @@ void server_request::request_parser()
     std::string::size_type path_end = _ServerRequest.find(' ', method_end + 1);
     this->_path = _ServerRequest.substr(method_end + 1, path_end - method_end - 1);
     this->_RequestURI = this->_path;
+
+	this->_type = "html";
+	if (this->_path.find('.', 0) != std::string::npos)
+	{
+		this->_type = this->_path.substr(this->_path.find('.', 0) + 1);
+	}
 
     // Extraire la version HTTP (HTTP/1.1)
     std::string::size_type version_end = _ServerRequest.find("\r\n", path_end + 1);
@@ -131,6 +141,7 @@ void server_request::request_parser()
     // Afficher les résultats
     std::cout << "\nMéthode : " << this->_method << std::endl;
     std::cout << "Chemin : " << this->_path << std::endl;
+    std::cout << "Type : " << this->_type << std::endl;
     std::cout << "Version : " << this->_version << std::endl;
     std::cout << "Host : " << this->_host << std::endl;
     std::cout << "Connection : " << this->_connectionType <<  std::endl;
