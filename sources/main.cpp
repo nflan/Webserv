@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 15:39:03 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/05 16:47:42 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/06 16:57:26 by nflan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ void handle_connection(server_configuration *servers, int conn_sock) {
 	}
 	std::cout << "Request :\n" << request << std::endl;
 	server_request* ServerRequest = new server_request(request);
-	server_response ServerResponse;
+	server_response ServerResponse(servers->getStatusCode());
 	ServerResponse.todo(*ServerRequest, conn_sock, servers);
 	// std::string answer = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
 	// std::cout << *ServerRequest << std::endl;
@@ -173,9 +173,11 @@ int StartServer(std::vector<server_configuration*> servers, int tablen)
 				if (events[n].data.fd == listen_sock[i])
 				{
 					temp_fd = i;
+					servers[temp_fd]->setStatusCode(200);
 					// std::fprintf(stderr, "\nEVENTS I = %d ET N = %d\n", i, n);
 					conn_sock = accept(listen_sock[i], (struct sockaddr *) &addr[i], &addrlen[i]);
 					if (conn_sock == -1) {
+						servers[temp_fd]->setStatusCode(500);
 						std::fprintf(stderr, "Error: server accept failed: %s\n", strerror(errno));
 						return(CloseSockets(listen_sock, tablen, servers, addr), EXIT_FAILURE);
 					}

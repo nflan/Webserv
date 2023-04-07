@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:06:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/05 14:43:06 by nflan            ###   ########.fr       */
+/*   Updated: 2023/04/06 16:56:13 by nflan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,11 +24,26 @@ _ConfigFile(convertConfigFile(ConfigFile)),
 _ServerName(findServerName()),
 _Root(findRoot()),
 _Port(findPort()),
+_StatusCode(200),
 _ClientMaxBodySize(findClientMaxBodySize())
 {
 	setCgi();
-	setErrorPage();
 	setDefErrorPage();
+	setErrorPage();
+	// deferrorpage -> errorpage
+	ErrorCorresp	check;
+	std::map<std::string, std::string>::iterator	tmp;
+	for (std::map<std::string, std::string>::iterator it = _DefErrorPage.begin(); it != _DefErrorPage.end(); it++)
+	{
+		tmp = _ErrorPage.find(check.getCorresp().find(it->first)->second);
+		if (tmp == _ErrorPage.end())
+			_ErrorPage.insert(*it);
+		else
+		{
+			_ErrorPage.insert(std::make_pair<std::string, std::string>(it->first, tmp->second));
+			_ErrorPage.erase(tmp);
+		}
+	}
 	if (DEBUG)
 	{
 		std::cout << "server_configuration Overload Constructor called" << std::endl;
@@ -58,6 +73,9 @@ std::string server_configuration::convertConfigFile(std::string ConfigFileStr)
 {
 	return (ConfigFileStr);
 }
+
+int	server_configuration::getStatusCode() { return (_StatusCode); }
+void	server_configuration::setStatusCode(int nb) { _StatusCode = nb; }
 
 std::string server_configuration::findServerName()
 {
@@ -136,6 +154,7 @@ void server_configuration::setErrorPage()
 	std::string	first;
 	std::string	second;
 	std::string	file;
+
 	size_t pos = _ConfigFile.find("error_page");
 
 	if (pos == std::string::npos)
@@ -179,6 +198,7 @@ void server_configuration::setDefErrorPage()
 	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS307, HTML307));
 	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS400, HTML400));
 	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS401, HTML401));
+	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS402, HTML402));
 	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS403, HTML403));
 	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS404, HTML404));
 	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS405, HTML405));
@@ -310,8 +330,8 @@ std::ostream& operator <<(std::ostream &out, server_configuration &ServConfig)
 		<< "\nCliend Body Limit : " << ServConfig.getClientMaxBodySize() \
 		<< "\nCGI (first = extension, second = root):" << std::endl;
 	ServConfig.printMap(ServConfig.getCgi());
-	out << "\nERROR_PAGES (first = status, second = root):" << std::endl;
-	ServConfig.printMap(ServConfig.getErrorPage());
 		
+	//out << "\nERROR_PAGES (first = status, second = root):" << std::endl;
+	//ServConfig.printMap(ServConfig.getErrorPage());
 	return (out);
 }
