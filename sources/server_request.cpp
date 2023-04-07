@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 14:31:36 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/07 13:22:00 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/07 15:09:25 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,8 +91,6 @@ std::ostream& operator <<(std::ostream &out, server_request &ServRequest)
 
 void server_request::request_parser()
 {
-    // std::string request = "GET /index.html HTTP/1.1\r\nHost: www.example.com\r\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8\r\nAccept-Language: en-US,en;q=0.5\r\nAccept-Encoding: gzip, deflate, br\r\nConnection: keep-alive\r\n\r\n";
-    
     // Extraire la méthode HTTP (GET/POST/DELETE)
     std::string::size_type method_end = _ServerRequest.find(' ');
     this->_method = _ServerRequest.substr(0, method_end);

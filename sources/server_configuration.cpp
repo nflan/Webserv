@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:06:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/07 14:16:15 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/07 15:08:18 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,14 +18,15 @@ server_configuration::server_configuration()
 		std::cout << "server_configuration Default Constructor called" << std::endl;
 }
 
-
 server_configuration::server_configuration(std::string ConfigFile) : 
 _ConfigFile(convertConfigFile(ConfigFile)),
 _ServerName(findServerName()),
 _Root(findRoot()),
 _Port(findPort()),
 _StatusCode(200),
-_ClientMaxBodySize(findClientMaxBodySize())
+_ClientMaxBodySize(findClientMaxBodySize()),
+_Location(findLocation()),
+_Loc(findLoc())
 {
 	setCgi();
 	setDefErrorPage();
@@ -90,7 +91,7 @@ std::string server_configuration::findServerName()
 			return(server_name.substr(0, space_pos)); // extract the substring before the space character
 		}
 	}
-	return ("Not found");
+	return ("");
 }
 
 std::string server_configuration::findRoot()
@@ -104,7 +105,7 @@ std::string server_configuration::findRoot()
 			return (root.substr(0, space_pos));
 		}
 	}
-	return ("Not found");
+	return ("");
 }
 
 int server_configuration::fillCgi(size_t pos)
@@ -281,27 +282,100 @@ size_t server_configuration::findClientMaxBodySize()
 	return (1048576);
 }
 
-/*std::string server_configuration::findErrorPage()
+std::map<std::string, std::string> server_configuration::findLocation()
 {
-	size_t pos = _ConfigFile.find("error_page");
-	if (pos != std::string::npos) {
-		pos += strlen("error_page");
-		std::string port = _ConfigFile.substr(pos + 5);
-		size_t space_pos = port.find_first_of(" \n;");
-		if (space_pos != std::string::npos) {
-			if (DEBUG)
-				std::cout << "server_configuration::findPort() " << port.substr(0, space_pos).c_str() << std::endl;
-			return (port.substr(0, space_pos).c_str());
+	std::map<std::string, std::string> location_map;
+	std::pair<std::string, std::string> location_pair;
+	size_t pos = 0;
+	size_t end_loc = 0;
+	
+	while (pos != std::string::npos)
+	{
+		pos = _ConfigFile.find("location /", pos);
+		if (pos != std::string::npos)
+		{
+			pos += strlen("location"); 
+			std::string location_path = _ConfigFile.substr(pos + 1); 
+			size_t space_pos = location_path.find_first_of("{"); 
+			if (space_pos == std::string::npos) 
+			{
+				location_pair.first = "";
+				location_pair.second = "";
+			}
+			location_pair.first = location_path.substr(0, space_pos);
+			end_loc = location_path.find_first_of("{}", space_pos + 1);
+			int j = 0;
+			while (location_path[end_loc] == '{')
+			{
+				j++;
+				end_loc = location_path.find_first_of("{}", end_loc + 1);
+			}
+			for (int i = 0; i < j; i++)
+			{
+				end_loc = location_path.find_first_of("}", end_loc + 1);
+			}
+			if (end_loc == std::string::npos)
+			{
+				location_pair.first = "";
+				location_pair.second = "";
+			}
+			location_pair.second = location_path.substr(space_pos + 1, end_loc);
+			pos = pos + end_loc;
+			end_loc = 0;
 		}
+		else
+		{
+			location_pair.first = "";
+			location_pair.second = "";
+		}
+		location_map.insert(location_pair);
 	}
-	return ("");
-}*/
+	return (location_map);
+}
+
+std::map<std::string, class server_location_configuration*> server_configuration::findLoc()
+{
+	std::map<std::string, class server_location_configuration*>	map_location;
+	std::pair<std::string, class server_location_configuration*>	pair_location;
+	
+	for (std::map<std::string, std::string>::iterator it = _Location.begin(); it != _Location.end(); it++)
+	{
+		pair_location.first = it->first;
+		server_location_configuration* tmp = new server_location_configuration(it->second);
+		pair_location.second = tmp;
+		map_location.insert(pair_location);
+	}
+	return (map_location);
+	
+}
 
 template<class T>
 void	server_configuration::printMap(std::map<T, T> map)
 {
 	for (std::map<std::string, std::string>::iterator it = map.begin(); it != map.end(); it++)
 		std::cout << "- first = '" << it->first << "' && second = '" << it->second << "'" << std::endl;
+}
+
+std::ostream&	server_configuration::printLoc(std::ostream &out)
+{
+		
+		for (std::map<std::string, class server_location_configuration*>::iterator it = _Loc.begin(); it != _Loc.end(); it++)
+		{
+			out << "\n\nLocation configurations  for " << it->first ;
+			for (std::vector<std::string>::iterator ite = it->second->getHttpMethodAccepted().begin(); ite != it->second->getHttpMethodAccepted().end(); ite++)
+				out << "\nHttpMethodAccepted : " << *ite;
+			out << "\nHttpRedirection " << it->second->getHttpRedirection() \
+			<< "\nRoot : " << it->second->getRoot() \
+			<< "\nDirectoryListing : " << it->second->getDirectoryListing() \
+			<< "\nDirectoryRequest : " << it->second->getDirectoryRequest() ;
+			for (std::map<std::string, std::string>::iterator ite = it->second->getCgi().begin(); ite != it->second->getCgi().end(); ite++)
+			{
+				out << "\nCGI : \n" \
+				<< "path : " << ite->first << "\nconf : " << ite->second ;
+			}
+			out << "\nUploadStore : " << it->second->getUploadStore();
+		}
+		return (out);
 }
 
 std::string server_configuration::getConfigFile() { return _ConfigFile;}
@@ -317,6 +391,7 @@ const char *	server_configuration::CgiException::what() const throw()
 {
 	return ("CGI parsing error\n");
 }
+
 const char *	server_configuration::ErrorPageException::what() const throw()
 {
 	return ("Error Page parsing error\n");
@@ -329,7 +404,10 @@ std::ostream& operator <<(std::ostream &out, server_configuration &ServConfig)
 		<< "\nPort : " << ServConfig.getPort() \
 		<< "\nCliend Body Limit : " << ServConfig.getClientMaxBodySize() \
 		<< "\nCGI (first = extension, second = root):" << std::endl;
-	ServConfig.printMap(ServConfig.getCgi());
+		ServConfig.printMap(ServConfig.getCgi());
+		out	<< "\n\n***\n" \
+		<< "\nLocation : " << ServConfig.printLoc(out) << std::endl \
+		<< "\n***\n" << std::endl;
 		
 	//out << "\nERROR_PAGES (first = status, second = root):" << std::endl;
 	//ServConfig.printMap(ServConfig.getErrorPage());

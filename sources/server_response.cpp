@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:46 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/07 14:22:06 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/07 15:10:10 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ server_response::server_response() : _status_code(200), _body(""), _ServerRespon
 
 server_response::server_response(int stat) : _status_code(stat), _body(""), _ServerResponse("")
 {
+	this->addType();
 	std::cout << "server_response int Constructor called" << std::endl;
 }
 
@@ -62,46 +63,6 @@ server_response &server_response::operator=(server_response const &obj)
 #include <string>
 #include <cstring>
 
-// void handle_post_request(int client_socket)
-// {
-// 	// Récupérer les données de la requête POST
-// 	std::stringstream response;
-// 	const int buffer_size = 1024;
-// 	char buffer[buffer_size];
-// 	std::memset(buffer, 0, buffer_size);
-// 	ssize_t bytes_received = recv(client_socket, buffer, buffer_size, 0);
-
-// 	// Extraire le contenu binaire
-// 	std::string raw_data(buffer, bytes_received);
-// 	size_t begin_content = raw_data.find("\r\n\r\n") + 4;
-// 	std::string binary_data(raw_data.begin() + begin_content, raw_data.end());
-
-// 	//Ecrire les Données dans un fichier
-// 	std::ofstream output_file("file.bin", std::ios::out | std::ios::binary);
-// 	output_file.write(binary_data.c_str(), binary_data.size());
-// 	output_file.close();
-
-// 	// Vérifier que toutes les données ont été reçues
-// 	int content_length_pos = raw_data.find("Content-Length:");
-// 	if (content_length_pos != std::string::npos) {
-// 		size_t end_pos = raw_data.find("\r\n", content_length_pos);
-// 		std::string content_length_str = raw_data.substr(content_length_pos + strlen("Content-Length:"), end_pos - content_length_pos - strlen("Content-Length:"));
-// 		int expected_length = std::stoi(content_length_str);
-// 		if (expected_length != binary_data.size()) {
-// 			std::cout << "Erreur : Taille incomplète des données binaires" << std::endl;
-// 		}
-// 	}
-
-// 	// Envoyer une réponse réussie au client
-// 	response << "HTTP/1.1 200 OK\r\n";
-// 	response << "Content-Type: text/plain; charset=UTF-8\r\n";
-// 	response << "Content-Length: 10\r\n";
-// 	response << "\r\n";
-// 	response << "Succès !\r\n";
-// 	std::string response_str = response.str();
-// 	send(client_socket, response_str.c_str(), response_str.length(), 0);
-// }
-
 void	server_response::addType()
 {
 	_contentType.insert(std::make_pair<std::string, std::string>("html", "Content-Type: text/html\r\n"));
@@ -110,12 +71,13 @@ void	server_response::addType()
 
 std::string server_response::getType(std::string type)
 {
+	std::cout << "TEST : " << type << std::endl;
 	for (std::map<std::string, std::string>::iterator it = _contentType.begin(); it != _contentType.end(); it++)
 	{
 		if (type == it->first)
 			return (it->second);
 	}
-	return ("Content-Type: text/plain; charset=UTF-8\r\n");
+	return ("Content-Type: text/html\r\n");
 }
 
 void	server_response::todo(const server_request& Server_Request, int conn_sock, server_configuration *server)
@@ -142,23 +104,10 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 	{
 		tmp += "index.html";
 	}
-	for (; n < 4; n++)
-	{
-		if (n != 3 && ftab[n] == Server_Request.getMethod())
-		{
-			break ;
-		}
-	}
-	switch (n)
-	{
-		case GET :
-		{
-			// std::string answer = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
-			// send(conn_sock, answer.c_str() , answer.size(), 0);
 
 	for (; n < 4; n++)
 	{
-		if (n != 3 && ftab[n] == Server_Request.getMethod())
+		if (n != 3 && ftab[n] == Server_Request.getMethod()) // OK 
 		{
 			break ;
 		}
@@ -167,24 +116,6 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 	{
 		case GET :
 		{
-			// std::string answer = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
-			// send(conn_sock, answer.c_str() , answer.size(), 0);
-			std::string tmp;
-			if (Root.size() == 1 && Root.find("/", 0, 1))
-				tmp = "." + Server_Request.getRequestURI();
-			else
-				tmp = Root + Server_Request.getRequestURI();
-			std::cout << "\nC0 = '" << tmp << "'\n" << std::endl;
-			if (tmp.size() == 3 && tmp.find(".//") != std::string::npos)
-			{
-				// tmp.erase();
-				std::cout << "\nC1\n" << std::endl;
-				tmp += "index.html";
-			}
-			if (tmp[tmp.size() - 1] == '/')
-			{
-				tmp += "index.html";
-			}
 			std::ifstream file(tmp.c_str());
 			std::stringstream buffer;
 			std::stringstream response;
@@ -195,25 +126,15 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 			}
 			else
 			{
-		//		std::cout << "\nC2\n" << std::endl;
 				buffer << file.rdbuf();
-				// std::cout << "\nBUFFER = " << buffer.str() << "\r\n" << std::endl;
 				content = buffer.str();
-		//		response << "HTTP/1.1 200 OK\r\n";
-		//		response << "Content-Type: text/html\r\n";
-				// response << "Content-Type: text/plain; charset=UTF-8\r\n";
-		//		response << "Content-Length: " << content.size() << "\r\n";
-		//		response << "\r\n";
-		//		response << content << "\r\n";
 			}
-			// response << "Hello world!\r\n";
 			std::cerr << "AFTER RESPONSE IFSTREAM\r\n" << std::endl;
-			createResponse(server, content);
-		//	_ServerResponse = response.str();
+			createResponse(server, content, Server_Request);
 			std::cout << std::endl << "SERVER RESPONSE CONSTRUITE -> " << std::endl << _ServerResponse << std::endl << std::endl;
 			send(conn_sock, _ServerResponse.c_str() , _ServerResponse.size(), 0);
 			std::cerr << "\nREPONSE SEND :\n";
-			// std::cerr << response_str << std::endl;
+			std::cerr << _ServerResponse << std::endl;
 			break ;
 		}
 		case POST :
@@ -316,13 +237,13 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 	return ;
 }
 
-std::string	server_response::addHeader(std::string statusMsg)
+std::string	server_response::addHeader(std::string statusMsg, const server_request& Server_Request)
 {
 	std::string	header;
 	std::stringstream	response;
 	
 	response << "HTTP/1.1" << " " << _status_code << " " << statusMsg << "\r\n";  /* ajouter la version HTTP (parsing) */ 
-	response << "Content-Type: " << "text/html" << "\r\n"; // modif text/html (parsing) -> peut etre faire map de content type / mime en fonction de .py = /truc .html = /text/html etc.
+	response << this->getType(Server_Request.getType()); // modif text/html (parsing) -> peut etre faire map de content type / mime en fonction de .py = /truc .html = /text/html etc.
 	header = response.str();
 	return (header);
 }
@@ -338,7 +259,7 @@ std::string	server_response::addBody(std::string msg)
 	return (body);
 }
 
-void	server_response::createResponse(server_configuration * server, std::string file)
+void	server_response::createResponse(server_configuration * server, std::string file, const server_request& Server_Request)
 {
 	std::stringstream	response;
 	enum	status { INFO, SUCCESS, REDIRECTION, CLIENT, SERVER };
@@ -353,7 +274,7 @@ void	server_response::createResponse(server_configuration * server, std::string 
 			switch (_status_code)
 				case 100:
 				{
-					response << addHeader(STATUS100);
+					response << addHeader(STATUS100, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS100]);
 					break;
 				}
@@ -370,7 +291,7 @@ void	server_response::createResponse(server_configuration * server, std::string 
 			{
 				case 200:
 				{
-					response << addHeader(STATUS200);
+					response << addHeader(STATUS200, Server_Request);
 					response << addBody(file);
 					break;
 				}
@@ -458,7 +379,7 @@ void	server_response::createResponse(server_configuration * server, std::string 
 				}
 				case 404:
 				{
-					response << addHeader(STATUS404);
+					response << addHeader(STATUS404, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS404]);
 					break;
 				}
@@ -524,7 +445,7 @@ void	server_response::createResponse(server_configuration * server, std::string 
 			{
 				case 500:
 				{
-					response << addHeader(STATUS500);
+					response << addHeader(STATUS500, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS500]);
 					break;
 				}
