@@ -3,9 +3,28 @@ server {
 		listen 8083;
 
 		root ./site/;
-		index index.html;
-		client_max_body_size 2M;
-		error_page 404 sources/test.html 405 error.html 406 e;
+		index index.html
+		client_max_body_size 2M
+		error_page 404 site/test.html 405 error.html 406 e;
+
+		location /upload {
+
+			limit_except POST GET {
+				deny all;
+			}
+			
+			return 301 https://www.example.com$request_uri;
+
+			root /files;
+
+			autoindex on;
+
+			index index.html;
+
+			cgi .php /usr/bin/php-cgi ;
+
+			upload_store /var/www/uploads;
+		}
 
 		location / {
 			index index.html index.htm default.html;

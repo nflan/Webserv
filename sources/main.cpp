@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 15:39:03 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/06 16:57:26 by nflan            ###   ########.fr       */
+/*   Updated: 2023/04/07 15:04:14 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,15 +83,16 @@ void handle_connection(server_configuration *servers, int conn_sock) {
 	{
 		n = read(conn_sock, buffer, 1024);
 		if (n > 0)
+		{
+			buffer[n] = '\0';
 			request.append(buffer);
+		}
 	}
 	std::cout << "Request :\n" << request << std::endl;
 	server_request* ServerRequest = new server_request(request);
+	ServerRequest->request_parser();
 	server_response ServerResponse(servers->getStatusCode());
 	ServerResponse.todo(*ServerRequest, conn_sock, servers);
-	// std::string answer = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
-	// std::cout << *ServerRequest << std::endl;
-	// write(conn_sock, answer.c_str() , strlen(answer.c_str()));
 	delete ServerRequest;
 }
 
@@ -192,16 +193,12 @@ int StartServer(std::vector<server_configuration*> servers, int tablen)
 						return(CloseSockets(listen_sock, tablen, servers, addr), EXIT_FAILURE);
 					}
 				}
-				// else {
-				// 	std::fprintf(stderr, "\nBALISE I = %d ET N = %d ET TMP_fd = %d\n", i, n, temp_fd);
-				// }
-					handle_connection(servers[temp_fd], events[n].data.fd);
+				handle_connection(servers[temp_fd], events[n].data.fd);
 			}
 		}
 	}
 	return 0;
 }
-
 
 std::vector<server_configuration*> SetupNewServers(std::string filename)
 {

@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:46 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/06 18:10:49 by nflan            ###   ########.fr       */
+/*   Updated: 2023/04/07 15:10:10 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,13 @@
 
 server_response::server_response() : _status_code(200), _body(""), _ServerResponse("")
 {
+	this->addType();
 	std::cout << "server_response Default Constructor called" << std::endl;
 }
 
 server_response::server_response(int stat) : _status_code(stat), _body(""), _ServerResponse("")
 {
+	this->addType();
 	std::cout << "server_response int Constructor called" << std::endl;
 }
 
@@ -61,45 +63,22 @@ server_response &server_response::operator=(server_response const &obj)
 #include <string>
 #include <cstring>
 
-// void handle_post_request(int client_socket)
-// {
-// 	// Récupérer les données de la requête POST
-// 	std::stringstream response;
-// 	const int buffer_size = 1024;
-// 	char buffer[buffer_size];
-// 	std::memset(buffer, 0, buffer_size);
-// 	ssize_t bytes_received = recv(client_socket, buffer, buffer_size, 0);
+void	server_response::addType()
+{
+	_contentType.insert(std::make_pair<std::string, std::string>("html", "Content-Type: text/html\r\n"));
+	_contentType.insert(std::make_pair<std::string, std::string>("jpg", "Content-Type: image/jpeg\r\n"));
+}
 
-// 	// Extraire le contenu binaire
-// 	std::string raw_data(buffer, bytes_received);
-// 	size_t begin_content = raw_data.find("\r\n\r\n") + 4;
-// 	std::string binary_data(raw_data.begin() + begin_content, raw_data.end());
-
-// 	//Ecrire les Données dans un fichier
-// 	std::ofstream output_file("file.bin", std::ios::out | std::ios::binary);
-// 	output_file.write(binary_data.c_str(), binary_data.size());
-// 	output_file.close();
-
-// 	// Vérifier que toutes les données ont été reçues
-// 	int content_length_pos = raw_data.find("Content-Length:");
-// 	if (content_length_pos != std::string::npos) {
-// 		size_t end_pos = raw_data.find("\r\n", content_length_pos);
-// 		std::string content_length_str = raw_data.substr(content_length_pos + strlen("Content-Length:"), end_pos - content_length_pos - strlen("Content-Length:"));
-// 		int expected_length = std::stoi(content_length_str);
-// 		if (expected_length != binary_data.size()) {
-// 			std::cout << "Erreur : Taille incomplète des données binaires" << std::endl;
-// 		}
-// 	}
-
-// 	// Envoyer une réponse réussie au client
-// 	response << "HTTP/1.1 200 OK\r\n";
-// 	response << "Content-Type: text/plain; charset=UTF-8\r\n";
-// 	response << "Content-Length: 10\r\n";
-// 	response << "\r\n";
-// 	response << "Succès !\r\n";
-// 	std::string response_str = response.str();
-// 	send(client_socket, response_str.c_str(), response_str.length(), 0);
-// }
+std::string server_response::getType(std::string type)
+{
+	std::cout << "TEST : " << type << std::endl;
+	for (std::map<std::string, std::string>::iterator it = _contentType.begin(); it != _contentType.end(); it++)
+	{
+		if (type == it->first)
+			return (it->second);
+	}
+	return ("Content-Type: text/html\r\n");
+}
 
 void	server_response::todo(const server_request& Server_Request, int conn_sock, server_configuration *server)
 {
@@ -109,10 +88,26 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 	const std::string ftab[3] = {"GET", "POST", "DELETE"};
 	std::string		content;
 	(void)Root;
+	std::string tmp;
+	if (Root.size() == 1 && Root.find("/", 0, 1))
+		tmp = "." + Server_Request.getRequestURI();
+	else
+		tmp = Root + Server_Request.getRequestURI();
+	std::cout << "\nC0 = '" << tmp << "'\n" << std::endl;
+	if (tmp.size() == 3 && tmp.find(".//") != std::string::npos)
+	{
+		// tmp.erase();
+		std::cout << "\nC1\n" << std::endl;
+		tmp += "index.html";
+	}
+	if (tmp[tmp.size() - 1] == '/')
+	{
+		tmp += "index.html";
+	}
 
 	for (; n < 4; n++)
 	{
-		if (n != 3 && ftab[n] == Server_Request.getMethod())
+		if (n != 3 && ftab[n] == Server_Request.getMethod()) // OK 
 		{
 			break ;
 		}
@@ -121,24 +116,6 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 	{
 		case GET :
 		{
-			// std::string answer = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
-			// send(conn_sock, answer.c_str() , answer.size(), 0);
-			std::string tmp;
-			if (Root.size() == 1 && Root.find("/", 0, 1))
-				tmp = "." + Server_Request.getRequestURI();
-			else
-				tmp = Root + Server_Request.getRequestURI();
-			std::cout << "\nC0 = '" << tmp << "'\n" << std::endl;
-			if (tmp.size() == 3 && tmp.find(".//") != std::string::npos)
-			{
-				// tmp.erase();
-				std::cout << "\nC1\n" << std::endl;
-				tmp += "index.html";
-			}
-			if (tmp[tmp.size() - 1] == '/')
-			{
-				tmp += "index.html";
-			}
 			std::ifstream file(tmp.c_str());
 			std::stringstream buffer;
 			std::stringstream response;
@@ -149,50 +126,124 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 			}
 			else
 			{
-		//		std::cout << "\nC2\n" << std::endl;
 				buffer << file.rdbuf();
-				// std::cout << "\nBUFFER = " << buffer.str() << "\r\n" << std::endl;
 				content = buffer.str();
-		//		response << "HTTP/1.1 200 OK\r\n";
-		//		response << "Content-Type: text/html\r\n";
-				// response << "Content-Type: text/plain; charset=UTF-8\r\n";
-		//		response << "Content-Length: " << content.size() << "\r\n";
-		//		response << "\r\n";
-		//		response << content << "\r\n";
 			}
-			// response << "Hello world!\r\n";
 			std::cerr << "AFTER RESPONSE IFSTREAM\r\n" << std::endl;
-			createResponse(server, content);
-		//	_ServerResponse = response.str();
+			createResponse(server, content, Server_Request);
 			std::cout << std::endl << "SERVER RESPONSE CONSTRUITE -> " << std::endl << _ServerResponse << std::endl << std::endl;
 			send(conn_sock, _ServerResponse.c_str() , _ServerResponse.size(), 0);
 			std::cerr << "\nREPONSE SEND :\n";
-			// std::cerr << response_str << std::endl;
+			std::cerr << _ServerResponse << std::endl;
 			break ;
 		}
 		case POST :
 		{
+			// std::string infilename = "./site/42.jpg";
+			// std::ifstream inputFile(infilename.c_str(), std::ios::binary);
+			// std::stringstream response1;
+			std::string outfilename = "./test.jpg"; // OK 1
+			std::ofstream outputFile(outfilename.c_str(), std::ios::binary); // OK 1
+
+			// // Get the file size
+			// inputFile.seekg(0, std::ios::end);
+			// int fileSize = inputFile.tellg();
+			// inputFile.seekg(0, std::ios::beg);
+			
+			// // Read the contents of the file into a buffer
+			// std::vector<unsigned char> fileBuffer(fileSize);
+			// inputFile.read(reinterpret_cast<char*>(fileBuffer.data()), fileSize);
+			
+			// inputFile.close();
+
+			// outputFile << reinterpret_cast<char*>(fileBuffer.data());
+			// outputFile.close();
+
+			/*OK 1*/
+			std::string tmp = "./site/42.jpg";
+            std::cout << "\nC0bis = '" << tmp << "'\n" << std::endl;
+            std::ifstream file(tmp.c_str(), std::ifstream::binary);
+            // std::stringstream buffer;
+            std::stringstream response;
+            std::filebuf* pbuf = file.rdbuf();
+            std::size_t size = pbuf->pubseekoff(0, file.end, file.in);
+            pbuf->pubseekpos (0,file.in);
+            char *buffer= new char[size];
+            pbuf->sgetn(buffer, size);
+            file.close();
+            std::string content(buffer, size);
+			std::cout << "\nC2\n" << std::endl;
+			/*OK 1*/
+
+            // buffer << file.rdbuf();
+            // std::cout << "\nBUFFER = " << buffer.str() << "\r\n" << std::endl;
+            // std::string content = buffer.str();
+            response << "HTTP/1.1 200 OK\r\n";
+            response << "content-Type: image/jpeg\r\n";
+            // response << "Content-Type: text/plain; charset=UTF-8\r\n";
+            response << "content-Length: " << size << "\r\n";
+            response << "\r\n";
+            response << content << '\0' << "\r\n";
+			outputFile << content ;
+			outputFile.close();
+            // }
+            // response << "Hello world!\r\n";
+            std::cerr << "AFTER RESPONSE IFSTREAM\r\n" << std::endl;
+            std::cout << buffer << std::endl;
+			delete [] buffer;
+            std::string response_str = response.str();
+            send(conn_sock, response_str.c_str() , response_str.size(), 0);
+/**********************************************************************************/
+			// std::cout << "Successfully wrote to " << outfilename << std::endl;
+			// response1 << "HTTP/1.1 200 OK\r\n";
+			// response1 << "Content-Length: " << fileSize << "\r\n";
+			// response1 << "\r\n";
+			// response1.write(reinterpret_cast<char*>(fileBuffer.data()), fileSize);
+			// std::string response_str1 = response1.str();
+			// send(conn_sock, response_str1.c_str() , response_str1.size(), 0);
+
 			break ;
 		}
 		case DELETE :
 		{
+			std::cout << "\ntmp.c_str() = " << tmp << "\n" << std::endl;
+			if (std::remove(tmp.c_str()) != 0) { // the remove function returns 0 on success
+        		std::cerr << "Error deleting file: " << '\n';
+    			}
+    			std::cout << "File deleted successfully: " << '\n';
+				
+			std::stringstream response;
+			response << "HTTP/1.1 200 OK\r\n";
+            // response << "Content-Type: text/plain; charset=UTF-8\r\n";
+            response << "content-Length: " << 9 << "\r\n";
+            response << "\r\n";
+            response << "OK delete" << "\r\n";
+			std::string response_str = response.str();
+            send(conn_sock, response_str.c_str() , response_str.size(), 0);
+
 			break ;
 		}
 		default :
 		{
+			std::stringstream response;
+			response << "HTTP/1.1 200 OK\r\n";
+            response << "content-Length: " << 0 << "\r\n";
+            response << "\r\n";
+			std::string response_str = response.str();
+            send(conn_sock, response_str.c_str() , response_str.size(), 0);
 			break ;
 		}
 	}
 	return ;
 }
 
-std::string	server_response::addHeader(std::string statusMsg)
+std::string	server_response::addHeader(std::string statusMsg, const server_request& Server_Request)
 {
 	std::string	header;
 	std::stringstream	response;
 	
 	response << "HTTP/1.1" << " " << _status_code << " " << statusMsg << "\r\n";  /* ajouter la version HTTP (parsing) */ 
-	response << "Content-Type: " << "text/html" << "\r\n"; // modif text/html (parsing) -> peut etre faire map de content type / mime en fonction de .py = /truc .html = /text/html etc.
+	response << this->getType(Server_Request.getType()); // modif text/html (parsing) -> peut etre faire map de content type / mime en fonction de .py = /truc .html = /text/html etc.
 	header = response.str();
 	return (header);
 }
@@ -208,7 +259,7 @@ std::string	server_response::addBody(std::string msg)
 	return (body);
 }
 
-void	server_response::createResponse(server_configuration * server, std::string file)
+void	server_response::createResponse(server_configuration * server, std::string file, const server_request& Server_Request)
 {
 	std::stringstream	response;
 	enum	status { INFO, SUCCESS, REDIRECTION, CLIENT, SERVER };
@@ -223,13 +274,13 @@ void	server_response::createResponse(server_configuration * server, std::string 
 			switch (_status_code)
 				case 100:
 				{
-					response << addHeader(STATUS100);
+					response << addHeader(STATUS100, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS100]);
 					break;
 				}
 				case 101:
 				{
-					response << addHeader(STATUS101);
+					response << addHeader(STATUS101, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS101]);
 					break;
 				}
@@ -242,43 +293,43 @@ void	server_response::createResponse(server_configuration * server, std::string 
 			{
 				case 200:
 				{
-					response << addHeader(STATUS200);
+					response << addHeader(STATUS200, Server_Request);
 					response << addBody(file);
 					break;
 				}
 				case 201:
 				{
-					response << addHeader(STATUS201);
+					response << addHeader(STATUS201, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS201]);
 					break;
 				}
 				case 202:
 				{
-					response << addHeader(STATUS202);
+					response << addHeader(STATUS202, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS202]);
 					break;
 				}
 				case 203:
 				{
-					response << addHeader(STATUS203);
+					response << addHeader(STATUS203, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS203]);
 					break;
 				}
 				case 204:
 				{
-					response << addHeader(STATUS204);
+					response << addHeader(STATUS204, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS204]);
 					break;
 				}
 				case 205:
 				{
-					response << addHeader(STATUS205);
+					response << addHeader(STATUS205, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS205]);
 					break;
 				}
 				case 206:
 				{
-					response << addHeader(STATUS206);
+					response << addHeader(STATUS206, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS206]);
 					break;
 				}
@@ -291,43 +342,43 @@ void	server_response::createResponse(server_configuration * server, std::string 
 			switch (_status_code)
 				case 300:
 				{
-					response << addHeader(STATUS300);
+					response << addHeader(STATUS300, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS300]);
 					break;
 				}
 				case 301:
 				{
-					response << addHeader(STATUS301);
+					response << addHeader(STATUS301, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS301]);
 					break;
 				}
 				case 302:
 				{
-					response << addHeader(STATUS302);
+					response << addHeader(STATUS302, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS302]);
 					break;
 				}
 				case 303:
 				{
-					response << addHeader(STATUS303);
+					response << addHeader(STATUS303, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS303]);
 					break;
 				}
 				case 304:
 				{
-					response << addHeader(STATUS304);
+					response << addHeader(STATUS304, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS304]);
 					break;
 				}
 				case 305:
 				{
-					response << addHeader(STATUS305);
+					response << addHeader(STATUS305, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS305]);
 					break;
 				}
 				case 307:
 				{
-					response << addHeader(STATUS307);
+					response << addHeader(STATUS307, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS307]);
 					break;
 				}
@@ -340,109 +391,109 @@ void	server_response::createResponse(server_configuration * server, std::string 
 			{
 				case 400:
 				{
-					response << addHeader(STATUS400);
+					response << addHeader(STATUS400, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS400]);
 					break;
 				}
 				case 401:
 				{
-					response << addHeader(STATUS401);
+					response << addHeader(STATUS401, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS401]);
 					break;
 				}
 				case 402:
 				{
-					response << addHeader(STATUS402);
+					response << addHeader(STATUS402, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS402]);
 					break;
 				}
 				case 403:
 				{
-					response << addHeader(STATUS403);
+					response << addHeader(STATUS403, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS403]);
 					break;
 				}
 				case 404:
 				{
-					response << addHeader(STATUS404);
+					response << addHeader(STATUS404, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS404]);
 					break;
 				}
 				case 405:
 				{
-					response << addHeader(STATUS405);
+					response << addHeader(STATUS405, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS405]);
 					break;
 				}
 				case 406:
 				{
-					response << addHeader(STATUS406);
+					response << addHeader(STATUS406, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS406]);
 					break;
 				}
 				case 407:
 				{
-					response << addHeader(STATUS407);
+					response << addHeader(STATUS407, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS407]);
 					break;
 				}
 				case 408:
 				{
-					response << addHeader(STATUS408);
+					response << addHeader(STATUS408, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS408]);
 					break;
 				}
 				case 409:
 				{
-					response << addHeader(STATUS409);
+					response << addHeader(STATUS409, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS409]);
 					break;
 				}
 				case 410:
 				{
-					response << addHeader(STATUS410);
+					response << addHeader(STATUS410, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS410]);
 					break;
 				}
 				case 411:
 				{
-					response << addHeader(STATUS411);
+					response << addHeader(STATUS411, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS411]);
 					break;
 				}
 				case 412:
 				{
-					response << addHeader(STATUS412);
+					response << addHeader(STATUS412, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS412]);
 					break;
 				}
 				case 413:
 				{
-					response << addHeader(STATUS413);
+					response << addHeader(STATUS413, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS413]);
 					break;
 				}
 				case 414:
 				{
-					response << addHeader(STATUS414);
+					response << addHeader(STATUS414, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS414]);
 					break;
 				}
 				case 415:
 				{
-					response << addHeader(STATUS415);
+					response << addHeader(STATUS415, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS415]);
 					break;
 				}
 				case 416:
 				{
-					response << addHeader(STATUS416);
+					response << addHeader(STATUS416, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS416]);
 					break;
 				}
 				case 417:
 				{
-					response << addHeader(STATUS417);
+					response << addHeader(STATUS417, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS417]);
 					break;
 				}
@@ -456,37 +507,37 @@ void	server_response::createResponse(server_configuration * server, std::string 
 			{
 				case 500:
 				{
-					response << addHeader(STATUS500);
+					response << addHeader(STATUS500, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS500]);
 					break;
 				}
 				case 501:
 				{
-					response << addHeader(STATUS501);
+					response << addHeader(STATUS501, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS501]);
 					break;
 				}
 				case 502:
 				{
-					response << addHeader(STATUS502);
+					response << addHeader(STATUS502, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS502]);
 					break;
 				}
 				case 503:
 				{
-					response << addHeader(STATUS503);
+					response << addHeader(STATUS503, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS503]);
 					break;
 				}
 				case 504:
 				{
-					response << addHeader(STATUS504);
+					response << addHeader(STATUS504, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS504]);
 					break;
 				}
 				case 505:
 				{
-					response << addHeader(STATUS505);
+					response << addHeader(STATUS505, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS505]);
 					break;
 				}

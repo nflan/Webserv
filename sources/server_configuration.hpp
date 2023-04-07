@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server_configuration.hpp                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
+/*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:03:12 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/06 16:48:50 by nflan            ###   ########.fr       */
+/*   Updated: 2023/04/07 15:08:42 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,8 @@
 #include "ErrorCorresp.hpp"
 #include <sstream>
 #include <map>
-
+#include "server_location_configuration.hpp"
+#include <vector>
 #define DEBUG 0
 
 class ErrorCorresp;
@@ -40,6 +41,8 @@ class server_configuration
 	size_t		_ClientMaxBodySize;
 	std::map<std::string, std::string>	_ErrorPage;
 	std::map<std::string, std::string>	_DefErrorPage;
+	std::map<std::string, std::string> _Location;
+	std::map<std::string, class server_location_configuration*> _Loc;
 	
 	public:
 	server_configuration();
@@ -52,17 +55,20 @@ class server_configuration
 	std::string findServerName();
 	int findPort();
 	std::string findRoot();
+	std::map<std::string, std::string> findLocation();
 	void	setCgi();
 	void	setErrorPage();
 	void	setDefErrorPage();
 	void	setStatusCode(int);
 	int fillCgi(size_t pos);
+	std::map<std::string, class server_location_configuration*> findLoc();
 
+	std::ostream&	printLoc(std::ostream &out);
+	
 	template<class T>
 	void	printMap(std::map<T,T>);
 
 	size_t findClientMaxBodySize();
-	std::string findErrorPage();
 	std::string getConfigFile();
 	std::string getServerName();
 	int	getStatusCode();
