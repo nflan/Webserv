@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:46 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/07 19:56:14 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/07 20:19:29 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,13 +116,15 @@ int server_response::checkConfFile(std::string MethodUsed, server_configuration 
 void	server_response::todo(const server_request& Server_Request, int conn_sock, server_configuration *server)
 {
 	enum imethod {GET, POST, DELETE};
-	std::string	Root = server->getRoot();
+	std::string	Root = server->getRoot(); // TODO : implementer ici la fonction avec le root normal si pas trouve
 	int n = 0;
 	const std::string ftab[3] = {"GET", "POST", "DELETE"};
 	std::string		content;
 	(void)Root;
 	std::string tmp;
+	/************/
 	_status_code = checkConfFile(Server_Request.getMethod(), server, Server_Request.getRequestURI());
+	/************/
 	std::cout << "DEBUG : " << Server_Request.getRequestURI() << std::endl;
 	
 	if (Root.size() == 1 && Root.find("/", 0, 1))
@@ -134,7 +136,7 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 	{
 		// tmp.erase();
 		std::cout << "\nC1\n" << std::endl;
-		tmp += "index.html";
+		tmp += "index.html"; // TODO : idem ici que pr le root
 	}
 	if (tmp[tmp.size() - 1] == '/')
 	{
@@ -157,7 +159,6 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 	{
 		case GET :
 		{
-			// 
 			std::ifstream file(tmp.c_str());
 			std::stringstream buffer;
 			std::stringstream response;
@@ -179,7 +180,7 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 			std::cerr << this->_ServerResponse << std::endl;
 			break ;
 		}
-		case POST :
+		case POST : //TO DO : METTRE OU ON VA TELECHARGER
 		{
 			// std::string infilename = "./site/42.jpg";
 			// std::ifstream inputFile(infilename.c_str(), std::ios::binary);
