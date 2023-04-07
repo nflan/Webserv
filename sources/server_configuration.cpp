@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:06:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/07 15:08:18 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/07 16:14:56 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -386,6 +386,7 @@ size_t server_configuration::getClientMaxBodySize() { return _ClientMaxBodySize;
 std::map<std::string, std::string> server_configuration::getCgi() { return (_cgi); }
 std::map<std::string, std::string> server_configuration::getErrorPage() { return _ErrorPage;}
 std::map<std::string, std::string>& server_configuration::getDefErrorPage() { return _DefErrorPage;}
+std::map<std::string, class server_location_configuration*>& server_configuration::getLoc() { return (_Loc);}
 
 const char *	server_configuration::CgiException::what() const throw()
 {

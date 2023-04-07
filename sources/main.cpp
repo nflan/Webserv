@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 15:39:03 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/07 15:04:14 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/07 16:13:33 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,10 +50,12 @@ void sigint_handler(int signum)
 
 void DeleteServers(std::vector<server_configuration*> servers)
 {
-	for (size_t i = 0; i < servers.size(); i++)
-	{
-		delete servers[i];
-	}
+    for (size_t i = 0; i < servers.size(); i++)
+    {
+        for (std::map<std::string, class server_location_configuration*>::iterator it = servers[i]->getLoc().begin(); it != servers[i]->getLoc().end(); it++)
+            delete it->second;
+        delete servers[i];
+    }
 }
 
 int setnonblocking(int sockfd) {

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cgi.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nflan <marvin@42.fr>                       +#+  +:+       +#+        */
+/*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/27 15:47:23 by nflan             #+#    #+#             */
-/*   Updated: 2023/03/29 15:24:25 by nflan            ###   ########.fr       */
+/*   Updated: 2023/04/07 18:02:56 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,8 +129,6 @@ void	exeCgi(Cgi & cgi)
 	}
 	waitpid(cgi.getPid(), &status, 0);
 }
-
-int	re
 
 int	main(int ac, char **av, char **envp)
 {

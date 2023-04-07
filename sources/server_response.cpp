@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:46 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/07 15:10:10 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/07 17:08:55 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,6 +116,10 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 	{
 		case GET :
 		{
+			if (Server_Request.getContentLength() > server->getClientMaxBodySize())
+			{
+				_status_code = 413;
+			}
 			std::ifstream file(tmp.c_str());
 			std::stringstream buffer;
 			std::stringstream response;
@@ -131,10 +135,10 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 			}
 			std::cerr << "AFTER RESPONSE IFSTREAM\r\n" << std::endl;
 			createResponse(server, content, Server_Request);
-			std::cout << std::endl << "SERVER RESPONSE CONSTRUITE -> " << std::endl << _ServerResponse << std::endl << std::endl;
-			send(conn_sock, _ServerResponse.c_str() , _ServerResponse.size(), 0);
+			std::cout << std::endl << "SERVER RESPONSE CONSTRUITE -> " << std::endl << this->_ServerResponse << std::endl << std::endl;
+			send(conn_sock, this->_ServerResponse.c_str() , this->_ServerResponse.size(), 0);
 			std::cerr << "\nREPONSE SEND :\n";
-			std::cerr << _ServerResponse << std::endl;
+			std::cerr << this->_ServerResponse << std::endl;
 			break ;
 		}
 		case POST :

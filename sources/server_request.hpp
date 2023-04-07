@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 14:29:37 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/06 15:43:26 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/07 17:15:47 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include <fstream>
 #include <sstream>
 #include <algorithm>
+#include <stdlib.h>
 
 #define DEBUG 0
 
@@ -54,6 +55,7 @@ class server_request
 	std::string getRequestURI() const;
 	std::string getType() const;
 	std::string	getBody() const;
+	unsigned long long getContentLength() const ;
 	void request_parser();
 };
 
