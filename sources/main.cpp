@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 15:39:03 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/05 17:21:48 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/07 12:44:54 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,10 @@ void handle_connection(server_configuration *servers, int conn_sock) {
 	{
 		n = read(conn_sock, buffer, 1024);
 		if (n > 0)
+		{
+			buffer[n] = '\0';
 			request.append(buffer);
+		}
 	}
 	std::cout << "Request :\n" << request << std::endl;
 	server_request* ServerRequest = new server_request(request);

@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:46 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/06 18:31:58 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/07 12:57:29 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -244,6 +244,7 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
             // response << "Hello world!\r\n";
             std::cerr << "AFTER RESPONSE IFSTREAM\r\n" << std::endl;
             std::cout << buffer << std::endl;
+			delete [] buffer;
             std::string response_str = response.str();
             send(conn_sock, response_str.c_str() , response_str.size(), 0);
 /**********************************************************************************/
@@ -259,6 +260,7 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 		}
 		case DELETE :
 		{
+			std::cout << "\ntmp.c_str() = " << tmp << "\n" << std::endl;
 			if (std::remove(tmp.c_str()) != 0) { // the remove function returns 0 on success
         		std::cerr << "Error deleting file: " << '\n';
     			}
@@ -277,6 +279,12 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 		}
 		default :
 		{
+			std::stringstream response;
+			response << "HTTP/1.1 200 OK\r\n";
+            response << "content-Length: " << 0 << "\r\n";
+            response << "\r\n";
+			std::string response_str = response.str();
+            send(conn_sock, response_str.c_str() , response_str.size(), 0);
 			break ;
 		}
 	}

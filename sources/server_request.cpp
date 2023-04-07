@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 14:31:36 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/06 15:42:48 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/07 13:22:00 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,8 +143,12 @@ void server_request::request_parser()
 	if (colength_start != colength_end)
     	this->_contentLength = _ServerRequest.substr(colength_start + 16, colength_end - colength_start - 16);
 
-    std::string::size_type body_start = _ServerRequest.find("\r\n\0\r\n", colength_end);
-    this->_body = _ServerRequest.substr(body_start + 5);
+	
+    std::string::size_type body_start = _ServerRequest.find("\r\n\r\n", method_end + 1);
+	std::string::size_type body_end = _ServerRequest.find("\r\n", body_start + 4);
+	std::cout << "\nbody_start : " << body_start << " body_end : " << body_end  << std::endl;
+	if (body_start != body_end)
+    	this->_body = _ServerRequest.substr(body_start + 4);
 
 		
     // Afficher les résultats
