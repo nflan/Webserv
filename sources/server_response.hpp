@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server_response.hpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/07 15:10:57 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/07 19:01:35 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,7 @@ class server_response
 	void	createResponse(server_configuration*, std::string, const server_request& Server_Request);
 	std::string	addHeader(std::string statusMsg, const server_request& Server_Request);
 	std::string	addBody(std::string body);
+	int checkConfFile(std::string MethodUsed, server_configuration *server, std::string RequestURI);
 
 	// Définition de la méthode pour obtenir le corps de la réponse
 	std::string get_body() const { return _body; }

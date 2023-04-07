@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 15:39:03 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/07 18:24:23 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/07 19:20:49 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ void DeleteServers(std::vector<server_configuration*> servers)
 {
 	for (size_t i = 0; i < servers.size(); i++)
 	{
-		for (std::map<std::string, class server_location_configuration*>::iterator it = servers[i]->getLoc().begin(); it != servers[i]->getLoc().end(); it++)
+		for (std::map<std::string, class server_location_configuration*>::iterator it = servers[i]->getLoc()->begin(); it != servers[i]->getLoc()->end(); it++)
 			delete it->second;
 		delete servers[i];
 	}

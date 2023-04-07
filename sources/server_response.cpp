@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server_response.cpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:46 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/07 17:08:55 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/07 19:56:14 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,6 +80,39 @@ std::string server_response::getType(std::string type)
 	return ("Content-Type: text/html\r\n");
 }
 
+int server_response::checkConfFile(std::string MethodUsed, server_configuration *server, std::string RequestURI)
+{
+	int i = 0;
+	
+	std::cout << "METHOD : " << MethodUsed << std::endl;
+	for (std::map<std::string, class server_location_configuration*>::reverse_iterator it = server->getLoc()->rbegin(); it != server->getLoc()->rend(); it++)
+	{
+		std::cout << i << std::endl;
+		std::cout << "IT-FIRST : " << it->first << " Size : " << it->first.size() << std::endl;
+		std::cout << "RequestURI.SUBSTR : " << RequestURI.substr(0, it->first.size()) << std::endl;
+		if (it->first == RequestURI.substr(0, it->first.size()))
+		{
+			for (std::vector<std::string>::reverse_iterator ite = it->second->getHttpMethodAccepted().rbegin(); ite != it->second->getHttpMethodAccepted().rend(); ite++)
+			{
+				std::cout << "ITE* : " << *ite << std::endl;
+				if (MethodUsed == *ite)
+				{
+					std::cout << "IL PASSE ICI" << std::endl;
+					// s'il passe ici c'est que la méthode est autorisée et qu'une loc a été trouvée
+					// return (200);
+				}
+				else
+				{
+					// s'il passe ici, c'est qu'une loc a ete trouvee mais la methode n'est pas trouvee
+					// return (405);
+				}
+			}
+		}
+	}
+	// s'il passe ici c'est qu'aucune loc n'a éte trouvée et que donc c'est possible (sauf interdiction mais non gere)
+	return (200);
+}
+
 void	server_response::todo(const server_request& Server_Request, int conn_sock, server_configuration *server)
 {
 	enum imethod {GET, POST, DELETE};
@@ -89,6 +122,9 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 	std::string		content;
 	(void)Root;
 	std::string tmp;
+	_status_code = checkConfFile(Server_Request.getMethod(), server, Server_Request.getRequestURI());
+	std::cout << "DEBUG : " << Server_Request.getRequestURI() << std::endl;
+	
 	if (Root.size() == 1 && Root.find("/", 0, 1))
 		tmp = "." + Server_Request.getRequestURI();
 	else
@@ -104,6 +140,11 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 	{
 		tmp += "index.html";
 	}
+	std::cout << "C2 : " << server->getClientMaxBodySize() << std::endl;
+	if (Server_Request.getContentLength() > server->getClientMaxBodySize())
+	{
+		_status_code = 413;
+	} // je le mets au dessus car c'est general et ca concerne toutes les methodes
 
 	for (; n < 4; n++)
 	{
@@ -116,10 +157,7 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 	{
 		case GET :
 		{
-			if (Server_Request.getContentLength() > server->getClientMaxBodySize())
-			{
-				_status_code = 413;
-			}
+			// 
 			std::ifstream file(tmp.c_str());
 			std::stringstream buffer;
 			std::stringstream response;

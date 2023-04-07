@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:06:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/07 18:24:32 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/07 19:30:04 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -302,7 +302,7 @@ std::map<std::string, std::string> server_configuration::findLocation()
 				location_pair.first = "";
 				location_pair.second = "";
 			}
-			location_pair.first = location_path.substr(0, space_pos);
+			location_pair.first = location_path.substr(0, space_pos - 1);
 			end_loc = location_path.find_first_of("{}", space_pos + 1);
 			int j = 0;
 			while (location_path[end_loc] == '{')
@@ -386,7 +386,7 @@ size_t server_configuration::getClientMaxBodySize() { return _ClientMaxBodySize;
 std::map<std::string, std::string> server_configuration::getCgi() { return (_cgi); }
 std::map<std::string, std::string> server_configuration::getErrorPage() { return _ErrorPage;}
 std::map<std::string, std::string>& server_configuration::getDefErrorPage() { return _DefErrorPage;}
-std::map<std::string, class server_location_configuration*>& server_configuration::getLoc() { return (_Loc);}
+std::map<std::string, class server_location_configuration*>* server_configuration::getLoc() { return (&_Loc);}
 
 const char *	server_configuration::CgiException::what() const throw()
 {
