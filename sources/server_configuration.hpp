@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:03:12 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/07 16:09:50 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/07 18:25:19 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ class server_configuration
 	std::map<std::string, std::string>	_cgi;
 	int			_Port;
 	int			_StatusCode;
-	size_t		_ClientMaxBodySize;
+	unsigned long long	_ClientMaxBodySize;
 	std::map<std::string, std::string>	_ErrorPage;
 	std::map<std::string, std::string>	_DefErrorPage;
 	std::map<std::string, std::string> _Location;

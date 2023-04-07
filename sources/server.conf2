@@ -26,7 +26,7 @@ server {
 			upload_store /var/www/uploads;
 		}
 
-		location / {
+		location /download/ {
 			index index.html index.htm default.html;
 		}
 
