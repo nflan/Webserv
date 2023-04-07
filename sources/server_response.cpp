@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:46 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/06 16:54:11 by nflan            ###   ########.fr       */
+/*   Updated: 2023/04/07 14:22:06 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 server_response::server_response() : _status_code(200), _body(""), _ServerResponse("")
 {
+	this->addType();
 	std::cout << "server_response Default Constructor called" << std::endl;
 }
 
@@ -101,6 +102,22 @@ server_response &server_response::operator=(server_response const &obj)
 // 	send(client_socket, response_str.c_str(), response_str.length(), 0);
 // }
 
+void	server_response::addType()
+{
+	_contentType.insert(std::make_pair<std::string, std::string>("html", "Content-Type: text/html\r\n"));
+	_contentType.insert(std::make_pair<std::string, std::string>("jpg", "Content-Type: image/jpeg\r\n"));
+}
+
+std::string server_response::getType(std::string type)
+{
+	for (std::map<std::string, std::string>::iterator it = _contentType.begin(); it != _contentType.end(); it++)
+	{
+		if (type == it->first)
+			return (it->second);
+	}
+	return ("Content-Type: text/plain; charset=UTF-8\r\n");
+}
+
 void	server_response::todo(const server_request& Server_Request, int conn_sock, server_configuration *server)
 {
 	enum imethod {GET, POST, DELETE};
@@ -109,6 +126,35 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 	const std::string ftab[3] = {"GET", "POST", "DELETE"};
 	std::string		content;
 	(void)Root;
+	std::string tmp;
+	if (Root.size() == 1 && Root.find("/", 0, 1))
+		tmp = "." + Server_Request.getRequestURI();
+	else
+		tmp = Root + Server_Request.getRequestURI();
+	std::cout << "\nC0 = '" << tmp << "'\n" << std::endl;
+	if (tmp.size() == 3 && tmp.find(".//") != std::string::npos)
+	{
+		// tmp.erase();
+		std::cout << "\nC1\n" << std::endl;
+		tmp += "index.html";
+	}
+	if (tmp[tmp.size() - 1] == '/')
+	{
+		tmp += "index.html";
+	}
+	for (; n < 4; n++)
+	{
+		if (n != 3 && ftab[n] == Server_Request.getMethod())
+		{
+			break ;
+		}
+	}
+	switch (n)
+	{
+		case GET :
+		{
+			// std::string answer = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
+			// send(conn_sock, answer.c_str() , answer.size(), 0);
 
 	for (; n < 4; n++)
 	{
@@ -172,14 +218,98 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 		}
 		case POST :
 		{
+			// std::string infilename = "./site/42.jpg";
+			// std::ifstream inputFile(infilename.c_str(), std::ios::binary);
+			// std::stringstream response1;
+			std::string outfilename = "./test.jpg"; // OK 1
+			std::ofstream outputFile(outfilename.c_str(), std::ios::binary); // OK 1
+
+			// // Get the file size
+			// inputFile.seekg(0, std::ios::end);
+			// int fileSize = inputFile.tellg();
+			// inputFile.seekg(0, std::ios::beg);
+			
+			// // Read the contents of the file into a buffer
+			// std::vector<unsigned char> fileBuffer(fileSize);
+			// inputFile.read(reinterpret_cast<char*>(fileBuffer.data()), fileSize);
+			
+			// inputFile.close();
+
+			// outputFile << reinterpret_cast<char*>(fileBuffer.data());
+			// outputFile.close();
+
+			/*OK 1*/
+			std::string tmp = "./site/42.jpg";
+            std::cout << "\nC0bis = '" << tmp << "'\n" << std::endl;
+            std::ifstream file(tmp.c_str(), std::ifstream::binary);
+            // std::stringstream buffer;
+            std::stringstream response;
+            std::filebuf* pbuf = file.rdbuf();
+            std::size_t size = pbuf->pubseekoff(0, file.end, file.in);
+            pbuf->pubseekpos (0,file.in);
+            char *buffer= new char[size];
+            pbuf->sgetn(buffer, size);
+            file.close();
+            std::string content(buffer, size);
+			std::cout << "\nC2\n" << std::endl;
+			/*OK 1*/
+
+            // buffer << file.rdbuf();
+            // std::cout << "\nBUFFER = " << buffer.str() << "\r\n" << std::endl;
+            // std::string content = buffer.str();
+            response << "HTTP/1.1 200 OK\r\n";
+            response << "content-Type: image/jpeg\r\n";
+            // response << "Content-Type: text/plain; charset=UTF-8\r\n";
+            response << "content-Length: " << size << "\r\n";
+            response << "\r\n";
+            response << content << '\0' << "\r\n";
+			outputFile << content ;
+			outputFile.close();
+            // }
+            // response << "Hello world!\r\n";
+            std::cerr << "AFTER RESPONSE IFSTREAM\r\n" << std::endl;
+            std::cout << buffer << std::endl;
+			delete [] buffer;
+            std::string response_str = response.str();
+            send(conn_sock, response_str.c_str() , response_str.size(), 0);
+/**********************************************************************************/
+			// std::cout << "Successfully wrote to " << outfilename << std::endl;
+			// response1 << "HTTP/1.1 200 OK\r\n";
+			// response1 << "Content-Length: " << fileSize << "\r\n";
+			// response1 << "\r\n";
+			// response1.write(reinterpret_cast<char*>(fileBuffer.data()), fileSize);
+			// std::string response_str1 = response1.str();
+			// send(conn_sock, response_str1.c_str() , response_str1.size(), 0);
+
 			break ;
 		}
 		case DELETE :
 		{
+			std::cout << "\ntmp.c_str() = " << tmp << "\n" << std::endl;
+			if (std::remove(tmp.c_str()) != 0) { // the remove function returns 0 on success
+        		std::cerr << "Error deleting file: " << '\n';
+    			}
+    			std::cout << "File deleted successfully: " << '\n';
+				
+			std::stringstream response;
+			response << "HTTP/1.1 200 OK\r\n";
+            // response << "Content-Type: text/plain; charset=UTF-8\r\n";
+            response << "content-Length: " << 9 << "\r\n";
+            response << "\r\n";
+            response << "OK delete" << "\r\n";
+			std::string response_str = response.str();
+            send(conn_sock, response_str.c_str() , response_str.size(), 0);
+
 			break ;
 		}
 		default :
 		{
+			std::stringstream response;
+			response << "HTTP/1.1 200 OK\r\n";
+            response << "content-Length: " << 0 << "\r\n";
+            response << "\r\n";
+			std::string response_str = response.str();
+            send(conn_sock, response_str.c_str() , response_str.size(), 0);
 			break ;
 		}
 	}

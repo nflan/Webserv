@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/06 16:50:22 by nflan            ###   ########.fr       */
+/*   Updated: 2023/04/07 14:23:07 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ class server_response
 	int			_status_code;
 	std::string	_body;
 	std::string	_ServerResponse;
+	std::map<std::string, std::string> _contentType;
 	
 	public:
 	server_response();
@@ -84,6 +85,8 @@ class server_response
     // void send_response_to_client(const std::string& response) {
     //     // Code ici pour envoyer la réponse au client
     // }
+	void		addType();
+	std::string	getType(std::string type);
 };
 
 #endif

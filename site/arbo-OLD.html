@@ -43,17 +43,14 @@
             echo ' - Droits : ' . substr(sprintf('%o', fileperms($file)), -4);
             echo ' - Créé le : ' . date('F d Y H:i:s.', filectime($file));
             echo ' - <a href="' . $file . '" download>Télécharger</a>';
-			echo ' <form method="POST" action="' . $path . $file . '">';
-				echo '<input type="hidden" name="_method" value="DELETE">';
-				echo '<input type="submit" value="Supprimer">';
-				echo '</form>';
+            echo ' - <a href="?delete='.urlencode($file).'" onclick="return confirm(\'Êtes-vous sûr de vouloir supprimer ce fichier ?\')">Supprimer</a>';
             echo '</li>';
           }
         }
       }
 
       // Supprimer le fichier si nécessaire
-      if(isset($_POST['_method']) && $_POST['_method'] === 'DELETE' && isset($_GET['delete'])) {
+      if(isset($_GET['delete'])) {
         $filename = urldecode($_GET['delete']);
         if(file_exists($filename)) {
           unlink($filename);
