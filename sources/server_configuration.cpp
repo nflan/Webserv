@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:06:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/07 15:08:18 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/07 18:28:18 by nflan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ server_configuration::server_configuration()
 }
 
 server_configuration::server_configuration(std::string ConfigFile) : 
-_ConfigFile(convertConfigFile(ConfigFile)),
+_ConfigFile(ConfigFile),
 _ServerName(findServerName()),
 _Root(findRoot()),
 _Port(findPort()),
@@ -33,15 +33,15 @@ _Loc(findLoc())
 	setErrorPage();
 	// deferrorpage -> errorpage
 	ErrorCorresp	check;
-	std::map<std::string, std::string>::iterator	tmp;
-	for (std::map<std::string, std::string>::iterator it = _DefErrorPage.begin(); it != _DefErrorPage.end(); it++)
+	std::map<std::string, std::pair<std::string, std::string> >::iterator	tmp;
+	for (std::map<std::string, std::pair<std::string, std::string> >::iterator it = _DefErrorPage.begin(); it != _DefErrorPage.end(); it++)
 	{
 		tmp = _ErrorPage.find(check.getCorresp().find(it->first)->second);
 		if (tmp == _ErrorPage.end())
 			_ErrorPage.insert(*it);
 		else
 		{
-			_ErrorPage.insert(std::make_pair<std::string, std::string>(it->first, tmp->second));
+			_ErrorPage.insert(std::make_pair(it->first, tmp->second));
 			_ErrorPage.erase(tmp);
 		}
 	}
@@ -57,22 +57,19 @@ server_configuration::server_configuration(server_configuration const &obj)
 {
 	*this = obj;
 }
+
 server_configuration::~server_configuration()
 {
 	if (DEBUG)
 		std::cout << "server_configuration Destructor called" << std::endl;
 }
+
 server_configuration &server_configuration::operator=(server_configuration const &obj)
 {
 	if (DEBUG)
 		std::cout << "server_configuration Copy assignment operator called" << std::endl;
 	(void)obj;
 	return *this;
-}
-
-std::string server_configuration::convertConfigFile(std::string ConfigFileStr)
-{
-	return (ConfigFileStr);
 }
 
 int	server_configuration::getStatusCode() { return (_StatusCode); }
@@ -144,8 +141,13 @@ std::string	readingFileEP( std::string file )
 		std::cout << "Can't open file " << file << " using default error page" << std::endl;
 		return ("");
 	}
+
+	std::stringstream buffer;
 	std::string fileContent;
-	std::getline(input_file, fileContent, '\0');
+
+	buffer << input_file.rdbuf();
+	fileContent = buffer.str();
+//	std::getline(input_file, fileContent, '\0');
 	input_file.close();
 	return (fileContent.substr(0, fileContent.size()));
 }
@@ -175,52 +177,54 @@ void server_configuration::setErrorPage()
 		file = _ConfigFile.substr(tmp, pos - tmp);
 		second = readingFileEP(file);
 		if (second.size() > 0)
-			_ErrorPage.insert(std::make_pair<std::string, std::string>(first, second));
+		{
+			_ErrorPage.insert(std::make_pair(first, std::make_pair(file, second)));
+		}
 	}
 }
 
 void server_configuration::setDefErrorPage()
 {
-	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS100, HTML100));
-	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS101, HTML101));
-	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS200, HTML200));
-	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS201, HTML201));
-	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS202, HTML202));
-	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS203, HTML203));
-	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS204, HTML204));
-	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS205, HTML205));
-	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS206, HTML206));
-	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS300, HTML300));
-	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS301, HTML301));
-	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS302, HTML302));
-	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS303, HTML303));
-	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS304, HTML304));
-	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS305, HTML305));
-	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS307, HTML307));
-	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS400, HTML400));
-	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS401, HTML401));
-	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS402, HTML402));
-	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS403, HTML403));
-	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS404, HTML404));
-	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS405, HTML405));
-	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS406, HTML406));
-	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS407, HTML407));
-	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS408, HTML408));
-	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS409, HTML409));
-	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS410, HTML410));
-	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS411, HTML411));
-	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS412, HTML412));
-	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS413, HTML413));
-	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS414, HTML414));
-	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS415, HTML415));
-	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS416, HTML416));
-	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS417, HTML417));
-	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS500, HTML500));
-	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS501, HTML501));
-	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS502, HTML502));
-	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS503, HTML503));
-	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS504, HTML504));
-	_DefErrorPage.insert(std::make_pair<std::string, std::string>(STATUS505, HTML505));
+	_DefErrorPage.insert(std::make_pair(STATUS100, std::make_pair("", HTML100)));
+	_DefErrorPage.insert(std::make_pair(STATUS101, std::make_pair("", HTML101)));
+	_DefErrorPage.insert(std::make_pair(STATUS200, std::make_pair("", HTML200)));
+	_DefErrorPage.insert(std::make_pair(STATUS201, std::make_pair("", HTML201)));
+	_DefErrorPage.insert(std::make_pair(STATUS202, std::make_pair("", HTML202)));
+	_DefErrorPage.insert(std::make_pair(STATUS203, std::make_pair("", HTML203)));
+	_DefErrorPage.insert(std::make_pair(STATUS204, std::make_pair("", HTML204)));
+	_DefErrorPage.insert(std::make_pair(STATUS205, std::make_pair("", HTML205)));
+	_DefErrorPage.insert(std::make_pair(STATUS206, std::make_pair("", HTML206)));
+	_DefErrorPage.insert(std::make_pair(STATUS300, std::make_pair("", HTML300)));
+	_DefErrorPage.insert(std::make_pair(STATUS301, std::make_pair("", HTML301)));
+	_DefErrorPage.insert(std::make_pair(STATUS302, std::make_pair("", HTML302)));
+	_DefErrorPage.insert(std::make_pair(STATUS303, std::make_pair("", HTML303)));
+	_DefErrorPage.insert(std::make_pair(STATUS304, std::make_pair("", HTML304)));
+	_DefErrorPage.insert(std::make_pair(STATUS305, std::make_pair("", HTML305)));
+	_DefErrorPage.insert(std::make_pair(STATUS307, std::make_pair("", HTML307)));
+	_DefErrorPage.insert(std::make_pair(STATUS400, std::make_pair("", HTML400)));
+	_DefErrorPage.insert(std::make_pair(STATUS401, std::make_pair("", HTML401)));
+	_DefErrorPage.insert(std::make_pair(STATUS402, std::make_pair("", HTML402)));
+	_DefErrorPage.insert(std::make_pair(STATUS403, std::make_pair("", HTML403)));
+	_DefErrorPage.insert(std::make_pair(STATUS404, std::make_pair("", HTML404)));
+	_DefErrorPage.insert(std::make_pair(STATUS405, std::make_pair("", HTML405)));
+	_DefErrorPage.insert(std::make_pair(STATUS406, std::make_pair("", HTML406)));
+	_DefErrorPage.insert(std::make_pair(STATUS407, std::make_pair("", HTML407)));
+	_DefErrorPage.insert(std::make_pair(STATUS408, std::make_pair("", HTML408)));
+	_DefErrorPage.insert(std::make_pair(STATUS409, std::make_pair("", HTML409)));
+	_DefErrorPage.insert(std::make_pair(STATUS410, std::make_pair("", HTML410)));
+	_DefErrorPage.insert(std::make_pair(STATUS411, std::make_pair("", HTML411)));
+	_DefErrorPage.insert(std::make_pair(STATUS412, std::make_pair("", HTML412)));
+	_DefErrorPage.insert(std::make_pair(STATUS413, std::make_pair("", HTML413)));
+	_DefErrorPage.insert(std::make_pair(STATUS414, std::make_pair("", HTML414)));
+	_DefErrorPage.insert(std::make_pair(STATUS415, std::make_pair("", HTML415)));
+	_DefErrorPage.insert(std::make_pair(STATUS416, std::make_pair("", HTML416)));
+	_DefErrorPage.insert(std::make_pair(STATUS417, std::make_pair("", HTML417)));
+	_DefErrorPage.insert(std::make_pair(STATUS500, std::make_pair("", HTML500)));
+	_DefErrorPage.insert(std::make_pair(STATUS501, std::make_pair("", HTML501)));
+	_DefErrorPage.insert(std::make_pair(STATUS502, std::make_pair("", HTML502)));
+	_DefErrorPage.insert(std::make_pair(STATUS503, std::make_pair("", HTML503)));
+	_DefErrorPage.insert(std::make_pair(STATUS504, std::make_pair("", HTML504)));
+	_DefErrorPage.insert(std::make_pair(STATUS505, std::make_pair("", HTML505)));
 //	for (std::map<std::string, std::string>::iterator it = _DefErrorPage.begin(); it != _DefErrorPage.end(); it++) // Print Def error pages
 //		std::cout << "Error code = '" << it->first << "' && Error HTML = '" << it->second << "'" << std::endl; // Print Def error pages
 }
@@ -384,8 +388,9 @@ std::string server_configuration::getRoot() { return _Root;}
 int server_configuration::getPort() { return _Port;}
 size_t server_configuration::getClientMaxBodySize() { return _ClientMaxBodySize;}
 std::map<std::string, std::string> server_configuration::getCgi() { return (_cgi); }
-std::map<std::string, std::string> server_configuration::getErrorPage() { return _ErrorPage;}
-std::map<std::string, std::string>& server_configuration::getDefErrorPage() { return _DefErrorPage;}
+std::map<std::string, std::pair<std::string, std::string> >		server_configuration::getErrorPage() { return _ErrorPage;}
+std::map<std::string, std::pair<std::string, std::string> >&	server_configuration::getDefErrorPage() { return _DefErrorPage;}
+std::map<std::string, class server_location_configuration*>&	server_configuration::getLoc() { return (_Loc);}
 
 const char *	server_configuration::CgiException::what() const throw()
 {
@@ -405,8 +410,9 @@ std::ostream& operator <<(std::ostream &out, server_configuration &ServConfig)
 		<< "\nCliend Body Limit : " << ServConfig.getClientMaxBodySize() \
 		<< "\nCGI (first = extension, second = root):" << std::endl;
 		ServConfig.printMap(ServConfig.getCgi());
-		out	<< "\n\n***\n" \
-		<< "\nLocation : " << ServConfig.printLoc(out) << std::endl \
+		out << "\n\n***\n" \
+		<< "\nLocation : "; ServConfig.printLoc(out);
+		out << std::endl \
 		<< "\n***\n" << std::endl;
 		
 	//out << "\nERROR_PAGES (first = status, second = root):" << std::endl;

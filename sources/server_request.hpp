@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 14:29:37 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/06 15:43:26 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/07 18:06:24 by nflan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,8 @@ class server_request
 	std::string getType() const;
 	std::string	getBody() const;
 	void request_parser();
+
+	void setType(std::string);
 };
 
 std::ostream& operator <<(std::ostream &out, server_request &ServRequest);
