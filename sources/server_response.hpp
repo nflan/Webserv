@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/07 15:10:57 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/07 18:20:56 by nflan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ class server_response
 
 	void	todo(const server_request& Server_Request, int conn_sock, server_configuration* Root);
 	void	createResponse(server_configuration*, std::string, const server_request& Server_Request);
-	std::string	addHeader(std::string statusMsg, const server_request& Server_Request);
+	std::string	addHeader(std::string statusMsg, std::pair<std::string, std::string> statusContent, const server_request& Server_Request);
 	std::string	addBody(std::string body);
 
 	// Définition de la méthode pour obtenir le corps de la réponse

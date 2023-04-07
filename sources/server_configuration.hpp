@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:03:12 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/07 15:08:42 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/07 16:45:30 by nflan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,8 @@ class server_configuration
 	int			_Port;
 	int			_StatusCode;
 	size_t		_ClientMaxBodySize;
-	std::map<std::string, std::string>	_ErrorPage;
-	std::map<std::string, std::string>	_DefErrorPage;
+	std::map<std::string, std::pair<std::string, std::string> >	_ErrorPage;
+	std::map<std::string, std::pair<std::string, std::string> >	_DefErrorPage;
 	std::map<std::string, std::string> _Location;
 	std::map<std::string, class server_location_configuration*> _Loc;
 	
@@ -51,7 +51,6 @@ class server_configuration
 	~server_configuration();
 	server_configuration &operator=(server_configuration const &obj);
 
-	std::string convertConfigFile(std::string ConfigFile);
 	std::string findServerName();
 	int findPort();
 	std::string findRoot();
@@ -73,8 +72,9 @@ class server_configuration
 	std::string getServerName();
 	int	getStatusCode();
 	std::map<std::string, std::string>	getCgi();
-	std::map<std::string, std::string>	getErrorPage();
-	std::map<std::string, std::string>&	getDefErrorPage();
+	std::map<std::string, std::pair<std::string, std::string> >	getErrorPage();
+	std::map<std::string, std::pair<std::string, std::string> >&	getDefErrorPage();
+	std::map<std::string, class server_location_configuration*>& getLoc();
 	std::string getRoot();
 	int getPort();
 

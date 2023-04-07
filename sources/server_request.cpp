@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 14:31:36 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/07 15:09:25 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/07 18:07:08 by nflan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,10 @@ std::string server_request::getServerRequest() const
 std::string server_request::getType() const
 {
 	return (_type);
+}
+void server_request::setType(std::string type)
+{
+	_type = type;
 }
 std::string server_request::getMethod() const
 {
