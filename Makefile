@@ -6,7 +6,7 @@
 #    By: chillion <chillion@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/09/01 12:07:22 by chillion          #+#    #+#              #
-#    Updated: 2023/04/07 18:19:31 by chillion         ###   ########.fr        #
+#    Updated: 2023/04/07 18:43:16 by chillion         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -87,7 +87,7 @@ t2 : all
 	$(VAL) ./${SOFT_NAME} sources/server.conf2
 
 tc : tmp
-	$(VAL) ./${SOFT_NAME2} ./site/arbo-OLD.html
+	$(VAL) ./${SOFT_NAME2} ./site/arbo-OLD.php
 
 clean : 
 	@echo "${RED}###${NC}Nettoyage des fichiers .o${RED}###"

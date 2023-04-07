@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/27 15:47:23 by nflan             #+#    #+#             */
-/*   Updated: 2023/04/07 18:02:56 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/07 19:30:11 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <fstream>
+#include <fcntl.h>
+#include <unistd.h>
 
 Cgi::Cgi(std::string & cgi_path, std::string & file_path, std::vector<std::string> & env, int input_fd)
 {
@@ -91,16 +93,31 @@ void	Cgi::print() const
 
 void	Cgi::dupping()
 {
-	if (_input_fd != -1)
-	{
-		if (dup2(_input_fd, STDIN_FILENO) == -1)
-			exit (1);
-		close (_input_fd);
+	std::string filename(".cgi-tmp.txt");
+
+	FILE* fp = fopen(filename.c_str(), "w");
+	if (fp == NULL) {
+		std::cerr << "Error opening file: " << std::strerror(errno) << std::endl;
+		return ((void) 1);
 	}
+
+	int fd = fileno(fp); // get file descriptor from file pointer
+
+	if (dup2(fd, STDOUT_FILENO) == -1) {
+		std::cerr << "Error redirecting output: " << std::strerror(errno) << std::endl;
+		return ((void) 1);
+	}
+// if (_input_fd != -1)
+// {
+// 	if (dup2(_input_fd, STDIN_FILENO) == -1)
+// 		exit (1);
+// 	close (_input_fd);
+// }
 //	if (dup2(_pdes[1], STDOUT_FILENO) == -1) // uncom quand good
 //		exit (1);
-	close (_pdes[1]);
+	close (fd);
 	close (_pdes[0]);
+	close (_pdes[1]);
 }
 
 const char *	PipeException::what() const throw()
@@ -143,6 +160,7 @@ int	main(int ac, char **av, char **envp)
 		//ajout d'une commande conditionnee pour voir si on fait un cgi ou pas (si le cgi en question est precise dans le fichier de configue. Sinon, on renvoie la reponse en dur, sans traitement)
 		Cgi	cgi(a, cmd, env, -1);
 		exeCgi(cgi);
+		cgi.closePdes();
 	}
 	catch ( std::exception& e )
 	{
