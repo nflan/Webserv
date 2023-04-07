@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server_configuration.hpp                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:03:12 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/07 15:08:42 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/07 16:09:50 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,7 @@ class server_configuration
 			virtual const char *	what() const throw();
 	};
 	size_t getClientMaxBodySize();
+	std::map<std::string, class server_location_configuration*>& getLoc();
 };
 
 std::ostream& operator <<(std::ostream &out, server_configuration &ServConfig);
