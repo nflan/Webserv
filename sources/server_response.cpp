@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:46 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/07 20:19:29 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/08 13:58:22 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,9 +113,40 @@ int server_response::checkConfFile(std::string MethodUsed, server_configuration 
 	return (200);
 }
 
+std::string server_response::getRealRoot(std::string MethodUsed, server_configuration *server, std::string RequestURI)
+{	
+	for (std::map<std::string, class server_location_configuration*>::reverse_iterator it = server->getLoc()->rbegin(); it != server->getLoc()->rend(); it++)
+	{
+		if (it->first == RequestURI.substr(0, it->first.size()))
+		{
+			for (std::vector<std::string>::reverse_iterator ite = it->second->getHttpMethodAccepted().rbegin(); ite != it->second->getHttpMethodAccepted().rend(); ite++)
+			{
+				std::cout << " it->second->getRoot() : " << it->second->getRoot() << std::endl;
+				std::cout << "server->getRoot() : " << server->getRoot() << std::endl;
+				std::cout << "MethodUsed : " << MethodUsed << std::endl;
+				std::cout << "*ite get RealRoot : " << *ite << std::endl;
+				if (MethodUsed == *ite)
+				{
+					std::cout << "MethodUsed == *ite" << std::endl;
+					if (it->second->getRoot().size() > 0)
+					{
+						std::cout << "IL A TROUVE UNE AUTRE ROOT" << std::endl;
+						return (it->second->getRoot());
+					}
+					else
+						return (server->getRoot());
+				}
+			}
+		}
+	}
+	// s'il passe ici c'est qu'aucune loc n'a éte trouvée et que donc c'est possible (sauf interdiction mais non gere)
+	return (server->getRoot());
+}
+
 void	server_response::todo(const server_request& Server_Request, int conn_sock, server_configuration *server)
 {
 	enum imethod {GET, POST, DELETE};
+	std::string RealRoot = getRealRoot(Server_Request.getMethod(), server, Server_Request.getRequestURI());
 	std::string	Root = server->getRoot(); // TODO : implementer ici la fonction avec le root normal si pas trouve
 	int n = 0;
 	const std::string ftab[3] = {"GET", "POST", "DELETE"};
@@ -123,7 +154,7 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 	(void)Root;
 	std::string tmp;
 	/************/
-	_status_code = checkConfFile(Server_Request.getMethod(), server, Server_Request.getRequestURI());
+	_status_code = checkConfFile(Server_Request.getMethod(), server, Server_Request.getRequestURI()); // on sait s'ils ont le droit
 	/************/
 	std::cout << "DEBUG : " << Server_Request.getRequestURI() << std::endl;
 	

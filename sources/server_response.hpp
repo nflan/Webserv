@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/07 19:01:35 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/08 13:47:05 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,7 @@ class server_response
 	std::string	addHeader(std::string statusMsg, const server_request& Server_Request);
 	std::string	addBody(std::string body);
 	int checkConfFile(std::string MethodUsed, server_configuration *server, std::string RequestURI);
+	std::string getRealRoot(std::string MethodUsed, server_configuration *server, std::string RequestURI);
 
 	// Définition de la méthode pour obtenir le corps de la réponse
 	std::string get_body() const { return _body; }
