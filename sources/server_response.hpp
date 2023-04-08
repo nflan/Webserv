@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/08 15:02:43 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/08 16:09:22 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,8 @@ class server_response
 	std::string getRealPath(std::string MethodUsed, server_configuration *server, std::string RequestURI);
 	std::string getRealPathIndex(std::string MethodUsed, server_configuration *server, std::string RequestURI);
 	std::string getPathToStore(std::string MethodUsed, server_configuration *server, std::string RequestURI);
-
+	bool isRedir(std::string MethodUsed, server_configuration *server, std::string RequestURI);
+	std::string getRedir(std::string MethodUsed, server_configuration *server, std::string RequestURI);
 	// Définition de la méthode pour obtenir le corps de la réponse
 	std::string get_body() const { return _body; }
 

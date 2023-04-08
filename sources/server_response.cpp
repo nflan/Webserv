@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:46 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/08 15:47:47 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/08 16:10:53 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -179,6 +179,65 @@ std::string server_response::getPathToStore(std::string MethodUsed, server_confi
 	return (server->getRoot());
 }
 
+bool server_response::isRedir(std::string MethodUsed, server_configuration *server, std::string RequestURI)
+{	
+	for (std::map<std::string, class server_location_configuration*>::reverse_iterator it = server->getLoc()->rbegin(); it != server->getLoc()->rend(); it++)
+	{
+		if (it->first == RequestURI.substr(0, it->first.size()))
+		{
+			for (std::vector<std::string>::reverse_iterator ite = it->second->getHttpMethodAccepted().rbegin(); ite != it->second->getHttpMethodAccepted().rend(); ite++)
+			{
+				std::cout << " it->second->getRoot() : " << it->second->getRoot() << std::endl;
+				std::cout << "server->getRoot() : " << server->getRoot() << std::endl;
+				std::cout << "MethodUsed : " << MethodUsed << std::endl;
+				std::cout << "*ite get RealIndex : " << *ite << std::endl;
+				if (MethodUsed == *ite)
+				{
+					std::cout << "MethodUsed == *ite" << std::endl;
+					if (it->second->getHttpRedirection().size() > 0)
+					{
+						std::cout << "IL A TROUVE UNE AUTRE INDEX" << std::endl;
+						return 1;
+					}
+					else
+					{
+						return 0;
+					}
+					
+				}
+			}
+		}
+	}
+	return 0;
+}
+
+std::string server_response::getRedir(std::string MethodUsed, server_configuration *server, std::string RequestURI)
+{	
+	for (std::map<std::string, class server_location_configuration*>::reverse_iterator it = server->getLoc()->rbegin(); it != server->getLoc()->rend(); it++)
+	{
+		if (it->first == RequestURI.substr(0, it->first.size()))
+		{
+			for (std::vector<std::string>::reverse_iterator ite = it->second->getHttpMethodAccepted().rbegin(); ite != it->second->getHttpMethodAccepted().rend(); ite++)
+			{
+				std::cout << " it->second->getRoot() : " << it->second->getRoot() << std::endl;
+				std::cout << "server->getRoot() : " << server->getRoot() << std::endl;
+				std::cout << "MethodUsed : " << MethodUsed << std::endl;
+				std::cout << "*ite get RealIndex : " << *ite << std::endl;
+				if (MethodUsed == *ite)
+				{
+					std::cout << "MethodUsed == *ite" << std::endl;
+					if (it->second->getHttpRedirection().size() > 0)
+					{
+						std::cout << "IL A TROUVE UNE AUTRE INDEX" << std::endl;
+						return (it->second->getHttpRedirection());
+					}
+				}
+			}
+		}
+	}
+	return ("ERROR");
+}
+
 void	server_response::todo(const server_request& Server_Request, int conn_sock, server_configuration *server)
 {
 	/*	Ci-dessous, je verifie que le ClientMaxBodySize n'est pas dépassé.
@@ -191,7 +250,7 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 	/* Ci-dessous, on vérifie que la méthode est autorisée. On le fait ici
 	car sinon un code erreur peut être renvoyé */
 	_status_code = checkConfFile(Server_Request.getMethod(), server, Server_Request.getRequestURI()); // on sait s'ils ont le droit
-
+	
 	enum imethod {GET, POST, DELETE};
 	std::string RealPath = getRealPath(Server_Request.getMethod(), server, Server_Request.getRequestURI());
 	std::string RealPathIndex = getRealPathIndex(Server_Request.getMethod(), server, Server_Request.getRequestURI());
@@ -218,7 +277,17 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 
 	}
 	std::cout << "S_ISDIR : " << test << std::endl;
-	
+
+	/*Si l'on se situe, ds une location et qu'il y a une HTTP redir alors
+	il faut pouvoir renvoyer la redir */
+	if (isRedir(Server_Request.getMethod(), server, Server_Request.getRequestURI()) > 0)
+	{
+		std::stringstream response;
+			response << "HTTP/1.1 301 Moved Permanently\r\nLocation: " \
+			<< getRedir(Server_Request.getMethod(), server, Server_Request.getRequestURI()) << "\r\n";
+			std::string response_str = response.str();
+			send(conn_sock, response_str.c_str() , response_str.size(), 0);
+	}
 	/*********************************************/
 	std::string	Root = server->getRoot();
 	int n = 0;
@@ -236,7 +305,8 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 	else
 		tmp = Root + Server_Request.getRequestURI();
 	/*********************************************/
-	
+
+
 	/* Cette partie a été rendue dynamique ci-dessus. Voir getRealPathIndex */
 	std::cout << "\nC0 = '" << tmp << "'\n" << std::endl;
 	if (tmp.size() == 3 && tmp.find(".//") != std::string::npos)
@@ -262,31 +332,26 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 	{
 		case GET :
 		{
-			// std::ifstream file(tmp.c_str());
-			// std::stringstream buffer;
-			// std::stringstream response;
-			// if (!file.is_open())
-			// {
-			// 	if (_status_code == 200)
-			// 		_status_code = 404;
-			// }
-			// else
-			// {
-			// 	buffer << file.rdbuf();
-			// 	content = buffer.str();
-			// }
-			// std::cerr << "AFTER RESPONSE IFSTREAM\r\n" << std::endl;
-			// createResponse(server, content, Server_Request);
-			// std::cout << std::endl << "SERVER RESPONSE CONSTRUITE -> " << std::endl << this->_ServerResponse << std::endl << std::endl;
-			// send(conn_sock, this->_ServerResponse.c_str() , this->_ServerResponse.size(), 0);
-			// std::cerr << "\nREPONSE SEND :\n";
-			// std::cerr << this->_ServerResponse << std::endl;			
-			// break ;
-
+			std::ifstream file(tmp.c_str());
+			std::stringstream buffer;
 			std::stringstream response;
-			response << "HTTP/1.1 301 Moved Permanently\r\nLocation: https://www.example.com/new-page.html\r\n" ;
-			std::string response_str = response.str();
-			send(conn_sock, response_str.c_str() , response_str.size(), 0);
+			if (!file.is_open())
+			{
+				if (_status_code == 200)
+					_status_code = 404;
+			}
+			else
+			{
+				buffer << file.rdbuf();
+				content = buffer.str();
+			}
+			std::cerr << "AFTER RESPONSE IFSTREAM\r\n" << std::endl;
+			createResponse(server, content, Server_Request);
+			std::cout << std::endl << "SERVER RESPONSE CONSTRUITE -> " << std::endl << this->_ServerResponse << std::endl << std::endl;
+			send(conn_sock, this->_ServerResponse.c_str() , this->_ServerResponse.size(), 0);
+			std::cerr << "\nREPONSE SEND :\n";
+			std::cerr << this->_ServerResponse << std::endl;			
+			break ;
 
 		}
 		case POST :
