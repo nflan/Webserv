@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:03:12 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/07 19:18:26 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/08 14:37:18 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ class server_configuration
 	std::string _ConfigFile;
 	std::string _ServerName;
 	std::string	_Root;
+	std::string _Index;
 	std::map<std::string, std::string>	_cgi;
 	int			_Port;
 	int			_StatusCode;
@@ -55,6 +56,7 @@ class server_configuration
 	std::string findServerName();
 	int findPort();
 	std::string findRoot();
+	std::string findIndex();
 	std::map<std::string, std::string> findLocation();
 	void	setCgi();
 	void	setErrorPage();
@@ -76,6 +78,8 @@ class server_configuration
 	std::map<std::string, std::string>	getErrorPage();
 	std::map<std::string, std::string>&	getDefErrorPage();
 	std::string getRoot();
+	std::string getIndex();
+
 	int getPort();
 
 	class CgiException: public std::exception {

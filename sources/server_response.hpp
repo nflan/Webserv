@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/08 13:47:05 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/08 15:02:43 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,19 +19,20 @@
 #include <stdlib.h>
 #include <netinet/in.h>
 #include <string.h>
-#include <iostream>
 #include <string>
 #include <sys/epoll.h>
-#include <iostream>
 #include <vector>
 #include <iterator>
 #include <arpa/inet.h>
 #include <fcntl.h>
 #include <csignal>
-
-#include <iostream>
-#include <string>
+#include <fstream>
 #include <sstream>
+#include <cstring>
+#include <filesystem>
+#include <iostream>
+#include <sys/stat.h>
+
 #include "server_configuration.hpp"
 #include "server_request.hpp"
 
@@ -57,7 +58,9 @@ class server_response
 	std::string	addHeader(std::string statusMsg, const server_request& Server_Request);
 	std::string	addBody(std::string body);
 	int checkConfFile(std::string MethodUsed, server_configuration *server, std::string RequestURI);
-	std::string getRealRoot(std::string MethodUsed, server_configuration *server, std::string RequestURI);
+	std::string getRealPath(std::string MethodUsed, server_configuration *server, std::string RequestURI);
+	std::string getRealPathIndex(std::string MethodUsed, server_configuration *server, std::string RequestURI);
+	std::string getPathToStore(std::string MethodUsed, server_configuration *server, std::string RequestURI);
 
 	// Définition de la méthode pour obtenir le corps de la réponse
 	std::string get_body() const { return _body; }

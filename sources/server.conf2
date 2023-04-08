@@ -3,8 +3,8 @@ server {
 		listen 8083;
 
 		root ./site/;
-		index index.html
-		client_max_body_size 2M
+		index index.html;
+		client_max_body_size 2M;
 		error_page 404 site/test.html 405 error.html 406 e;
 
 		location /upload {
@@ -19,7 +19,7 @@ server {
 
 			autoindex on;
 
-			index index.html;
+			index index2.html;
 
 			cgi .php /usr/bin/php-cgi ;
 

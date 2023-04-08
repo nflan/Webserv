@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:46 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/08 13:58:22 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/08 15:14:23 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,28 +40,6 @@ server_response &server_response::operator=(server_response const &obj)
 	std::cout << "server_response Copy assignment operator called" << std::endl;
 	return *this;
 }
-
-// void server_response::generate_post_response(const std::string& request_uri, const std::string& data)
-// {
-// 	// Par exemple, on pourrait simplement renvoyer un message de confirmation avec les données reçues
-// 	std::string response_body = "Données reçues : " + data;
-	
-// 	// Ensuite, on prépare et envoie la réponse
-// 	std::ostringstream response_stream;
-// 	response_stream << "HTTP/1.1 200 OK\r\n"
-// 					<< "Content-Type: text/plain\r\n"
-// 					<< "Content-Length: " << response_body.length() << "\r\n"
-// 					<< "\r\n"
-// 					<< response_body;
-// 	std::string response = response_stream.str();
-// 	send_response_to_client(response);
-// }
-
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <string>
-#include <cstring>
 
 void	server_response::addType()
 {
@@ -113,7 +91,7 @@ int server_response::checkConfFile(std::string MethodUsed, server_configuration 
 	return (200);
 }
 
-std::string server_response::getRealRoot(std::string MethodUsed, server_configuration *server, std::string RequestURI)
+std::string server_response::getRealPath(std::string MethodUsed, server_configuration *server, std::string RequestURI)
 {	
 	for (std::map<std::string, class server_location_configuration*>::reverse_iterator it = server->getLoc()->rbegin(); it != server->getLoc()->rend(); it++)
 	{
@@ -131,7 +109,66 @@ std::string server_response::getRealRoot(std::string MethodUsed, server_configur
 					if (it->second->getRoot().size() > 0)
 					{
 						std::cout << "IL A TROUVE UNE AUTRE ROOT" << std::endl;
-						return (it->second->getRoot());
+						return (it->second->getRoot() + RequestURI.substr(it->first.size()));
+					}
+					else
+						return (server->getRoot() + RequestURI.substr(1));
+				}
+			}
+		}
+	}
+	// s'il passe ici c'est qu'aucune loc n'a éte trouvée et que donc c'est possible (sauf interdiction mais non gere)
+	return (server->getRoot() + RequestURI.substr(1));
+}
+
+std::string server_response::getRealPathIndex(std::string MethodUsed, server_configuration *server, std::string RequestURI)
+{	
+	for (std::map<std::string, class server_location_configuration*>::reverse_iterator it = server->getLoc()->rbegin(); it != server->getLoc()->rend(); it++)
+	{
+		if (it->first == RequestURI.substr(0, it->first.size()))
+		{
+			for (std::vector<std::string>::reverse_iterator ite = it->second->getHttpMethodAccepted().rbegin(); ite != it->second->getHttpMethodAccepted().rend(); ite++)
+			{
+				std::cout << " it->second->getRoot() : " << it->second->getRoot() << std::endl;
+				std::cout << "server->getRoot() : " << server->getRoot() << std::endl;
+				std::cout << "MethodUsed : " << MethodUsed << std::endl;
+				std::cout << "*ite get RealIndex : " << *ite << std::endl;
+				if (MethodUsed == *ite)
+				{
+					std::cout << "MethodUsed == *ite" << std::endl;
+					if (it->second->getDirectoryRequest().size() > 0)
+					{
+						std::cout << "IL A TROUVE UNE AUTRE INDEX" << std::endl;
+						return (it->second->getRoot() + "/" + it->second->getDirectoryRequest());
+					}
+					else
+						return (server->getRoot() + server->getIndex());
+				}
+			}
+		}
+	}
+	return (server->getRoot() + server->getIndex());
+}
+
+std::string server_response::getPathToStore(std::string MethodUsed, server_configuration *server, std::string RequestURI)
+{	
+	for (std::map<std::string, class server_location_configuration*>::reverse_iterator it = server->getLoc()->rbegin(); it != server->getLoc()->rend(); it++)
+	{
+		if (it->first == RequestURI.substr(0, it->first.size()))
+		{
+			for (std::vector<std::string>::reverse_iterator ite = it->second->getHttpMethodAccepted().rbegin(); ite != it->second->getHttpMethodAccepted().rend(); ite++)
+			{
+				std::cout << " it->second->getRoot() : " << it->second->getRoot() << std::endl;
+				std::cout << "server->getRoot() : " << server->getRoot() << std::endl;
+				std::cout << "MethodUsed : " << MethodUsed << std::endl;
+				std::cout << "*ite get RealIndex : " << *ite << std::endl;
+				if (MethodUsed == *ite)
+				{
+					std::cout << "MethodUsed == *ite" << std::endl;
+					if (it->second->getUploadStore().size() > 0)
+					{
+						std::cout << "IL A TROUVE UNE AUTRE INDEX" << std::endl;
+						return (it->second->getRoot() + "/" + it->second->getUploadStore());
 					}
 					else
 						return (server->getRoot());
@@ -139,45 +176,80 @@ std::string server_response::getRealRoot(std::string MethodUsed, server_configur
 			}
 		}
 	}
-	// s'il passe ici c'est qu'aucune loc n'a éte trouvée et que donc c'est possible (sauf interdiction mais non gere)
 	return (server->getRoot());
 }
 
 void	server_response::todo(const server_request& Server_Request, int conn_sock, server_configuration *server)
 {
+	/*	Ci-dessous, je verifie que le ClientMaxBodySize n'est pas dépassé.
+		Je le mets au-dessus, car si c'est le cas, retour d'erreur*/
+	if (Server_Request.getContentLength() > server->getClientMaxBodySize())
+	{
+		_status_code = 413;
+	}
+	
+	/* Ci-dessous, on vérifie que la méthode est autorisée. On le fait ici
+	car sinon un code erreur peut être renvoyé */
+	_status_code = checkConfFile(Server_Request.getMethod(), server, Server_Request.getRequestURI()); // on sait s'ils ont le droit
+
 	enum imethod {GET, POST, DELETE};
-	std::string RealRoot = getRealRoot(Server_Request.getMethod(), server, Server_Request.getRequestURI());
-	std::string	Root = server->getRoot(); // TODO : implementer ici la fonction avec le root normal si pas trouve
+	std::string RealPath = getRealPath(Server_Request.getMethod(), server, Server_Request.getRequestURI());
+	std::string RealPathIndex = getRealPathIndex(Server_Request.getMethod(), server, Server_Request.getRequestURI());
+	std::string PathToStore = getPathToStore(Server_Request.getMethod(), server, Server_Request.getRequestURI());
+	std::cout << "RealPath : " << RealPath << std::endl;
+	std::cout << "RealPathIndex : " << RealPathIndex << std::endl;
+	std::cout << "PathToStore : " << PathToStore << std::endl;
+
+	/********************************************/
+	/*Ici, on check si c'est le path donné est un directory ou non.
+	Une fosis que l'on sait cela, on peut renvoyer un index ou 
+	un message erreur */
+	struct stat path_info;
+	bool test;
+	if (stat(RealPath.c_str(), &path_info) != 0) {
+        // Failed to get information about the path
+        std::cout << " BOOL FALSE" << std::endl;
+		test = false;
+    }
+	else
+	{
+        std::cout << " BOOL TRUE" << std::endl;
+		test = S_ISDIR(path_info.st_mode);
+
+	}
+	std::cout << "S_ISDIR : " << test << std::endl;
+	
+	/*********************************************/
+	std::string	Root = server->getRoot();
 	int n = 0;
 	const std::string ftab[3] = {"GET", "POST", "DELETE"};
 	std::string		content;
 	(void)Root;
 	std::string tmp;
-	/************/
-	_status_code = checkConfFile(Server_Request.getMethod(), server, Server_Request.getRequestURI()); // on sait s'ils ont le droit
-	/************/
-	std::cout << "DEBUG : " << Server_Request.getRequestURI() << std::endl;
 	
-	if (Root.size() == 1 && Root.find("/", 0, 1))
-		tmp = "." + Server_Request.getRequestURI();
-	else
-		tmp = Root + Server_Request.getRequestURI();
-	std::cout << "\nC0 = '" << tmp << "'\n" << std::endl;
-	if (tmp.size() == 3 && tmp.find(".//") != std::string::npos)
-	{
-		// tmp.erase();
-		std::cout << "\nC1\n" << std::endl;
-		tmp += "index.html"; // TODO : idem ici que pr le root
-	}
-	if (tmp[tmp.size() - 1] == '/')
-	{
-		tmp += "index.html";
-	}
-	std::cout << "C2 : " << server->getClientMaxBodySize() << std::endl;
-	if (Server_Request.getContentLength() > server->getClientMaxBodySize())
-	{
-		_status_code = 413;
-	} // je le mets au dessus car c'est general et ca concerne toutes les methodes
+
+	
+	/*	A mon sens, on peut supprimer cela, car on a pas 
+		a le gérer a priori, il suffit de faire un bon fichier de conf */
+
+	// if (Root.size() == 1 && Root.find("/", 0, 1))
+	// 	tmp = "." + Server_Request.getRequestURI();
+	// else
+	// 	tmp = Root + Server_Request.getRequestURI();
+	
+	/* Cette partie a été rendue dynamique ci-dessus. Voir getRealPathIndex */
+	
+	// std::cout << "\nC0 = '" << tmp << "'\n" << std::endl;
+	// if (tmp.size() == 3 && tmp.find(".//") != std::string::npos)
+	// {
+	// 	std::cout << "\nC1\n" << std::endl;
+	// 	tmp += "index.html"; // TODO : idem ici que pr le root
+	// }
+	// if (tmp[tmp.size() - 1] == '/')
+	// {
+	// 	tmp += "index.html";
+	// }
+	// std::cout << "C2 : " << server->getClientMaxBodySize() << std::endl;
 
 	for (; n < 4; n++)
 	{
@@ -211,7 +283,7 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 			std::cerr << this->_ServerResponse << std::endl;
 			break ;
 		}
-		case POST : //TO DO : METTRE OU ON VA TELECHARGER
+		case POST :
 		{
 			// std::string infilename = "./site/42.jpg";
 			// std::ifstream inputFile(infilename.c_str(), std::ios::binary);

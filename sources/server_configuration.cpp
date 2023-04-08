@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:06:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/07 19:30:04 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/08 14:36:59 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ server_configuration::server_configuration(std::string ConfigFile) :
 _ConfigFile(convertConfigFile(ConfigFile)),
 _ServerName(findServerName()),
 _Root(findRoot()),
+_Index(findIndex()),
 _Port(findPort()),
 _StatusCode(200),
 _ClientMaxBodySize(findClientMaxBodySize()),
@@ -103,6 +104,20 @@ std::string server_configuration::findRoot()
 		size_t space_pos = root.find_first_of(" \n;");
 		if (space_pos != std::string::npos) {
 			return (root.substr(0, space_pos));
+		}
+	}
+	return ("");
+}
+
+std::string server_configuration::findIndex()
+{
+	size_t pos = _ConfigFile.find("index");
+	if (pos != std::string::npos) {
+		pos += strlen("index");
+		std::string index = _ConfigFile.substr(pos + 1);
+		size_t space_pos = index.find_first_of(" \n;");
+		if (space_pos != std::string::npos) {
+			return (index.substr(0, space_pos));
 		}
 	}
 	return ("");
@@ -381,6 +396,7 @@ std::ostream&	server_configuration::printLoc(std::ostream &out)
 std::string server_configuration::getConfigFile() { return _ConfigFile;}
 std::string server_configuration::getServerName() { return _ServerName;}
 std::string server_configuration::getRoot() { return _Root;}
+std::string server_configuration::getIndex() { return _Index;}
 int server_configuration::getPort() { return _Port;}
 size_t server_configuration::getClientMaxBodySize() { return _ClientMaxBodySize;}
 std::map<std::string, std::string> server_configuration::getCgi() { return (_cgi); }
