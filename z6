@@ -1,5 +1,20 @@
+[0;34m###[0mCreation du fichier objects/main.o[0;34m###[0;33m
+c++ -std=c++98 -Wall -Wextra -Werror -MMD -MP -Isources/ -g3 -c sources/main.cpp -o objects/main.o
+[0m
+[0;34m###[0mCreation du fichier objects/server_configuration.o[0;34m###[0;33m
+c++ -std=c++98 -Wall -Wextra -Werror -MMD -MP -Isources/ -g3 -c sources/server_configuration.cpp -o objects/server_configuration.o
+[0m
+[0;34m###[0mCreation du fichier objects/server_request.o[0;34m###[0;33m
+c++ -std=c++98 -Wall -Wextra -Werror -MMD -MP -Isources/ -g3 -c sources/server_request.cpp -o objects/server_request.o
+[0m
 [0;34m###[0mCreation du fichier objects/server_response.o[0;34m###[0;33m
 c++ -std=c++98 -Wall -Wextra -Werror -MMD -MP -Isources/ -g3 -c sources/server_response.cpp -o objects/server_response.o
+[0m
+[0;34m###[0mCreation du fichier objects/server_location_configuration.o[0;34m###[0;33m
+c++ -std=c++98 -Wall -Wextra -Werror -MMD -MP -Isources/ -g3 -c sources/server_location_configuration.cpp -o objects/server_location_configuration.o
+[0m
+[0;34m###[0mCreation du fichier objects/ErrorCorresp.o[0;34m###[0;33m
+c++ -std=c++98 -Wall -Wextra -Werror -MMD -MP -Isources/ -g3 -c sources/ErrorCorresp.cpp -o objects/ErrorCorresp.o
 [0m
 [0;34m###[0mCreation du fichier webserv[0;34m###[0;33m
 c++ objects/main.o objects/server_configuration.o objects/server_request.o objects/server_response.o objects/server_location_configuration.o objects/ErrorCorresp.o -std=c++98 -Wall -Wextra -Werror -MMD -MP -Isources/ -g3 -o webserv
@@ -40,14 +55,14 @@ Location configurations  for /upload
 HttpMethodAccepted : POST
 HttpMethodAccepted : GET
 HttpMethodAccepted : 
-HttpRedirection 
+HttpRedirection https://www.example.com/new-page.html
 Root : /files
 DirectoryListing : on
 DirectoryRequest : index2.html
 CGI : 
 path : .php
 conf : /usr/bin/php-cgi
-UploadStore : /var/www/uploads0x42d388
+UploadStore : /var/www/uploads0x42f388
 
 ***
 
@@ -70,7 +85,7 @@ HttpRedirection
 Root : 
 DirectoryListing : 
 DirectoryRequest : 
-UploadStore : 0x42d388
+UploadStore : 0x42f388
 
 ***
 
@@ -95,7 +110,7 @@ HttpRedirection
 Root : 
 DirectoryListing : 
 DirectoryRequest : 
-UploadStore : 0x42d388
+UploadStore : 0x42f388
 
 ***
 
@@ -118,23 +133,23 @@ HttpRedirection
 Root : 
 DirectoryListing : 
 DirectoryRequest : 
-UploadStore : 0x42d388
+UploadStore : 0x42f388
 
 ***
 
 
 Request :
-GET / HTTP/1.1
+GET /upload/mathieu HTTP/1.1
 Host: localhost:8083
 User-Agent: insomnia/2022.7.0
 Accept: */*
 
 
 
-body_start : 80 body_end : 18446744073709551615
+body_start : 94 body_end : 18446744073709551615
 
 M√©thode : GET
-Chemin : /
+Chemin : /upload/mathieu
 Type : html
 Version : HTTP/1.1
 Host : localhost:8083
@@ -149,41 +164,243 @@ server_response int Constructor called
 METHOD : GET
 0
 IT-FIRST : /upload Size : 7
-RequestURI.SUBSTR : /
+RequestURI.SUBSTR : /upload
+ITE* : 
+ITE* : GET
+IL PASSE ICI
+ITE* : POST
 0
 IT-FIRST : /download/ Size : 10
-RequestURI.SUBSTR : /
+RequestURI.SUBSTR : /upload/ma
 0
 IT-FIRST :  Size : 0
 RequestURI.SUBSTR : 
 ITE* : 
- it->second->getRoot() : 
+ it->second->getRoot() : /files
 server->getRoot() : ./site/
 MethodUsed : GET
 *ite get RealRoot : 
- it->second->getRoot() : 
+ it->second->getRoot() : /files
+server->getRoot() : ./site/
+MethodUsed : GET
+*ite get RealRoot : GET
+MethodUsed == *ite
+IL A TROUVE UNE AUTRE ROOT
+ it->second->getRoot() : /files
 server->getRoot() : ./site/
 MethodUsed : GET
 *ite get RealIndex : 
- it->second->getRoot() : 
+ it->second->getRoot() : /files
+server->getRoot() : ./site/
+MethodUsed : GET
+*ite get RealIndex : GET
+MethodUsed == *ite
+IL A TROUVE UNE AUTRE INDEX
+ it->second->getRoot() : /files
 server->getRoot() : ./site/
 MethodUsed : GET
 *ite get RealIndex : 
-RealPath : ./site/
-RealPathIndex : ./site/index.html
-PathToStore : ./site/
- BOOL TRUE
-S_ISDIR : 1
+ it->second->getRoot() : /files
+server->getRoot() : ./site/
+MethodUsed : GET
+*ite get RealIndex : GET
+MethodUsed == *ite
+IL A TROUVE UNE AUTRE INDEX
+RealPath : /files/mathieu
+RealPathIndex : /files/index2.html
+PathToStore : /files//var/www/uploads
+ BOOL FALSE
+S_ISDIR : 0
+ it->second->getRoot() : /files
+server->getRoot() : ./site/
+MethodUsed : GET
+*ite get RealIndex : 
+ it->second->getRoot() : /files
+server->getRoot() : ./site/
+MethodUsed : GET
+*ite get RealIndex : GET
+MethodUsed == *ite
+IL A TROUVE UNE AUTRE INDEX
+ it->second->getRoot() : /files
+server->getRoot() : ./site/
+MethodUsed : GET
+*ite get RealIndex : 
+ it->second->getRoot() : /files
+server->getRoot() : ./site/
+MethodUsed : GET
+*ite get RealIndex : GET
+MethodUsed == *ite
+IL A TROUVE UNE AUTRE INDEX
 
-C0 = './site//'
+C0 = './site//upload/mathieu'
 
 C2 : 2097152
+JE SUIS DANS CLIENT
+TEST : html
 
-C0bis = './site/42.jpg'
+SERVER RESPONSE CONSTRUITE -> 
+HTTP/1.1 404 Not Found
+Content-Type: text/html
+Content-Length: 639
+
+Content-type: text/html; charset=UTF-8
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="utf-8">
+	<title>Uploader un fichier</title>
+</head>
+<body>
+	<h1>Uploader un fichier</h1>
+	<form action="upload.php" method="POST" enctype="multipart/form-data">
+		<label for="file">Choisissez un fichier :</label>
+		<input type="file" name="file" id="file"><br><br>
+		<input type="submit" value="Uploader le fichier">
+	</form>
+
+	<hr>
+
+	<h2>Liste des fichiers upload√©s :</h2>
+	<ul>
+		<li> "teSTEUR.txt" - <a href="download.php?file=teSTEUR.txt">T√©l√©charger</a> - <a href="delete.php?file=teSTEUR.txt">Supprimer</a></li>	</ul>
+
+</body>
+</html>
 
 
-C2
+server_request Destructor called
+server_response Destructor called
+Request :
+GET /upload/test HTTP/1.1
+Host: localhost:8083
+User-Agent: insomnia/2022.7.0
+Accept: */*
 
-ˇÿˇ‚ˇˇICC_PROFILE
+
+
+body_start : 91 body_end : 18446744073709551615
+
+M√©thode : GET
+Chemin : /upload/test
+Type : html
+Version : HTTP/1.1
+Host : localhost:8083
+Connection : 
+MIME : */*
+Content Type : 
+Content Length : 
+
+Body : 
+
+server_response int Constructor called
+METHOD : GET
+0
+IT-FIRST : /upload Size : 7
+RequestURI.SUBSTR : /upload
+ITE* : 
+ITE* : GET
+IL PASSE ICI
+ITE* : POST
+0
+IT-FIRST : /download/ Size : 10
+RequestURI.SUBSTR : /upload/te
+0
+IT-FIRST :  Size : 0
+RequestURI.SUBSTR : 
+ITE* : 
+ it->second->getRoot() : /files
+server->getRoot() : ./site/
+MethodUsed : GET
+*ite get RealRoot : 
+ it->second->getRoot() : /files
+server->getRoot() : ./site/
+MethodUsed : GET
+*ite get RealRoot : GET
+MethodUsed == *ite
+IL A TROUVE UNE AUTRE ROOT
+ it->second->getRoot() : /files
+server->getRoot() : ./site/
+MethodUsed : GET
+*ite get RealIndex : 
+ it->second->getRoot() : /files
+server->getRoot() : ./site/
+MethodUsed : GET
+*ite get RealIndex : GET
+MethodUsed == *ite
+IL A TROUVE UNE AUTRE INDEX
+ it->second->getRoot() : /files
+server->getRoot() : ./site/
+MethodUsed : GET
+*ite get RealIndex : 
+ it->second->getRoot() : /files
+server->getRoot() : ./site/
+MethodUsed : GET
+*ite get RealIndex : GET
+MethodUsed == *ite
+IL A TROUVE UNE AUTRE INDEX
+RealPath : /files/test
+RealPathIndex : /files/index2.html
+PathToStore : /files//var/www/uploads
+ BOOL FALSE
+S_ISDIR : 0
+ it->second->getRoot() : /files
+server->getRoot() : ./site/
+MethodUsed : GET
+*ite get RealIndex : 
+ it->second->getRoot() : /files
+server->getRoot() : ./site/
+MethodUsed : GET
+*ite get RealIndex : GET
+MethodUsed == *ite
+IL A TROUVE UNE AUTRE INDEX
+ it->second->getRoot() : /files
+server->getRoot() : ./site/
+MethodUsed : GET
+*ite get RealIndex : 
+ it->second->getRoot() : /files
+server->getRoot() : ./site/
+MethodUsed : GET
+*ite get RealIndex : GET
+MethodUsed == *ite
+IL A TROUVE UNE AUTRE INDEX
+
+C0 = './site//upload/test'
+
+C2 : 2097152
+JE SUIS DANS CLIENT
+TEST : html
+
+SERVER RESPONSE CONSTRUITE -> 
+HTTP/1.1 404 Not Found
+Content-Type: text/html
+Content-Length: 639
+
+Content-type: text/html; charset=UTF-8
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="utf-8">
+	<title>Uploader un fichier</title>
+</head>
+<body>
+	<h1>Uploader un fichier</h1>
+	<form action="upload.php" method="POST" enctype="multipart/form-data">
+		<label for="file">Choisissez un fichier :</label>
+		<input type="file" name="file" id="file"><br><br>
+		<input type="submit" value="Uploader le fichier">
+	</form>
+
+	<hr>
+
+	<h2>Liste des fichiers upload√©s :</h2>
+	<ul>
+		<li> "teSTEUR.txt" - <a href="download.php?file=teSTEUR.txt">T√©l√©charger</a> - <a href="delete.php?file=teSTEUR.txt">Supprimer</a></li>	</ul>
+
+</body>
+</html>
+
+
 server_request Destructor called
 server_response Destructor called

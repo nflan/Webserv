@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:46 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/08 16:10:53 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/08 16:14:39 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -250,8 +250,10 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 	/* Ci-dessous, on vérifie que la méthode est autorisée. On le fait ici
 	car sinon un code erreur peut être renvoyé */
 	_status_code = checkConfFile(Server_Request.getMethod(), server, Server_Request.getRequestURI()); // on sait s'ils ont le droit
+	/********************************************/
 	
 	enum imethod {GET, POST, DELETE};
+	
 	std::string RealPath = getRealPath(Server_Request.getMethod(), server, Server_Request.getRequestURI());
 	std::string RealPathIndex = getRealPathIndex(Server_Request.getMethod(), server, Server_Request.getRequestURI());
 	std::string PathToStore = getPathToStore(Server_Request.getMethod(), server, Server_Request.getRequestURI());
@@ -259,7 +261,7 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 	std::cout << "RealPathIndex : " << RealPathIndex << std::endl;
 	std::cout << "PathToStore : " << PathToStore << std::endl;
 
-	/********************************************/
+
 	/*Ici, on check si c'est le path donné est un directory ou non.
 	Une fosis que l'on sait cela, on peut renvoyer un index ou 
 	un message erreur */
@@ -277,6 +279,7 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 
 	}
 	std::cout << "S_ISDIR : " << test << std::endl;
+	/************************************************/
 
 	/*Si l'on se situe, ds une location et qu'il y a une HTTP redir alors
 	il faut pouvoir renvoyer la redir */
@@ -289,6 +292,7 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 			send(conn_sock, response_str.c_str() , response_str.size(), 0);
 	}
 	/*********************************************/
+	
 	std::string	Root = server->getRoot();
 	int n = 0;
 	const std::string ftab[3] = {"GET", "POST", "DELETE"};
