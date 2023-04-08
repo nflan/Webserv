@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:46 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/08 15:14:23 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/08 15:47:47 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -231,26 +231,26 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 	
 	/*	A mon sens, on peut supprimer cela, car on a pas 
 		a le gérer a priori, il suffit de faire un bon fichier de conf */
-
-	// if (Root.size() == 1 && Root.find("/", 0, 1))
-	// 	tmp = "." + Server_Request.getRequestURI();
-	// else
-	// 	tmp = Root + Server_Request.getRequestURI();
+	if (Root.size() == 1 && Root.find("/", 0, 1))
+		tmp = "." + Server_Request.getRequestURI();
+	else
+		tmp = Root + Server_Request.getRequestURI();
+	/*********************************************/
 	
 	/* Cette partie a été rendue dynamique ci-dessus. Voir getRealPathIndex */
+	std::cout << "\nC0 = '" << tmp << "'\n" << std::endl;
+	if (tmp.size() == 3 && tmp.find(".//") != std::string::npos)
+	{
+		std::cout << "\nC1\n" << std::endl;
+		tmp += "index.html"; // TODO : idem ici que pr le root
+	}
+	if (tmp[tmp.size() - 1] == '/')
+	{
+		tmp += "index.html";
+	}
+	std::cout << "C2 : " << server->getClientMaxBodySize() << std::endl;
+	/*********************************/
 	
-	// std::cout << "\nC0 = '" << tmp << "'\n" << std::endl;
-	// if (tmp.size() == 3 && tmp.find(".//") != std::string::npos)
-	// {
-	// 	std::cout << "\nC1\n" << std::endl;
-	// 	tmp += "index.html"; // TODO : idem ici que pr le root
-	// }
-	// if (tmp[tmp.size() - 1] == '/')
-	// {
-	// 	tmp += "index.html";
-	// }
-	// std::cout << "C2 : " << server->getClientMaxBodySize() << std::endl;
-
 	for (; n < 4; n++)
 	{
 		if (n != 3 && ftab[n] == Server_Request.getMethod()) // OK 
@@ -262,26 +262,32 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 	{
 		case GET :
 		{
-			std::ifstream file(tmp.c_str());
-			std::stringstream buffer;
+			// std::ifstream file(tmp.c_str());
+			// std::stringstream buffer;
+			// std::stringstream response;
+			// if (!file.is_open())
+			// {
+			// 	if (_status_code == 200)
+			// 		_status_code = 404;
+			// }
+			// else
+			// {
+			// 	buffer << file.rdbuf();
+			// 	content = buffer.str();
+			// }
+			// std::cerr << "AFTER RESPONSE IFSTREAM\r\n" << std::endl;
+			// createResponse(server, content, Server_Request);
+			// std::cout << std::endl << "SERVER RESPONSE CONSTRUITE -> " << std::endl << this->_ServerResponse << std::endl << std::endl;
+			// send(conn_sock, this->_ServerResponse.c_str() , this->_ServerResponse.size(), 0);
+			// std::cerr << "\nREPONSE SEND :\n";
+			// std::cerr << this->_ServerResponse << std::endl;			
+			// break ;
+
 			std::stringstream response;
-			if (!file.is_open())
-			{
-				if (_status_code == 200)
-					_status_code = 404;
-			}
-			else
-			{
-				buffer << file.rdbuf();
-				content = buffer.str();
-			}
-			std::cerr << "AFTER RESPONSE IFSTREAM\r\n" << std::endl;
-			createResponse(server, content, Server_Request);
-			std::cout << std::endl << "SERVER RESPONSE CONSTRUITE -> " << std::endl << this->_ServerResponse << std::endl << std::endl;
-			send(conn_sock, this->_ServerResponse.c_str() , this->_ServerResponse.size(), 0);
-			std::cerr << "\nREPONSE SEND :\n";
-			std::cerr << this->_ServerResponse << std::endl;
-			break ;
+			response << "HTTP/1.1 301 Moved Permanently\r\nLocation: https://www.example.com/new-page.html\r\n" ;
+			std::string response_str = response.str();
+			send(conn_sock, response_str.c_str() , response_str.size(), 0);
+
 		}
 		case POST :
 		{

@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 17:08:06 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/05 18:43:27 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/08 15:51:03 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ server_location_configuration::server_location_configuration()
 
 server_location_configuration::server_location_configuration(std::string location_conf) :
 _HttpMethodAccepted(findHttpMethodAccepted(location_conf)),
-_HttpRedirection(""),
+_HttpRedirection(findHttpRedirection(location_conf)),
 _Root(findRoot(location_conf)),
 _DirectoryListing(findDirectoryListing(location_conf)),
 _DirectoryRequest(findDirectoryRequest(location_conf)),
@@ -104,6 +104,20 @@ std::string server_location_configuration::findDirectoryListing(std::string loca
 	size_t pos = location_conf.find("autoindex");
 	if (pos != std::string::npos) {
 		pos += strlen("autoindex");
+		std::string root = location_conf.substr(pos + 1);
+		size_t space_pos = root.find_first_of(" \n;");
+		if (space_pos != std::string::npos) {
+			return (root.substr(0, space_pos));
+		}
+	}
+	return ("");
+}
+
+std::string server_location_configuration::findHttpRedirection(std::string location_conf)
+{
+	size_t pos = location_conf.find("return 301");
+	if (pos != std::string::npos) {
+		pos += strlen("return 301");
 		std::string root = location_conf.substr(pos + 1);
 		size_t space_pos = root.find_first_of(" \n;");
 		if (space_pos != std::string::npos) {

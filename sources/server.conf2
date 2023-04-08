@@ -13,7 +13,7 @@ server {
 				deny all;
 			}
 			
-			return 301 https://www.example.com$request_uri;
+			return 301 https://www.example.com/new-page.html;
 
 			root /files;
 
@@ -27,7 +27,7 @@ server {
 		}
 
 		location /download/ {
-			index index.html index.htm default.html;
+			index index.html;
 		}
 
 	allow_methods GET;

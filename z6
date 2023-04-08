@@ -47,7 +47,7 @@ DirectoryRequest : index2.html
 CGI : 
 path : .php
 conf : /usr/bin/php-cgi
-UploadStore : /var/www/uploads0x42d348
+UploadStore : /var/www/uploads0x42d388
 
 ***
 
@@ -70,7 +70,7 @@ HttpRedirection
 Root : 
 DirectoryListing : 
 DirectoryRequest : 
-UploadStore : 0x42d348
+UploadStore : 0x42d388
 
 ***
 
@@ -95,7 +95,7 @@ HttpRedirection
 Root : 
 DirectoryListing : 
 DirectoryRequest : 
-UploadStore : 0x42d348
+UploadStore : 0x42d388
 
 ***
 
@@ -118,23 +118,23 @@ HttpRedirection
 Root : 
 DirectoryListing : 
 DirectoryRequest : 
-UploadStore : 0x42d348
+UploadStore : 0x42d388
 
 ***
 
 
 Request :
-GET /test/de/merde HTTP/1.1
+GET / HTTP/1.1
 Host: localhost:8083
 User-Agent: insomnia/2022.7.0
 Accept: */*
 
 
 
-body_start : 93 body_end : 18446744073709551615
+body_start : 80 body_end : 18446744073709551615
 
 MÃ©thode : GET
-Chemin : /test/de/merde
+Chemin : /
 Type : html
 Version : HTTP/1.1
 Host : localhost:8083
@@ -149,10 +149,10 @@ server_response int Constructor called
 METHOD : GET
 0
 IT-FIRST : /upload Size : 7
-RequestURI.SUBSTR : /test/d
+RequestURI.SUBSTR : /
 0
 IT-FIRST : /download/ Size : 10
-RequestURI.SUBSTR : /test/de/m
+RequestURI.SUBSTR : /
 0
 IT-FIRST :  Size : 0
 RequestURI.SUBSTR : 
@@ -169,131 +169,21 @@ MethodUsed : GET
 server->getRoot() : ./site/
 MethodUsed : GET
 *ite get RealIndex : 
-RealPath : ./site/test/de/merde
+RealPath : ./site/
 RealPathIndex : ./site/index.html
 PathToStore : ./site/
  BOOL TRUE
 S_ISDIR : 1
-JE SUIS DANS CLIENT
-TEST : html
 
-SERVER RESPONSE CONSTRUITE -> 
-HTTP/1.1 404 Not Found
-Content-Type: text/html
-Content-Length: 639
+C0 = './site//'
 
-Content-type: text/html; charset=UTF-8
+C2 : 2097152
 
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-	<meta charset="utf-8">
-	<title>Uploader un fichier</title>
-</head>
-<body>
-	<h1>Uploader un fichier</h1>
-	<form action="upload.php" method="POST" enctype="multipart/form-data">
-		<label for="file">Choisissez un fichier :</label>
-		<input type="file" name="file" id="file"><br><br>
-		<input type="submit" value="Uploader le fichier">
-	</form>
-
-	<hr>
-
-	<h2>Liste des fichiers uploadÃ©s :</h2>
-	<ul>
-		<li> "teSTEUR.txt" - <a href="download.php?file=teSTEUR.txt">TÃ©lÃ©charger</a> - <a href="delete.php?file=teSTEUR.txt">Supprimer</a></li>	</ul>
-
-</body>
-</html>
+C0bis = './site/42.jpg'
 
 
-server_request Destructor called
-server_response Destructor called
-Request :
-GET /test/de/mer HTTP/1.1
-Host: localhost:8083
-User-Agent: insomnia/2022.7.0
-Accept: */*
+C2
 
-
-
-body_start : 91 body_end : 18446744073709551615
-
-MÃ©thode : GET
-Chemin : /test/de/mer
-Type : html
-Version : HTTP/1.1
-Host : localhost:8083
-Connection : 
-MIME : */*
-Content Type : 
-Content Length : 
-
-Body : 
-
-server_response int Constructor called
-METHOD : GET
-0
-IT-FIRST : /upload Size : 7
-RequestURI.SUBSTR : /test/d
-0
-IT-FIRST : /download/ Size : 10
-RequestURI.SUBSTR : /test/de/m
-0
-IT-FIRST :  Size : 0
-RequestURI.SUBSTR : 
-ITE* : 
- it->second->getRoot() : 
-server->getRoot() : ./site/
-MethodUsed : GET
-*ite get RealRoot : 
- it->second->getRoot() : 
-server->getRoot() : ./site/
-MethodUsed : GET
-*ite get RealIndex : 
- it->second->getRoot() : 
-server->getRoot() : ./site/
-MethodUsed : GET
-*ite get RealIndex : 
-RealPath : ./site/test/de/mer
-RealPathIndex : ./site/index.html
-PathToStore : ./site/
- BOOL FALSE
-S_ISDIR : 0
-JE SUIS DANS CLIENT
-TEST : html
-
-SERVER RESPONSE CONSTRUITE -> 
-HTTP/1.1 404 Not Found
-Content-Type: text/html
-Content-Length: 639
-
-Content-type: text/html; charset=UTF-8
-
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-	<meta charset="utf-8">
-	<title>Uploader un fichier</title>
-</head>
-<body>
-	<h1>Uploader un fichier</h1>
-	<form action="upload.php" method="POST" enctype="multipart/form-data">
-		<label for="file">Choisissez un fichier :</label>
-		<input type="file" name="file" id="file"><br><br>
-		<input type="submit" value="Uploader le fichier">
-	</form>
-
-	<hr>
-
-	<h2>Liste des fichiers uploadÃ©s :</h2>
-	<ul>
-		<li> "teSTEUR.txt" - <a href="download.php?file=teSTEUR.txt">TÃ©lÃ©charger</a> - <a href="delete.php?file=teSTEUR.txt">Supprimer</a></li>	</ul>
-
-</body>
-</html>
-
-
+ÿØÿâÿÿICC_PROFILE
 server_request Destructor called
 server_response Destructor called
