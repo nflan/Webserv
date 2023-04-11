@@ -6,7 +6,7 @@
 /*   By: nflan <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/27 15:47:23 by nflan             #+#    #+#             */
-/*   Updated: 2023/03/29 15:24:25 by nflan            ###   ########.fr       */
+/*   Updated: 2023/04/11 12:39:13 by nflan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,7 +130,20 @@ void	exeCgi(Cgi & cgi)
 	waitpid(cgi.getPid(), &status, 0);
 }
 
-int	re
+// ajouter dans l'env avant exec (source https://www.youtube.com/watch?v=37choLzDTgY) :
+// CONTENT_TYPE=
+// CONTENT_LENGTH=
+// HTTP_COOKIE=(askip dans le header)
+// HTTP_USER_AGENT=(web browser surement dans le header requete)
+// PATH_INFO=(path cgi script (on l'a))
+// QUERY_STRING=(the url-encoded information that is sent with GET method request)
+// REMOTE_ADDR=(the ip address of the remote host making the request. pour authentification)
+// REMOTE_HOST=(the fully qualified name of the host making the request, not mandatory)
+// REQUEST_MET_HOD=(the method used to make the request (GET / POST / DELETE))
+// SCRIPT_FILENAME=(the full path to the cgi script)
+// SCRIPT_NAME=(the name of the cgi script)
+// SERVER_NAME=(hostname or ip address)
+// SERVER_SOFWARE=(name and version of the software the server is running)
 
 int	main(int ac, char **av, char **envp)
 {

@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:46 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/07 18:28:52 by nflan            ###   ########.fr       */
+/*   Updated: 2023/04/11 17:10:41 by nflan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,7 @@ std::string server_response::getType(std::string type)
 void	server_response::todo(const server_request& Server_Request, int conn_sock, server_configuration *server)
 {
 	enum imethod {GET, POST, DELETE};
+	std::stringstream response;
 	std::string	Root = server->getRoot();
 	int n = 0;
 	const std::string ftab[3] = {"GET", "POST", "DELETE"};
@@ -118,7 +119,6 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 		{
 			std::ifstream file(tmp.c_str());
 			std::stringstream buffer;
-			std::stringstream response;
 			if (!file.is_open())
 			{
 				if (_status_code == 200)
@@ -164,7 +164,6 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
             std::cout << "\nC0bis = '" << tmp << "'\n" << std::endl;
             std::ifstream file(tmp.c_str(), std::ifstream::binary);
             // std::stringstream buffer;
-            std::stringstream response;
             std::filebuf* pbuf = file.rdbuf();
             std::size_t size = pbuf->pubseekoff(0, file.end, file.in);
             pbuf->pubseekpos (0,file.in);
@@ -191,8 +190,8 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
             std::cerr << "AFTER RESPONSE IFSTREAM\r\n" << std::endl;
             std::cout << buffer << std::endl;
 			delete [] buffer;
-            std::string response_str = response.str();
-            send(conn_sock, response_str.c_str() , response_str.size(), 0);
+			_ServerResponse = response.str();
+			send(conn_sock, _ServerResponse.c_str() , _ServerResponse.size(), 0);
 /**********************************************************************************/
 			// std::cout << "Successfully wrote to " << outfilename << std::endl;
 			// response1 << "HTTP/1.1 200 OK\r\n";
@@ -207,30 +206,20 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 		case DELETE :
 		{
 			std::cout << "\ntmp.c_str() = " << tmp << "\n" << std::endl;
-			if (std::remove(tmp.c_str()) != 0) { // the remove function returns 0 on success
-        		std::cerr << "Error deleting file: " << '\n';
-    			}
-    			std::cout << "File deleted successfully: " << '\n';
-				
-			std::stringstream response;
-			response << "HTTP/1.1 200 OK\r\n";
-            // response << "Content-Type: text/plain; charset=UTF-8\r\n";
-            response << "content-Length: " << 9 << "\r\n";
-            response << "\r\n";
-            response << "OK delete" << "\r\n";
-			std::string response_str = response.str();
-            send(conn_sock, response_str.c_str() , response_str.size(), 0);
-
+			if (std::remove(tmp.c_str()) != 0) // the remove function returns 0 on success
+				_status_code = 404;
+			else
+				content = "OK delete";
+			createResponse(server, content, Server_Request);
+			send(conn_sock, _ServerResponse.c_str() , _ServerResponse.size(), 0);
 			break ;
 		}
 		default :
 		{
-			std::stringstream response;
-			response << "HTTP/1.1 200 OK\r\n";
-            response << "content-Length: " << 0 << "\r\n";
-            response << "\r\n";
-			std::string response_str = response.str();
-            send(conn_sock, response_str.c_str() , response_str.size(), 0);
+			response << addHeader(STATUS500, server->getErrorPage().find(STATUS500)->second, Server_Request);
+			response << addBody(server->getErrorPage()[STATUS500].second);
+			_ServerResponse = response.str();
+			send(conn_sock, _ServerResponse.c_str() , _ServerResponse.size(), 0);
 			break ;
 		}
 	}
@@ -259,7 +248,7 @@ std::string	server_response::addBody(std::string msg)
 	std::string	body;
 	std::stringstream	response;
 
-	response << "Content-Length: " << msg.size() << "\r\n\r\n"; // modif text/html (parsing) -> peut etre faire map de content type / mime en fonction de .py = /truc .html = /text/html etc.
+	response << "Content-Length: " << msg.size() << "\r\n\r\n";
 	response << msg << "\r\n";
 	body = response.str();
 	return (body);
