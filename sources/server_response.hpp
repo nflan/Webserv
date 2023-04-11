@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/07 18:20:56 by nflan            ###   ########.fr       */
+/*   Updated: 2023/04/11 18:44:35 by nflan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,9 +28,8 @@
 #include <arpa/inet.h>
 #include <fcntl.h>
 #include <csignal>
-
+#include <errno.h>
 #include <iostream>
-#include <string>
 #include <sstream>
 #include "server_configuration.hpp"
 #include "server_request.hpp"
@@ -54,6 +53,7 @@ class server_response
 
 	void	todo(const server_request& Server_Request, int conn_sock, server_configuration* Root);
 	void	createResponse(server_configuration*, std::string, const server_request& Server_Request);
+	void	delete_dir(const char * path);
 	std::string	addHeader(std::string statusMsg, std::pair<std::string, std::string> statusContent, const server_request& Server_Request);
 	std::string	addBody(std::string body);
 
@@ -68,6 +68,11 @@ class server_response
 
 	void		addType();
 	std::string	getType(std::string type);
+
+	class DeleteException: public std::exception {
+		public:
+			virtual const char *	what() const throw();
+	};
 };
 
 #endif

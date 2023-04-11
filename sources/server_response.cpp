@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:46 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/11 17:10:41 by nflan            ###   ########.fr       */
+/*   Updated: 2023/04/11 19:20:30 by nflan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -205,11 +205,16 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 		}
 		case DELETE :
 		{
+//delete -> nftw avec flag pour partir de la fin
 			std::cout << "\ntmp.c_str() = " << tmp << "\n" << std::endl;
-			if (std::remove(tmp.c_str()) != 0) // the remove function returns 0 on success
-				_status_code = 404;
-			else
+			try
+			{
+				this->delete_dir(tmp.c_str()); // penser a changer le status code en 404 / 403 si besoin;
+			}
+			catch (server_response::DeleteException& e) {}
+			if (_status_code == 200)
 				content = "OK delete";
+	//		if (std::remove(tmp.c_str()) != 0) // the remove function returns 0 on success
 			createResponse(server, content, Server_Request);
 			send(conn_sock, _ServerResponse.c_str() , _ServerResponse.size(), 0);
 			break ;
@@ -226,12 +231,49 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 	return ;
 }
 
+void	server_response::delete_dir(const char * path)
+{
+	DIR	*dir = NULL;
+	struct dirent *send = NULL;
+	std::string	test;
+
+	dir = opendir(path);
+	if (errno == EACCES || errno == EMFILE || errno == ENFILE || errno == ENOENT || errno == ENOMEM || errno == ENOTDIR)
+	{
+		if (errno == ENOENT)
+			_status_code = 404;
+		else if (errno == ENOTDIR && std::remove(path) != 0) // the remove function returns 0 on success
+			_status_code = 404;
+		else if (errno == EACCES)
+			_status_code = 403;
+		else if (errno == EMFILE || errno == ENFILE || errno == ENOMEM)
+			_status_code = 500;
+		throw DeleteException();
+	}
+	send = readdir(dir);
+	if (!send)
+	{
+		_status_code = 500;
+		closedir(dir);
+		throw DeleteException();
+	}
+	while (send)
+	{
+		test = send->d_name;
+		std::cerr << "coucou je suis dans un dossier et je vais dans un fichier ou dosser" << std::endl;
+		std::cerr << "name -> " << send->d_name << std::endl;
+		if (test != "." && test != "..")
+			delete_dir(send->d_name);
+		send = readdir(dir);
+	}
+}
+
 std::string	server_response::addHeader(std::string statusMsg, std::pair<std::string, std::string> statusContent, const server_request& Server_Request)
 {
 	std::string	header;
 	std::stringstream	response;
 	
-	response << "HTTP/1.1" << " " << _status_code << " " << statusMsg << "\r\n";  /* ajouter la version HTTP (parsing) */ 
+	response << Server_Request.getVersion() << " " << _status_code << " " << statusMsg << "\r\n";  /* ajouter la version HTTP (parsing) */ 
 	if (statusContent.first != "")
 	{
 		if (statusContent.first.find('.', 0) != std::string::npos)
@@ -473,4 +515,9 @@ void	server_response::createResponse(server_configuration * server, std::string 
 			std::cout << "default" << std::endl;
 	}
 	_ServerResponse = response.str();
+}
+
+const char *	server_response::DeleteException::what() const throw()
+{
+	return ("Delete error\n");
 }
