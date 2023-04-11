@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 15:39:03 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/07 19:20:49 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/11 18:24:53 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,6 +119,7 @@ int StartServer(std::vector<server_configuration*> servers, int tablen)
 	{
 		addrlen[i] = sizeof(addr[i]);
 		listen_sock[i] = socket(AF_INET, SOCK_STREAM, 0);
+		std::cout << "listen_sock[i] : " << listen_sock[i] << std::endl;
 		if (listen_sock[i] == -1) {
 			std::fprintf(stderr, "Error: cannot create socket: %s\n", strerror(errno));
 			return(EXIT_FAILURE);
@@ -127,15 +128,21 @@ int StartServer(std::vector<server_configuration*> servers, int tablen)
 		addr[i].sin_family = AF_INET;
 		addr[i].sin_addr.s_addr = htonl(INADDR_ANY);
 		addr[i].sin_port = htons(servers[i]->getPort());
+		
+		std::cout << "servers[i]->getPort() : " << servers[i]->getPort() << std::endl;
 
 		int val = 1;
-		if (setsockopt(listen_sock[i], SOL_SOCKET, SO_REUSEPORT, &val, sizeof(val)) < 0) {
+		if (setsockopt(listen_sock[i], SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val)) < 0) {
 			std::fprintf(stderr, "Error: setsockopt() failed: %s\n", strerror(errno));
 			return(CloseSockets(listen_sock, tablen, servers, addr), EXIT_FAILURE);
 		}
-		if (bind(listen_sock[i], (struct sockaddr *) &addr[i], addrlen[i]) == -1) {
-			std::fprintf(stderr, "Error: bind failed: %s\n", strerror(errno));
-			return(CloseSockets(listen_sock, tablen, servers, addr), EXIT_FAILURE);
+		if (bind(listen_sock[i], (struct sockaddr *) &addr[i], addrlen[i]) == -1)
+		{
+			if (errno == EADDRINUSE) // changer
+			{	
+				std::fprintf(stderr, "Error: bind failed: %s\n", strerror(errno));
+				return(CloseSockets(listen_sock, tablen, servers, addr), EXIT_FAILURE);
+			}
 		}
 		if (listen(listen_sock[i], SOMAXCONN) == -1) {
 			std::fprintf(stderr, "Error: listen failed: %s\n", strerror(errno));
@@ -265,7 +272,7 @@ int main(int argc, char const **argv)
 	signal(SIGINT, sigint_handler);
 
 	std::vector<server_configuration*> servers = SetupNewServers(argv[1]);
-	PrintServer(servers);
+	// PrintServer(servers);
 	StartServer(servers, servers.size());
 	DeleteServers(servers);
 	return 0;

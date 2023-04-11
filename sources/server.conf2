@@ -2,12 +2,12 @@ server {
 	server_name webserv.com;
 		listen 8083;
 
-		root ./site/;
+		root /site;
 		index index.html;
 		client_max_body_size 2M;
 		error_page 404 site/test.html 405 error.html 406 e;
 
-		location /upload {
+		location /upload/ {
 
 			limit_except POST GET {
 				deny all;
@@ -31,35 +31,4 @@ server {
 		}
 
 	allow_methods GET;
-}
-
-server {
-	server_name webserv2.com;
-		listen 0.0.0.0:8080;
-
-		root ./test;
-		index index.html;
-
-		allow_methods GET;
-}
-
-server {
-	server_name webserv2;
-	listen 0.0.0.0:8086;
-
-	root ./test;
-	index index.html;
-
-	allow_methods GET;
-	cgi .php /usr/bin/php-cgi .py /usr/bin/python3;
-}
-
-server {
-	server_name webserv3;
-		listen 0.0.0.0:8084;
-
-		root ../;
-		index index.php;
-
-		allow_methods GET;
 }
