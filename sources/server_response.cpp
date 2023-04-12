@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:46 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/12 13:02:36 by nflan            ###   ########.fr       */
+/*   Updated: 2023/04/12 13:48:34 by nflan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -207,13 +207,9 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 		{
 //delete -> nftw avec flag pour partir de la fin
 			std::cout << "\ntmp.c_str() = " << tmp << "\n" << std::endl;
-			try
-			{
-				this->delete_dir(tmp.c_str()); // penser a changer le status code en 404 / 403 si besoin;
-			}
-			catch (server_response::DeleteException& e) {}
+			this->delete_dir(tmp.c_str());
 			if (_status_code == 200)
-				content = "OK delete";
+				content = server->getErrorPage()[STATUS200].second;
 	//		if (std::remove(tmp.c_str()) != 0) // the remove function returns 0 on success
 			createResponse(server, content, Server_Request);
 			send(conn_sock, _ServerResponse.c_str() , _ServerResponse.size(), 0);
@@ -237,7 +233,10 @@ static int	delete_fct(const char *fpath, const struct stat *sb, int tflag, struc
 	static_cast<void>(ftwbuf);
 
 	if (tflag == FTW_DP)
-		return (rmdir(fpath), 1);
+	{
+		if (rmdir(fpath))
+			return (1);
+	}
 	else
 		if (unlink(fpath))
 			return (1);
@@ -246,10 +245,11 @@ static int	delete_fct(const char *fpath, const struct stat *sb, int tflag, struc
 
 void	server_response::delete_dir(const char* path)
 {
-	if (access(path, X_OK))
-		_status_code = 403;
-	if (nftw(path, delete_fct, 500, FTW_DEPTH))
+	if (access(path, F_OK))
 		_status_code = 404;
+	else
+		if (nftw(path, &delete_fct, 1, FTW_DEPTH))
+			_status_code = 403;
 }
 
 /*void	server_response::delete_dir(const char * path)
@@ -357,26 +357,38 @@ void	server_response::createResponse(server_configuration * server, std::string 
 				}
 				case 201:
 				{
+					response << addHeader(STATUS201 server->getErrorPage().find(STATUS201)->second, Server_Request);
+					response << addBody(server->getErrorPage()[STATUS201].second);
 					break;
 				}
 				case 202:
 				{
+					response << addHeader(STATUS202, server->getErrorPage().find(STATUS202)->second, Server_Request);
+					response << addBody(server->getErrorPage()[STATUS202].second);
 					break;
 				}
 				case 203:
 				{
+					response << addHeader(STATUS203, server->getErrorPage().find(STATUS203)->second, Server_Request);
+					response << addBody(server->getErrorPage()[STATUS203].second);
 					break;
 				}
 				case 204:
 				{
+					response << addHeader(STATUS204, server->getErrorPage().find(STATUS204)->second, Server_Request);
+					response << addBody(server->getErrorPage()[STATUS204].second);
 					break;
 				}
 				case 205:
 				{
+					response << addHeader(STATUS205, server->getErrorPage().find(STATUS205)->second, Server_Request);
+					response << addBody(server->getErrorPage()[STATUS205].second);
 					break;
 				}
 				case 206:
 				{
+					response << addHeader(STATUS206, server->getErrorPage().find(STATUS206)->second, Server_Request);
+					response << addBody(server->getErrorPage()[STATUS206].second);
 					break;
 				}
 			}
@@ -388,30 +400,44 @@ void	server_response::createResponse(server_configuration * server, std::string 
 			switch (_status_code)
 				case 300:
 				{
+					response << addHeader(STATUS300, server->getErrorPage().find(STATUS300)->second, Server_Request);
+					response << addBody(server->getErrorPage()[STATUS300].second);
 					break;
 				}
 				case 301:
 				{
+					response << addHeader(STATUS301, server->getErrorPage().find(STATUS301)->second, Server_Request);
+					response << addBody(server->getErrorPage()[STATUS301].second);
 					break;
 				}
 				case 302:
 				{
+					response << addHeader(STATUS302, server->getErrorPage().find(STATUS302)->second, Server_Request);
+					response << addBody(server->getErrorPage()[STATUS302].second);
 					break;
 				}
 				case 303:
 				{
+					response << addHeader(STATUS303, server->getErrorPage().find(STATUS303)->second, Server_Request);
+					response << addBody(server->getErrorPage()[STATUS303].second);
 					break;
 				}
 				case 304:
 				{
+					response << addHeader(STATUS304, server->getErrorPage().find(STATUS304)->second, Server_Request);
+					response << addBody(server->getErrorPage()[STATUS304].second);
 					break;
 				}
 				case 305:
 				{
+					response << addHeader(STATUS305, server->getErrorPage().find(STATUS305)->second, Server_Request);
+					response << addBody(server->getErrorPage()[STATUS305].second);
 					break;
 				}
 				case 307:
 				{
+					response << addHeader(STATUS307, server->getErrorPage().find(STATUS307)->second, Server_Request);
+					response << addBody(server->getErrorPage()[STATUS307].second);
 					break;
 				}
 			break;
@@ -423,18 +449,26 @@ void	server_response::createResponse(server_configuration * server, std::string 
 			{
 				case 400:
 				{
+					response << addHeader(STATUS400, server->getErrorPage().find(STATUS400)->second, Server_Request);
+					response << addBody(server->getErrorPage()[STATUS400].second);
 					break;
 				}
 				case 401:
 				{
+					response << addHeader(STATUS401, server->getErrorPage().find(STATUS401)->second, Server_Request);
+					response << addBody(server->getErrorPage()[STATUS401].second);
 					break;
 				}
 				case 402:
 				{
+					response << addHeader(STATUS402, server->getErrorPage().find(STATUS402)->second, Server_Request);
+					response << addBody(server->getErrorPage()[STATUS402].second);
 					break;
 				}
 				case 403:
 				{
+					response << addHeader(STATUS403, server->getErrorPage().find(STATUS403)->second, Server_Request);
+					response << addBody(server->getErrorPage()[STATUS403].second);
 					break;
 				}
 				case 404:
@@ -445,54 +479,80 @@ void	server_response::createResponse(server_configuration * server, std::string 
 				}
 				case 405:
 				{
+					response << addHeader(STATUS405, server->getErrorPage().find(STATUS405)->second, Server_Request);
+					response << addBody(server->getErrorPage()[STATUS405].second);
 					break;
 				}
 				case 406:
 				{
+					response << addHeader(STATUS406, server->getErrorPage().find(STATUS406)->second, Server_Request);
+					response << addBody(server->getErrorPage()[STATUS406].second);
 					break;
 				}
 				case 407:
 				{
+					response << addHeader(STATUS407, server->getErrorPage().find(STATUS407)->second, Server_Request);
+					response << addBody(server->getErrorPage()[STATUS407].second);
 					break;
 				}
 				case 408:
 				{
+					response << addHeader(STATUS408, server->getErrorPage().find(STATUS408)->second, Server_Request);
+					response << addBody(server->getErrorPage()[STATUS408].second);
 					break;
 				}
 				case 409:
 				{
+					response << addHeader(STATUS409, server->getErrorPage().find(STATUS409)->second, Server_Request);
+					response << addBody(server->getErrorPage()[STATUS409].second);
 					break;
 				}
 				case 410:
 				{
+					response << addHeader(STATUS410, server->getErrorPage().find(STATUS410)->second, Server_Request);
+					response << addBody(server->getErrorPage()[STATUS410].second);
 					break;
 				}
 				case 411:
 				{
+					response << addHeader(STATUS411, server->getErrorPage().find(STATUS411)->second, Server_Request);
+					response << addBody(server->getErrorPage()[STATUS411].second);
 					break;
 				}
 				case 412:
 				{
+					response << addHeader(STATUS412, server->getErrorPage().find(STATUS412)->second, Server_Request);
+					response << addBody(server->getErrorPage()[STATUS412].second);
 					break;
 				}
 				case 413:
 				{
+					response << addHeader(STATUS413, server->getErrorPage().find(STATUS413)->second, Server_Request);
+					response << addBody(server->getErrorPage()[STATUS413].second);
 					break;
 				}
 				case 414:
 				{
+					response << addHeader(STATUS414, server->getErrorPage().find(STATUS414)->second, Server_Request);
+					response << addBody(server->getErrorPage()[STATUS414].second);
 					break;
 				}
 				case 415:
 				{
+					response << addHeader(STATUS415, server->getErrorPage().find(STATUS415)->second, Server_Request);
+					response << addBody(server->getErrorPage()[STATUS415].second);
 					break;
 				}
 				case 416:
 				{
+					response << addHeader(STATUS416, server->getErrorPage().find(STATUS416)->second, Server_Request);
+					response << addBody(server->getErrorPage()[STATUS416].second);
 					break;
 				}
 				case 417:
 				{
+					response << addHeader(STATUS417, server->getErrorPage().find(STATUS417)->second, Server_Request);
+					response << addBody(server->getErrorPage()[STATUS417].second);
 					break;
 				}
 			}
@@ -511,22 +571,32 @@ void	server_response::createResponse(server_configuration * server, std::string 
 				}
 				case 501:
 				{
+					response << addHeader(STATUS501, server->getErrorPage().find(STATUS501)->second, Server_Request);
+					response << addBody(server->getErrorPage()[STATUS501].second);
 					break;
 				}
 				case 502:
 				{
+					response << addHeader(STATUS502, server->getErrorPage().find(STATUS502)->second, Server_Request);
+					response << addBody(server->getErrorPage()[STATUS502].second);
 					break;
 				}
 				case 503:
 				{
+					response << addHeader(STATUS503, server->getErrorPage().find(STATUS503)->second, Server_Request);
+					response << addBody(server->getErrorPage()[STATUS503].second);
 					break;
 				}
 				case 504:
 				{
+					response << addHeader(STATUS504, server->getErrorPage().find(STATUS504)->second, Server_Request);
+					response << addBody(server->getErrorPage()[STATUS504].second);
 					break;
 				}
 				case 505:
 				{
+					response << addHeader(STATUS505, server->getErrorPage().find(STATUS505)->second, Server_Request);
+					response << addBody(server->getErrorPage()[STATUS505].second);
 					break;
 				}
 			}
