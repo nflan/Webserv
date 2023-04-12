@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:46 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/12 18:00:05 by nflan            ###   ########.fr       */
+/*   Updated: 2023/04/12 18:27:53 by nflan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,8 +145,7 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 	std::string	tmp;
 	int n = 0;
 	const std::string ftab[3] = {"GET", "POST", "DELETE"};
-	(void)Root;
-	if (Root.size() == 1 && Root.find("/", 0, 1))
+	if (Root == "/")
 		tmp = "." + Server_Request.getRequestURI();
 	else
 		tmp = Root + Server_Request.getRequestURI();
@@ -158,9 +157,7 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 		tmp += "index.html";
 	}
 	if (tmp[tmp.size() - 1] == '/')
-	{
-		tmp += "index.html";
-	}
+		tmp.erase(tmp.size() - 1, 1);//+= "index.html";
 
 	for (; n < 4; n++)
 	{
@@ -173,9 +170,10 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 	{
 		case GET :
 		{
+			std::cout << "TMP = " << tmp << std::endl;
 			if (_status_code == 200)
 			{
-				if (access(tmp.c_str(), F_OK))
+				if (access(tmp.c_str(), F_OK) && tmp != "./")
 					_status_code = 404;
 				else
 				{
@@ -319,14 +317,14 @@ std::string	server_response::addHeader(std::string statusMsg, std::pair<std::str
 	std::string	header;
 	std::stringstream	response;
 	
-	response << Server_Request.getVersion() << " " << _status_code << " " << statusMsg << "\r\n";  /* ajouter la version HTTP (parsing) */ 
+	response << Server_Request.getVersion() << " " << _status_code << " " << statusMsg << "\r\n";
 	if (statusContent.first != "")
 	{
 		if (statusContent.first.find('.', 0) != std::string::npos)
 			response << this->getType(statusContent.first.substr(statusContent.first.find('.', 0) + 1));
 	}
 	else
-		response << this->getType(Server_Request.getType()); // modif text/html (parsing) -> peut etre faire map de content type / mime en fonction de .py = /truc .html = /text/html etc.
+		response << this->getType(Server_Request.getType()); // modif text/html (parsing) -> peut etre faire map de content type / mime en fonction de .py = /truc .html = text/html etc.
 	header = response.str();
 	return (header);
 }
@@ -628,7 +626,9 @@ void	server_response::createResponse(server_configuration * server, std::string 
 			break;
 		}
 		default:
-			std::cout << "default" << std::endl;
+			response << addHeader(STATUS500, server->getErrorPage().find(STATUS500)->second, Server_Request);
+			response << addBody(server->getErrorPage()[STATUS500].second);
+			break;
 	}
 	_ServerResponse = response.str();
 }
