@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:46 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/12 17:19:50 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/12 17:40:12 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,8 @@ int server_response::checkConfFile(std::string MethodUsed, server_configuration 
 
 std::string server_response::getRealPath(std::string MethodUsed, server_configuration *server, std::string RequestURI)
 {	
-	if (RequestURI.at(RequestURI.size() - 1) == '/')
+	std::cout << "BIG TEST 0: " << RequestURI << std::endl;
+	if (RequestURI.size() > 2 && RequestURI.at(RequestURI.size() - 1) == '/')
 		RequestURI = RequestURI.substr(0, RequestURI.size() - 1);
 	std::cout << "BIG TEST : " << RequestURI << std::endl;
 	for (std::map<std::string, class server_location_configuration*>::reverse_iterator it = server->getLoc()->rbegin(); it != server->getLoc()->rend(); it++)
