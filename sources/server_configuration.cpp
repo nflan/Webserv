@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:06:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/12 12:32:03 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/12 15:56:47 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,7 @@ std::string server_configuration::findServerName()
 	if (pos != std::string::npos) { // check if "server_name" was found
 		pos += strlen("server_name"); // move the position to the end of "server_name"
 		std::string server_name = _ConfigFile.substr(pos + 1); // extract the substring starting from the next character
-		size_t space_pos = server_name.find_first_of(" \n"); // find the position of the first space or newline character
+		size_t space_pos = server_name.find_first_of(" \n;"); // find the position of the first space or newline character
 		if (space_pos != std::string::npos) { // check if a space character was found
 			if (DEBUG)
 				std::cout << "std::string server_configuration::findServerName() " << server_name.substr(0, space_pos) << std::endl;

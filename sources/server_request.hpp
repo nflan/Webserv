@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server_request.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 14:29:37 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/07 17:15:47 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/12 15:24:35 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,7 @@ class server_request
 	std::string getRequestURI() const;
 	std::string getType() const;
 	std::string	getBody() const;
+	std::string	getHost() const;
 	unsigned long long getContentLength() const ;
 	void request_parser();
 };
