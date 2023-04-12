@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:46 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/12 16:58:57 by nflan            ###   ########.fr       */
+/*   Updated: 2023/04/12 18:00:05 by nflan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,14 +125,14 @@ std::string	server_response::list_dir(std::string path)
 		return ("");
 	}
 	path.erase(0,1);
-	response << "<html><head><meta name=\"viewport\" content=\"width=device-width, minimum-scale=0.1\"><title>" << path << "</title></head><body style=\"height: 100%;\"><h1 style=\"text-align: center; font-size:3em;\">List directory to this path:" << path << "</h1>";
+	response << "<html><head><meta name=\"viewport\" content=\"width=device-width, minimum-scale=0.1\"><title>" << path << "</title></head><body style=\"height: 100%;\"><h1 style=\"text-align: center; font-size:3em;\">List directory to this path:</h1><p style=\"text-align: center;\">" << path << "</p></br><ul>";
 	while (send)
 	{
-		response << "<p><a href=\"" << path << "/" << send->d_name << "\">" << send->d_name << "</a><p>";
+		response << "<li><a href=\"" << path << "/" << send->d_name << "\">" << send->d_name << "</a></li>";
 		send = readdir(dir);
 	}
 	closedir(dir);
-	response << "<p style=\"text-align: center;\">webserv</p></body></html>";
+	response << "</ul><p style=\"text-align: center;\">webserv</p></body></html>";
 	content = response.str();
 	return (content);
 }
