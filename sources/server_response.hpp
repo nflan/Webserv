@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/11 18:44:35 by nflan            ###   ########.fr       */
+/*   Updated: 2023/04/12 12:12:44 by nflan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@
 #include <errno.h>
 #include <iostream>
 #include <sstream>
+#include <ftw.h>
 #include "server_configuration.hpp"
 #include "server_request.hpp"
 

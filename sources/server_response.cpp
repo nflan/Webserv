@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:46 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/11 19:20:30 by nflan            ###   ########.fr       */
+/*   Updated: 2023/04/12 13:02:36 by nflan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -231,7 +231,28 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 	return ;
 }
 
-void	server_response::delete_dir(const char * path)
+static int	delete_fct(const char *fpath, const struct stat *sb, int tflag, struct FTW *ftwbuf)
+{
+	static_cast<void>(sb);
+	static_cast<void>(ftwbuf);
+
+	if (tflag == FTW_DP)
+		return (rmdir(fpath), 1);
+	else
+		if (unlink(fpath))
+			return (1);
+	return (0);
+}
+
+void	server_response::delete_dir(const char* path)
+{
+	if (access(path, X_OK))
+		_status_code = 403;
+	if (nftw(path, delete_fct, 500, FTW_DEPTH))
+		_status_code = 404;
+}
+
+/*void	server_response::delete_dir(const char * path)
 {
 	DIR	*dir = NULL;
 	struct dirent *send = NULL;
@@ -260,13 +281,13 @@ void	server_response::delete_dir(const char * path)
 	while (send)
 	{
 		test = send->d_name;
-		std::cerr << "coucou je suis dans un dossier et je vais dans un fichier ou dosser" << std::endl;
+		std::cerr << "coucou je suis dans un dossier et je vais dans un fichier ou dossier" << std::endl;
 		std::cerr << "name -> " << send->d_name << std::endl;
 		if (test != "." && test != "..")
 			delete_dir(send->d_name);
 		send = readdir(dir);
 	}
-}
+}*/
 
 std::string	server_response::addHeader(std::string statusMsg, std::pair<std::string, std::string> statusContent, const server_request& Server_Request)
 {
