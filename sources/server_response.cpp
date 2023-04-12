@@ -6,19 +6,19 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:46 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/12 13:48:34 by nflan            ###   ########.fr       */
+/*   Updated: 2023/04/12 16:58:57 by nflan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "server_response.hpp"
 
-server_response::server_response() : _status_code(200), _body(""), _ServerResponse("")
+server_response::server_response() : _status_code(200), _body(""), _content(""), _ServerResponse("")
 {
 	this->addType();
 	std::cout << "server_response Default Constructor called" << std::endl;
 }
 
-server_response::server_response(int stat) : _status_code(stat), _body(""), _ServerResponse("")
+server_response::server_response(int stat) : _status_code(stat), _body(""), _content(""), _ServerResponse("")
 {
 	this->addType();
 	std::cout << "server_response int Constructor called" << std::endl;
@@ -80,16 +80,72 @@ std::string server_response::getType(std::string type)
 	return ("Content-Type: text/html\r\n");
 }
 
+bool	is_dir(const char* path, server_response& sr)
+{
+	struct stat tab;
+
+	if (stat(path, &tab) == -1)
+		return (sr.setStatusCode(500), 1);
+	if (S_ISDIR(tab.st_mode))
+		return (1);
+	return (0);
+}
+
+std::string	prev_link(std::string path)
+{
+	unsigned int	i = 0;
+	for (; path.find("/") != std::string::npos; i++){} 
+
+	return (path);
+}
+
+std::string	server_response::list_dir(std::string path)
+{
+	DIR	*dir = NULL;
+	struct dirent *send = NULL;
+	std::string	content;
+	std::stringstream	response;
+
+	dir = opendir(path.c_str());
+	if (errno == EACCES || errno == EMFILE || errno == ENFILE || errno == ENOENT || errno == ENOMEM || errno == ENOTDIR)
+	{
+		if (errno == ENOENT || errno == ENOTDIR)
+			_status_code = 404;
+		else if (errno == EACCES)
+			_status_code = 403;
+		else if (errno == EMFILE || errno == ENFILE || errno == ENOMEM)
+			_status_code = 500;
+		return ("");
+	}
+	send = readdir(dir);
+	if (!send)
+	{
+		_status_code = 500;
+		closedir(dir);
+		return ("");
+	}
+	path.erase(0,1);
+	response << "<html><head><meta name=\"viewport\" content=\"width=device-width, minimum-scale=0.1\"><title>" << path << "</title></head><body style=\"height: 100%;\"><h1 style=\"text-align: center; font-size:3em;\">List directory to this path:" << path << "</h1>";
+	while (send)
+	{
+		response << "<p><a href=\"" << path << "/" << send->d_name << "\">" << send->d_name << "</a><p>";
+		send = readdir(dir);
+	}
+	closedir(dir);
+	response << "<p style=\"text-align: center;\">webserv</p></body></html>";
+	content = response.str();
+	return (content);
+}
+
 void	server_response::todo(const server_request& Server_Request, int conn_sock, server_configuration *server)
 {
 	enum imethod {GET, POST, DELETE};
 	std::stringstream response;
 	std::string	Root = server->getRoot();
+	std::string	tmp;
 	int n = 0;
 	const std::string ftab[3] = {"GET", "POST", "DELETE"};
-	std::string		content;
 	(void)Root;
-	std::string tmp;
 	if (Root.size() == 1 && Root.find("/", 0, 1))
 		tmp = "." + Server_Request.getRequestURI();
 	else
@@ -117,20 +173,28 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 	{
 		case GET :
 		{
-			std::ifstream file(tmp.c_str());
-			std::stringstream buffer;
-			if (!file.is_open())
+			if (_status_code == 200)
 			{
-				if (_status_code == 200)
+				if (access(tmp.c_str(), F_OK))
 					_status_code = 404;
-			}
-			else
-			{
-				buffer << file.rdbuf();
-				content = buffer.str();
+				else
+				{
+					std::stringstream buffer;
+					if (is_dir(tmp.c_str(), *this))
+						buffer << list_dir(tmp);
+					else if (_status_code == 200)
+					{
+						std::ifstream file(tmp.c_str());
+						if (!file.is_open())
+							_status_code = 403;
+						else
+							buffer << file.rdbuf();
+					}
+					_content = buffer.str();
+				}
 			}
 			std::cerr << "AFTER RESPONSE IFSTREAM\r\n" << std::endl;
-			createResponse(server, content, Server_Request);
+			createResponse(server, _content, Server_Request);
 			std::cout << std::endl << "SERVER RESPONSE CONSTRUITE -> " << std::endl << _ServerResponse << std::endl << std::endl;
 			send(conn_sock, _ServerResponse.c_str() , _ServerResponse.size(), 0);
 			std::cerr << "\nREPONSE SEND :\n";
@@ -205,13 +269,11 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 		}
 		case DELETE :
 		{
-//delete -> nftw avec flag pour partir de la fin
 			std::cout << "\ntmp.c_str() = " << tmp << "\n" << std::endl;
 			this->delete_dir(tmp.c_str());
 			if (_status_code == 200)
-				content = server->getErrorPage()[STATUS200].second;
-	//		if (std::remove(tmp.c_str()) != 0) // the remove function returns 0 on success
-			createResponse(server, content, Server_Request);
+				_content = server->getErrorPage()[STATUS200].second;
+			createResponse(server, _content, Server_Request);
 			send(conn_sock, _ServerResponse.c_str() , _ServerResponse.size(), 0);
 			break ;
 		}
@@ -251,43 +313,6 @@ void	server_response::delete_dir(const char* path)
 		if (nftw(path, &delete_fct, 1, FTW_DEPTH))
 			_status_code = 403;
 }
-
-/*void	server_response::delete_dir(const char * path)
-{
-	DIR	*dir = NULL;
-	struct dirent *send = NULL;
-	std::string	test;
-
-	dir = opendir(path);
-	if (errno == EACCES || errno == EMFILE || errno == ENFILE || errno == ENOENT || errno == ENOMEM || errno == ENOTDIR)
-	{
-		if (errno == ENOENT)
-			_status_code = 404;
-		else if (errno == ENOTDIR && std::remove(path) != 0) // the remove function returns 0 on success
-			_status_code = 404;
-		else if (errno == EACCES)
-			_status_code = 403;
-		else if (errno == EMFILE || errno == ENFILE || errno == ENOMEM)
-			_status_code = 500;
-		throw DeleteException();
-	}
-	send = readdir(dir);
-	if (!send)
-	{
-		_status_code = 500;
-		closedir(dir);
-		throw DeleteException();
-	}
-	while (send)
-	{
-		test = send->d_name;
-		std::cerr << "coucou je suis dans un dossier et je vais dans un fichier ou dossier" << std::endl;
-		std::cerr << "name -> " << send->d_name << std::endl;
-		if (test != "." && test != "..")
-			delete_dir(send->d_name);
-		send = readdir(dir);
-	}
-}*/
 
 std::string	server_response::addHeader(std::string statusMsg, std::pair<std::string, std::string> statusContent, const server_request& Server_Request)
 {
@@ -357,7 +382,7 @@ void	server_response::createResponse(server_configuration * server, std::string 
 				}
 				case 201:
 				{
-					response << addHeader(STATUS201 server->getErrorPage().find(STATUS201)->second, Server_Request);
+					response << addHeader(STATUS201, server->getErrorPage().find(STATUS201)->second, Server_Request);
 					response << addBody(server->getErrorPage()[STATUS201].second);
 					break;
 				}
@@ -608,7 +633,3 @@ void	server_response::createResponse(server_configuration * server, std::string 
 	_ServerResponse = response.str();
 }
 
-const char *	server_response::DeleteException::what() const throw()
-{
-	return ("Delete error\n");
-}

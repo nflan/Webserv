@@ -6,22 +6,24 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/12 12:12:44 by nflan            ###   ########.fr       */
+/*   Updated: 2023/04/12 16:58:32 by nflan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERVER_RESPONSE_HPP
 #define SERVER_RESPONSE_HPP
 
-#include <stdio.h>
 #include <sys/socket.h>
+#include <sys/types.h>
+#include <sys/epoll.h>
+#include <sys/stat.h>
+#include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <netinet/in.h>
 #include <string.h>
 #include <iostream>
 #include <string>
-#include <sys/epoll.h>
 #include <iostream>
 #include <vector>
 #include <iterator>
@@ -42,6 +44,7 @@ class server_response
 	private:
 	int			_status_code;
 	std::string	_body;
+	std::string	_content;
 	std::string	_ServerResponse;
 	std::map<std::string, std::string> _contentType;
 	
@@ -55,6 +58,7 @@ class server_response
 	void	todo(const server_request& Server_Request, int conn_sock, server_configuration* Root);
 	void	createResponse(server_configuration*, std::string, const server_request& Server_Request);
 	void	delete_dir(const char * path);
+	std::string	list_dir(std::string path);
 	std::string	addHeader(std::string statusMsg, std::pair<std::string, std::string> statusContent, const server_request& Server_Request);
 	std::string	addBody(std::string body);
 
@@ -66,14 +70,11 @@ class server_response
 
 	// Définition de la méthode pour obtenir le code d'état de la réponse
 	int get_status_code() const { return _status_code; }
+	void		setStatusCode(int st) { _status_code = (st); }
 
 	void		addType();
 	std::string	getType(std::string type);
 
-	class DeleteException: public std::exception {
-		public:
-			virtual const char *	what() const throw();
-	};
 };
 
 #endif
