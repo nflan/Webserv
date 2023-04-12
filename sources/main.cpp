@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 15:39:03 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/11 18:24:53 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/12 12:50:39 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,24 +98,33 @@ void handle_connection(server_configuration *servers, int conn_sock) {
 	delete ServerRequest;
 }
 
-void	CloseSockets(int *listen_sock, int tablen, std::vector<server_configuration*> servers, sockaddr_in *addr)
+
+void	CloseSockets(int *listen_sock, sockaddr_in *addr, std::vector<int> Ports)
 {
+	int tablen = Ports.size();
+	
 	for (int i = 0; i < tablen; i++)
 	{
 		close(listen_sock[i]);
-		close(servers[i]->getPort());
+		close(Ports[i]);
 		close(addr[i].sin_port);
 	}
 }
 
-int StartServer(std::vector<server_configuration*> servers, int tablen)
-{
-	struct sockaddr_in addr[tablen];
-	socklen_t addrlen[tablen];
-	int conn_sock, nfds, epollfd;
-	int listen_sock[tablen];
+/*
+	- gérer les CloseSocket qui ne doit pas tout fermer ou arreter le programme;
+	- faire la fonction pour savoir dans quelle serveur on est;
 	
-	for (int i = 0; i < tablen; i++)
+*/
+
+int StartServer(std::vector<server_configuration*> servers, std::vector<int> Ports)
+{
+	struct sockaddr_in addr[Ports.size()];
+	socklen_t addrlen[Ports.size()];
+	int conn_sock, nfds, epollfd;
+	int listen_sock[Ports.size()];
+	
+	for (size_t i = 0; i < Ports.size(); i++)
 	{
 		addrlen[i] = sizeof(addr[i]);
 		listen_sock[i] = socket(AF_INET, SOCK_STREAM, 0);
@@ -127,46 +136,46 @@ int StartServer(std::vector<server_configuration*> servers, int tablen)
 		memset(&addr[i], 0, sizeof(addr[i]));
 		addr[i].sin_family = AF_INET;
 		addr[i].sin_addr.s_addr = htonl(INADDR_ANY);
-		addr[i].sin_port = htons(servers[i]->getPort());
+		addr[i].sin_port = htons(Ports[i]);
 		
-		std::cout << "servers[i]->getPort() : " << servers[i]->getPort() << std::endl;
+		std::cout << "servers[i]->getPort() : " << Ports[i] << std::endl;
 
 		int val = 1;
 		if (setsockopt(listen_sock[i], SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val)) < 0) {
 			std::fprintf(stderr, "Error: setsockopt() failed: %s\n", strerror(errno));
-			return(CloseSockets(listen_sock, tablen, servers, addr), EXIT_FAILURE);
+			return(CloseSockets(listen_sock, addr, Ports), EXIT_FAILURE);
 		}
 		if (bind(listen_sock[i], (struct sockaddr *) &addr[i], addrlen[i]) == -1)
 		{
 			if (errno == EADDRINUSE) // changer
 			{	
 				std::fprintf(stderr, "Error: bind failed: %s\n", strerror(errno));
-				return(CloseSockets(listen_sock, tablen, servers, addr), EXIT_FAILURE);
+				return(CloseSockets(listen_sock, addr, Ports), EXIT_FAILURE);
 			}
 		}
 		if (listen(listen_sock[i], SOMAXCONN) == -1) {
 			std::fprintf(stderr, "Error: listen failed: %s\n", strerror(errno));
-			return(CloseSockets(listen_sock, tablen, servers, addr), EXIT_FAILURE);
+			return(CloseSockets(listen_sock, addr, Ports), EXIT_FAILURE);
 		}
 	}
 
 	epollfd = epoll_create1(0);
 	if (epollfd == -1) {
 		std::fprintf(stderr, "Error: epoll_create1: %s\n", strerror(errno));
-		return(CloseSockets(listen_sock, tablen, servers, addr), EXIT_FAILURE);
+		return(CloseSockets(listen_sock, addr, Ports), EXIT_FAILURE);
 	}
 
 
 	struct epoll_event ev, events[MAX_EVENTS];
 
-	for (int i = 0; i < tablen; i++)
+	for (size_t i = 0; i < Ports.size(); i++)
 	{
 		ev.events = EPOLLIN;
 		ev.data.fd = listen_sock[i];
 		if (epoll_ctl(epollfd, EPOLL_CTL_ADD, listen_sock[i], &ev) == -1) 
 		{
 			std::fprintf(stderr, "Error: epoll_ctl: listen_sock, %s\n", strerror(errno));
-			return(CloseSockets(listen_sock, tablen, servers, addr), EXIT_FAILURE);
+			return(CloseSockets(listen_sock, addr, Ports), EXIT_FAILURE);
 		}
 	}
 
@@ -175,10 +184,10 @@ int StartServer(std::vector<server_configuration*> servers, int tablen)
 		nfds = epoll_wait(epollfd, events, MAX_EVENTS, -1);
 		if (nfds == -1) {
 			std::fprintf(stderr, "Error: epoll_wait: %s\n", strerror(errno));
-			return(CloseSockets(listen_sock, tablen, servers, addr), EXIT_FAILURE);
+			return(CloseSockets(listen_sock, addr, Ports), EXIT_FAILURE);
 		}
 		for (int n = 0; n < nfds; ++n) {
-			for (int i = 0; i < tablen; i++)
+			for (size_t i = 0; i < Ports.size(); i++)
 			{
 				if (events[n].data.fd == listen_sock[i])
 				{
@@ -187,19 +196,19 @@ int StartServer(std::vector<server_configuration*> servers, int tablen)
 					// std::fprintf(stderr, "\nEVENTS I = %d ET N = %d\n", i, n);
 					conn_sock = accept(listen_sock[i], (struct sockaddr *) &addr[i], &addrlen[i]);
 					if (conn_sock == -1) {
-						servers[temp_fd]->setStatusCode(500);
+						servers[temp_fd]->setStatusCode(500); // il faudrait trouver le bon pour le mettre, facile à faire
 						std::fprintf(stderr, "Error: server accept failed: %s\n", strerror(errno));
-						return(CloseSockets(listen_sock, tablen, servers, addr), EXIT_FAILURE);
+						return(CloseSockets(listen_sock, addr, Ports), EXIT_FAILURE);
 					}
 					if (setnonblocking(conn_sock) == -1) {
 						std::fprintf(stderr, "Error: setnonblocking: %s\n", strerror(errno));
-						return(CloseSockets(listen_sock, tablen, servers, addr), EXIT_FAILURE);
+						return(CloseSockets(listen_sock, addr, Ports), EXIT_FAILURE);
 					}
 					ev.events = EPOLLIN | EPOLLET;
 					ev.data.fd = conn_sock;
 					if (epoll_ctl(epollfd, EPOLL_CTL_ADD, conn_sock, &ev) == -1) {
 						std::fprintf(stderr, "Error: epoll_ctl: conn_sock, %s\n", strerror(errno));
-						return(CloseSockets(listen_sock, tablen, servers, addr), EXIT_FAILURE);
+						return(CloseSockets(listen_sock, addr, Ports), EXIT_FAILURE);
 					}
 				}
 				handle_connection(servers[temp_fd], events[n].data.fd);
@@ -262,6 +271,24 @@ void PrintServer(std::vector<server_configuration*> servers)
 	// }
 }
 
+std::vector<int> getPorts(std::vector<server_configuration*> servers)
+{
+	std::vector<int> Ports;
+	
+	for (std::vector<server_configuration*>::iterator it = servers.begin(); it != servers.end(); it++)
+	{		
+		std::vector<int> ports = (*it)->getPort();
+		for (std::vector<int>::iterator ite = ports.begin(); ite != ports.end(); ite++)
+		{
+			int i = 0;
+			std::cout << "Ports " << i << " : " << *ite << std::endl;
+			Ports.push_back(*ite);
+			i++;
+		}
+	}
+	return Ports;
+}
+
 int main(int argc, char const **argv)
 {
 	if (argc != 2)
@@ -273,7 +300,7 @@ int main(int argc, char const **argv)
 
 	std::vector<server_configuration*> servers = SetupNewServers(argv[1]);
 	// PrintServer(servers);
-	StartServer(servers, servers.size());
+	StartServer(servers, getPorts(servers));
 	DeleteServers(servers);
 	return 0;
 }

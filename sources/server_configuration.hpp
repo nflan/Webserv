@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:03:12 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/08 14:37:18 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/12 11:53:21 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ class server_configuration
 	std::string	_Root;
 	std::string _Index;
 	std::map<std::string, std::string>	_cgi;
-	int			_Port;
+	std::vector<int> _Port;
 	int			_StatusCode;
 	unsigned long long	_ClientMaxBodySize;
 	std::map<std::string, std::string>	_ErrorPage;
@@ -54,7 +54,7 @@ class server_configuration
 
 	std::string convertConfigFile(std::string ConfigFile);
 	std::string findServerName();
-	int findPort();
+	std::vector<int> findPort();
 	std::string findRoot();
 	std::string findIndex();
 	std::map<std::string, std::string> findLocation();
@@ -79,9 +79,10 @@ class server_configuration
 	std::map<std::string, std::string>&	getDefErrorPage();
 	std::string getRoot();
 	std::string getIndex();
-
-	int getPort();
-
+	
+	
+	std::vector<int> getPort();
+	
 	class CgiException: public std::exception {
 		public:
 			virtual const char *	what() const throw();
