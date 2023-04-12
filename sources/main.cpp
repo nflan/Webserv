@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 15:39:03 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/12 16:35:55 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/12 17:59:03 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,18 +34,24 @@
 #define READ_SIZE 1000
 #define MAX_EVENTS 10
 
+static std::vector<int> open_ports;
+
 void sigint_handler(int signum)
 {
     std::cerr << "\nSignal SIGINT (" << signum << ") received." << std::endl;
-	close(8083); // Port 1
-	close(8086); // Port 2
-	close(3); // listen_socket 1
-	close(4); // listen_socket 2
-	close(5); // epoll_create1
-	close(6); // accept AF_INET socket conn_sock ev.data.fd Conf1
-	close(7); // accept AF_INET socket conn_sock ev.data.fd Conf1
-	close(8); // accept AF_INET socket conn_sock ev.data.fd Conf2
-	close(9); // accept AF_INET socket conn_sock ev.data.fd Conf2
+	for (size_t i = 0; i < open_ports.size(); i++)
+	{
+		close(open_ports[i]);
+	}
+	// close(8083); // Port 1
+	// close(8086); // Port 2
+	// close(3); // listen_socket 1
+	// close(4); // listen_socket 2
+	// close(5); // epoll_create1
+	// close(6); // accept AF_INET socket conn_sock ev.data.fd Conf1
+	// close(7); // accept AF_INET socket conn_sock ev.data.fd Conf1
+	// close(8); // accept AF_INET socket conn_sock ev.data.fd Conf2
+	// close(9); // accept AF_INET socket conn_sock ev.data.fd Conf2
 	// close(0); // bind listen
 	// close(1); // nfds
 }
@@ -200,7 +206,8 @@ int StartServer(std::vector<server_configuration*> servers, std::vector<int> Por
 		std::fprintf(stderr, "Error: epoll_create1: %s\n", strerror(errno));
 		return(CloseSockets(listen_sock, addr, Ports), EXIT_FAILURE);
 	}
-
+	open_ports.push_back(epollfd);
+	
 	struct epoll_event ev, events[MAX_EVENTS];
 
 	for (size_t i = 0; i < Ports.size(); i++)
@@ -230,6 +237,8 @@ int StartServer(std::vector<server_configuration*> servers, std::vector<int> Por
 					// servers[temp_fd]->setStatusCode(200);
 					// std::fprintf(stderr, "\nEVENTS I = %d ET N = %d\n", i, n);
 					conn_sock = accept(listen_sock[i], (struct sockaddr *) &addr[i], &addrlen[i]);
+					open_ports.push_back(conn_sock);
+					std::cout << "conn_sock : " << conn_sock << std::endl;
 					StorePort.insert(std::pair<int, int>(Ports[i], listen_sock[i]));
 					ChangePort(StorePort, conn_sock, listen_sock[i]);
 					if (conn_sock == -1) {
@@ -250,6 +259,7 @@ int StartServer(std::vector<server_configuration*> servers, std::vector<int> Por
 					}
 				}
 				handle_connection(servers, events[n].data.fd, StorePort, CodeStatus);
+				std::cout << "events[n].data.fd : " << events[n].data.fd << std::endl;
 			}
 		}
 	}
