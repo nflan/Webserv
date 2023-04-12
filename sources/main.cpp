@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 15:39:03 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/12 16:03:18 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/12 16:35:55 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ int setnonblocking(int sockfd) {
 server_configuration* getGoodServer(std::vector<server_configuration*> servers, server_request *ServerRequest, int Port)
 {
 	std::vector<server_configuration*> SamePort;
-	
+
 	for (std::vector<server_configuration*>::iterator it = servers.begin(); it != servers.end(); it++)
 	{
 		for (size_t i = 0; i < (*it)->getPort().size(); i++)
@@ -92,12 +92,14 @@ server_configuration* getGoodServer(std::vector<server_configuration*> servers, 
 	return (SamePort.at(0));
 }
 
-void handle_connection(std::vector<server_configuration*> servers, int conn_sock, std::map<int, int> StorePort)
+void handle_connection(std::vector<server_configuration*> servers, int conn_sock, std::map<int, int> StorePort, int CodeStatus)
 {
+	(void)CodeStatus;
 	server_configuration *GoodServerConf;
 	char buffer[1024];
 	int n = read(conn_sock, buffer, 1024);
 	int Port;
+	
 	if (n <= 0) {
 		// close(conn_sock);
 		return;
@@ -159,7 +161,8 @@ int StartServer(std::vector<server_configuration*> servers, std::vector<int> Por
 	int conn_sock, nfds, epollfd;
 	int listen_sock[Ports.size()];
 	std::map<int, int> StorePort;
-	
+	int CodeStatus = 0;
+
 	for (size_t i = 0; i < Ports.size(); i++)
 	{
 		addrlen[i] = sizeof(addr[i]);
@@ -198,7 +201,6 @@ int StartServer(std::vector<server_configuration*> servers, std::vector<int> Por
 		return(CloseSockets(listen_sock, addr, Ports), EXIT_FAILURE);
 	}
 
-
 	struct epoll_event ev, events[MAX_EVENTS];
 
 	for (size_t i = 0; i < Ports.size(); i++)
@@ -224,12 +226,14 @@ int StartServer(std::vector<server_configuration*> servers, std::vector<int> Por
 				if (events[n].data.fd == listen_sock[i])
 				{
 					temp_fd = i;
+					CodeStatus = 200; // a voir comment on gère le code status après envoi ds le handle connection
 					// servers[temp_fd]->setStatusCode(200);
 					// std::fprintf(stderr, "\nEVENTS I = %d ET N = %d\n", i, n);
 					conn_sock = accept(listen_sock[i], (struct sockaddr *) &addr[i], &addrlen[i]);
 					StorePort.insert(std::pair<int, int>(Ports[i], listen_sock[i]));
 					ChangePort(StorePort, conn_sock, listen_sock[i]);
 					if (conn_sock == -1) {
+						CodeStatus = 500;
 						// servers[temp_fd]->setStatusCode(500); // il faudrait trouver le bon pour le mettre, facile à faire
 						std::fprintf(stderr, "Error: server accept failed: %s\n", strerror(errno));
 						return(CloseSockets(listen_sock, addr, Ports), EXIT_FAILURE);
@@ -245,7 +249,7 @@ int StartServer(std::vector<server_configuration*> servers, std::vector<int> Por
 						return(CloseSockets(listen_sock, addr, Ports), EXIT_FAILURE);
 					}
 				}
-				handle_connection(servers, events[n].data.fd, StorePort);
+				handle_connection(servers, events[n].data.fd, StorePort, CodeStatus);
 			}
 		}
 	}

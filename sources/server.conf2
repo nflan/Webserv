@@ -31,7 +31,7 @@ server {
 			index index.html;
 		}
 
-	allow_methods GET;
+		allow_methods GET ;
 }
 
 server {
