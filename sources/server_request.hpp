@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 14:29:37 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/11 18:18:42 by nflan            ###   ########.fr       */
+/*   Updated: 2023/04/13 14:05:12 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include <fstream>
 #include <sstream>
 #include <algorithm>
+#include <stdlib.h>
 #include <sys/types.h>
 #include <dirent.h>
 
@@ -57,6 +58,7 @@ class server_request
 	std::string	getType() const;
 	std::string	getVersion() const;
 	std::string	getBody() const;
+	unsigned long long getContentLength() const ;
 	void request_parser();
 
 	void setType(std::string);

@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 14:31:36 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/11 18:16:23 by nflan            ###   ########.fr       */
+/*   Updated: 2023/04/13 14:04:20 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,16 @@ std::string server_request::getVersion() const
 std::string server_request::getBody() const
 {
 	return (_body);
+}
+
+unsigned long long server_request::getContentLength() const
+{
+	char *endptr;
+	unsigned long long result = strtoull(_contentLength.c_str(), &endptr, 10);
+	if (*endptr != '\0') {
+        std::cout << "Invalid character : " << *endptr << std::endl; 
+    }
+    return (result);
 }
 
 std::ostream& operator <<(std::ostream &out, server_request &ServRequest)

@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 15:39:03 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/07 16:13:08 by nflan            ###   ########.fr       */
+/*   Updated: 2023/04/13 14:02:31 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ void sigint_handler(int signum)
 	// close(0); // bind listen
 	// close(1); // nfds
 }
+
 
 int setnonblocking(int sockfd) {
 	int flags;

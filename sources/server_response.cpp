@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:46 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/13 12:21:46 by nflan            ###   ########.fr       */
+/*   Updated: 2023/04/13 14:07:34 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -196,7 +196,7 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 			std::cout << std::endl << "SERVER RESPONSE CONSTRUITE -> " << std::endl << _ServerResponse << std::endl << std::endl;
 			send(conn_sock, _ServerResponse.c_str() , _ServerResponse.size(), 0);
 			std::cerr << "\nREPONSE SEND :\n";
-			std::cerr << _ServerResponse << std::endl;
+			std::cerr << this->_ServerResponse << std::endl;
 			break ;
 		}
 		case POST :

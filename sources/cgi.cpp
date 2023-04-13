@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cgi.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nflan <marvin@42.fr>                       +#+  +:+       +#+        */
+/*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/27 15:47:23 by nflan             #+#    #+#             */
-/*   Updated: 2023/04/11 12:39:13 by nflan            ###   ########.fr       */
+/*   Updated: 2023/04/13 14:01:10 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <fstream>
+#include <fcntl.h>
+#include <unistd.h>
 
 Cgi::Cgi(std::string & cgi_path, std::string & file_path, std::vector<std::string> & env, int input_fd)
 {
@@ -91,16 +93,31 @@ void	Cgi::print() const
 
 void	Cgi::dupping()
 {
-	if (_input_fd != -1)
-	{
-		if (dup2(_input_fd, STDIN_FILENO) == -1)
-			exit (1);
-		close (_input_fd);
+	std::string filename(".cgi-tmp.txt");
+
+	FILE* fp = fopen(filename.c_str(), "w");
+	if (fp == NULL) {
+		std::cerr << "Error opening file: " << std::strerror(errno) << std::endl;
+		return ((void) 1);
 	}
+
+	int fd = fileno(fp); // get file descriptor from file pointer
+
+	if (dup2(fd, STDOUT_FILENO) == -1) {
+		std::cerr << "Error redirecting output: " << std::strerror(errno) << std::endl;
+		return ((void) 1);
+	}
+// if (_input_fd != -1)
+// {
+// 	if (dup2(_input_fd, STDIN_FILENO) == -1)
+// 		exit (1);
+// 	close (_input_fd);
+// }
 //	if (dup2(_pdes[1], STDOUT_FILENO) == -1) // uncom quand good
 //		exit (1);
-	close (_pdes[1]);
+	close (fd);
 	close (_pdes[0]);
+	close (_pdes[1]);
 }
 
 const char *	PipeException::what() const throw()
@@ -128,8 +145,52 @@ void	exeCgi(Cgi & cgi)
 			throw ExecveException();
 	}
 	waitpid(cgi.getPid(), &status, 0);
+	if (WIFEXITED(status))
+		status = WEXITSTATUS(status);
+	std::cerr << "EXIT STATUS = " << status << std::endl;
 }
 
+std::string	cgi_type(std::string const &type)
+{
+	enum	status { PHP, PYTHON, AUTRE};
+
+	const std::string ftab[3] = {"php", ".py", "others"};
+	// const std::string ftab[3] = {"/usr/bin/php-cgi", "/usr/bin/python3", "/usr/bin/autre"};
+	int n = 0;
+	for (; n < 4; n++)
+	{
+		if (n != 3 && ftab[n] == type) // OK 
+		{
+			break ;
+		}
+	}
+	switch (n)
+	{
+		case PHP:
+		{
+			std::cout << "JE SUIS DANS CGI PHP" << std::endl;
+			return ("/usr/bin/php-cgi");
+			break;
+		}
+		case PYTHON:
+		{
+			std::cout << "JE SUIS DANS CGI PYTHON" << std::endl;
+			return ("/usr/bin/python3");
+			break;
+		}
+		case AUTRE:
+		{
+			std::cout << "JE SUIS DANS CGI AUTRE" << std::endl;
+			return ("/usr/bin/autre");
+			break;
+		}
+		default :
+		{
+			return ("NONE");
+			break ;
+		}
+	}
+}
 // ajouter dans l'env avant exec (source https://www.youtube.com/watch?v=37choLzDTgY) :
 // CONTENT_TYPE=
 // CONTENT_LENGTH=
@@ -152,12 +213,13 @@ int	main(int ac, char **av, char **envp)
 	std::vector<std::string>	env;
 	for (size_t i = 0; envp[i]; i++)
 		env.push_back(envp[i]);
-	std::string a("/usr/bin/php-cgi");
+	std::string a = cgi_type("php");
 	std::string cmd(av[1]);
 	try {
 		//ajout d'une commande conditionnee pour voir si on fait un cgi ou pas (si le cgi en question est precise dans le fichier de configue. Sinon, on renvoie la reponse en dur, sans traitement)
 		Cgi	cgi(a, cmd, env, -1);
 		exeCgi(cgi);
+		cgi.closePdes();
 	}
 	catch ( std::exception& e )
 	{
