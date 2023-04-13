@@ -6,11 +6,12 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:46 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/13 14:07:34 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/13 14:58:57 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "server_response.hpp"
+# define DEBUG1 1
 
 server_response::server_response() : _status_code(200), _body(""), _content(""), _ServerResponse("")
 {
@@ -40,28 +41,6 @@ server_response &server_response::operator=(server_response const &obj)
 	std::cout << "server_response Copy assignment operator called" << std::endl;
 	return *this;
 }
-
-// void server_response::generate_post_response(const std::string& request_uri, const std::string& data)
-// {
-// 	// Par exemple, on pourrait simplement renvoyer un message de confirmation avec les données reçues
-// 	std::string response_body = "Données reçues : " + data;
-	
-// 	// Ensuite, on prépare et envoie la réponse
-// 	std::ostringstream response_stream;
-// 	response_stream << "HTTP/1.1 200 OK\r\n"
-// 					<< "Content-Type: text/plain\r\n"
-// 					<< "Content-Length: " << response_body.length() << "\r\n"
-// 					<< "\r\n"
-// 					<< response_body;
-// 	std::string response = response_stream.str();
-// 	send_response_to_client(response);
-// }
-
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <string>
-#include <cstring>
 
 void	server_response::addType()
 {
@@ -137,28 +116,255 @@ std::string	server_response::list_dir(std::string path)
 	return (content);
 }
 
+int server_response::checkConfFile(std::string MethodUsed, server_configuration *server, std::string RequestURI)
+{	
+	// std::cout << "METHOD : " << MethodUsed << std::endl;
+	for (std::map<std::string, class server_location_configuration*>::reverse_iterator it = server->getLoc()->rbegin(); it != server->getLoc()->rend(); it++)
+	{
+		// std::cout << "IT-FIRST : " << it->first << " Size : " << it->first.size() << std::endl;
+		// std::cout << "RequestURI.SUBSTR : " << RequestURI.substr(0, it->first.size()) << std::endl;
+		if (it->first == RequestURI.substr(0, it->first.size()))
+		{
+			for (std::vector<std::string>::reverse_iterator ite = it->second->getHttpMethodAccepted().rbegin(); ite != it->second->getHttpMethodAccepted().rend(); ite++)
+			{
+				// std::cout << "ITE* : " << *ite << std::endl;
+				if (MethodUsed == *ite)
+				{
+					// std::cout << "IL PASSE ICI" << std::endl;
+					// s'il passe ici c'est que la méthode est autorisée et qu'une loc a été trouvée
+					// return (200);
+				}
+				else
+				{
+					// s'il passe ici, c'est qu'une loc a ete trouvee mais la methode n'est pas trouvee
+					// return (405);
+				}
+			}
+		}
+	}
+	// s'il passe ici c'est qu'aucune loc n'a éte trouvée et que donc c'est possible (sauf interdiction mais non gere)
+	return (200);
+}
+
+std::string server_response::getRealPath(std::string MethodUsed, server_configuration *server, std::string RequestURI)
+{	
+	std::cout << "BIG TEST 0: " << RequestURI << std::endl;
+	if (RequestURI.size() > 2 && RequestURI.at(RequestURI.size() - 1) == '/')
+		RequestURI = RequestURI.substr(0, RequestURI.size() - 1);
+	std::cout << "BIG TEST : " << RequestURI << std::endl;
+	for (std::map<std::string, class server_location_configuration*>::reverse_iterator it = server->getLoc()->rbegin(); it != server->getLoc()->rend(); it++)
+	{
+		if (it->first == RequestURI.substr(0, it->first.size()))
+		{
+			for (std::vector<std::string>::reverse_iterator ite = it->second->getHttpMethodAccepted().rbegin(); ite != it->second->getHttpMethodAccepted().rend(); ite++)
+			{
+				if (MethodUsed == *ite)
+				{
+					if (it->second->getRoot().size() > 0)
+					{
+						if (it->second->getRoot().at(it->second->getRoot().size() - 1 ) == '/')
+							return (it->second->getRoot() + RequestURI.substr(it->first.size()));
+						else
+							return (it->second->getRoot() + "/" + RequestURI.substr(it->first.size()));
+					}
+					else
+					{
+						if (server->getRoot().at(server->getRoot().size() - 1 ) == '/') 
+							return (server->getRoot() + RequestURI.substr(1));
+						else
+							return (server->getRoot() + "/" + RequestURI.substr(1));
+					}
+				}
+			}
+		}
+	}
+	if (server->getRoot().at(server->getRoot().size() - 1 ) == '/') 
+		return (server->getRoot() + RequestURI.substr(1));
+	else
+		return (server->getRoot() + "/" + RequestURI.substr(1));
+}
+
+std::string server_response::getRealPathIndex(std::string MethodUsed, server_configuration *server, std::string RequestURI)
+{	
+	for (std::map<std::string, class server_location_configuration*>::reverse_iterator it = server->getLoc()->rbegin(); it != server->getLoc()->rend(); it++)
+	{
+		if (it->first == RequestURI.substr(0, it->first.size()))
+		{
+			for (std::vector<std::string>::reverse_iterator ite = it->second->getHttpMethodAccepted().rbegin(); ite != it->second->getHttpMethodAccepted().rend(); ite++)
+			{
+				if (MethodUsed == *ite)
+				{
+					if (it->second->getDirectoryRequest().size() > 0)
+					{
+						if (it->second->getRoot().at(it->second->getRoot().size() - 1 ) == '/')
+							return (it->second->getRoot() + it->second->getDirectoryRequest());
+						else
+							return (it->second->getRoot() + "/" + it->second->getDirectoryRequest());
+					}
+					else
+					{
+						if (server->getRoot().at(server->getRoot().size() - 1 ) == '/') 
+							return (server->getRoot() + server->getIndex());
+						else
+							return (server->getRoot() + "/" + server->getIndex());
+					}
+				}
+			}
+		}
+	}
+	if (server->getRoot().at(server->getRoot().size() - 1 ) == '/') 
+		return (server->getRoot() + server->getIndex());
+	else
+		return (server->getRoot() + "/" + server->getIndex());
+}
+
+std::string server_response::getPathToStore(std::string MethodUsed, server_configuration *server, std::string RequestURI)
+{	
+	for (std::map<std::string, class server_location_configuration*>::reverse_iterator it = server->getLoc()->rbegin(); it != server->getLoc()->rend(); it++)
+	{
+		if (it->first == RequestURI.substr(0, it->first.size()))
+		{
+			for (std::vector<std::string>::reverse_iterator ite = it->second->getHttpMethodAccepted().rbegin(); ite != it->second->getHttpMethodAccepted().rend(); ite++)
+			{
+				if (MethodUsed == *ite)
+				{
+					if (it->second->getUploadStore().size() > 0)
+					{
+						if (it->second->getRoot().at(it->second->getRoot().size() - 1 ) == '/')
+							return (it->second->getRoot() + it->second->getUploadStore());
+						else
+							return (it->second->getRoot() + "/" + it->second->getUploadStore());
+					}
+					else
+						return (server->getRoot());
+				}
+			}
+		}
+	}
+	return (server->getRoot());
+}
+
+bool server_response::isRedir(std::string MethodUsed, server_configuration *server, std::string RequestURI)
+{	
+	for (std::map<std::string, class server_location_configuration*>::reverse_iterator it = server->getLoc()->rbegin(); it != server->getLoc()->rend(); it++)
+	{
+		if (it->first == RequestURI.substr(0, it->first.size()))
+		{
+			for (std::vector<std::string>::reverse_iterator ite = it->second->getHttpMethodAccepted().rbegin(); ite != it->second->getHttpMethodAccepted().rend(); ite++)
+			{
+				if (MethodUsed == *ite)
+				{
+					if (it->second->getHttpRedirection().size() > 0)
+					{
+						return 1;
+					}
+					else
+					{
+						return 0;
+					}
+					
+				}
+			}
+		}
+	}
+	return 0;
+}
+
+std::string server_response::getRedir(std::string MethodUsed, server_configuration *server, std::string RequestURI)
+{	
+	for (std::map<std::string, class server_location_configuration*>::reverse_iterator it = server->getLoc()->rbegin(); it != server->getLoc()->rend(); it++)
+	{
+		if (it->first == RequestURI.substr(0, it->first.size()))
+		{
+			for (std::vector<std::string>::reverse_iterator ite = it->second->getHttpMethodAccepted().rbegin(); ite != it->second->getHttpMethodAccepted().rend(); ite++)
+			{
+				if (MethodUsed == *ite)
+				{
+					if (it->second->getHttpRedirection().size() > 0)
+					{
+						return (it->second->getHttpRedirection());
+					}
+				}
+			}
+		}
+	}
+	return ("ERROR");
+}
+
 void	server_response::todo(const server_request& Server_Request, int conn_sock, server_configuration *server)
 {
+	/*	Ci-dessous, je verifie que le ClientMaxBodySize n'est pas dépassé.
+		Je le mets au-dessus, car si c'est le cas, retour d'erreur*/
+	if (Server_Request.getContentLength() > server->getClientMaxBodySize())
+	{
+		_status_code = 413;
+	}
+	
+	/* Ci-dessous, on vérifie que la méthode est autorisée. On le fait ici
+	car sinon un code erreur peut être renvoyé */
+	_status_code = checkConfFile(Server_Request.getMethod(), server, Server_Request.getRequestURI()); // on sait s'ils ont le droit
+	/********************************************/
+	
 	enum imethod {GET, POST, DELETE};
 	std::stringstream response;
-	std::string	Root = server->getRoot();
-	std::string	tmp;
+	
+	std::string RealPath = getRealPath(Server_Request.getMethod(), server, Server_Request.getRequestURI());
+	std::string RealPathIndex = getRealPathIndex(Server_Request.getMethod(), server, Server_Request.getRequestURI());
+	std::string PathToStore = getPathToStore(Server_Request.getMethod(), server, Server_Request.getRequestURI());
+	if (DEBUG1)
+	{
+		std::cout << "RealPath : " << RealPath << std::endl;
+		std::cout << "RealPathIndex : " << RealPathIndex << std::endl;
+		std::cout << "PathToStore : " << PathToStore << std::endl;
+	}
+
+	/*Ici, on check si c'est le path donné est un directory ou non.
+	Une fosis que l'on sait cela, on peut renvoyer un index ou 
+	un message erreur */
+	struct stat path_info;
+	bool dir;
+	std::string FinalPath;
+	if (stat(RealPath.c_str(), &path_info) != 0) {
+		/* Si l'on va ici, cela signifie qu'il ne s'agit ni d'un directory, ni d'un file.
+		Autrement dit, le PATH n'est pas valide : il faut renvoyer un message d'erreur */
+		/* => VOIR AVEC NICO */
+		_status_code = 404;
+        if (0)
+			std::cout << " BOOL FALSE" << std::endl;
+    }
+	else
+	{
+		/* Si l'on va ici, c'est qu'il s'agit d'un PATH valide, donc soit un fichier, soit un directory 
+		C'est S_ISDIR qui va nous permettre de savoir si c'est un file ou un directory */
+		dir = S_ISDIR(path_info.st_mode);
+		if (0)
+			std::cout << " BOOL TRUE is_dir " << dir << std::endl;
+		if (dir && RealPath != server->getRoot()) // A FAIRE MARCHER
+			FinalPath = RealPathIndex;
+		else
+			FinalPath = RealPath;
+	}
+	
+	std::cout << "FinalPath : " << FinalPath << std::endl;
+	/************************************************/
+
+
+	/*Si l'on se situe, ds une location et qu'il y a une HTTP redir alors
+	il faut pouvoir renvoyer la redir */
+	if (isRedir(Server_Request.getMethod(), server, Server_Request.getRequestURI()) > 0)
+	{
+		std::stringstream response;
+			response << "HTTP/1.1 301 Moved Permanently\r\nLocation: " \
+			<< getRedir(Server_Request.getMethod(), server, Server_Request.getRequestURI()) << "\r\n";
+			std::string response_str = response.str();
+			send(conn_sock, response_str.c_str() , response_str.size(), 0);
+	}
+	
+	/*********************************************/
+
 	int n = 0;
 	const std::string ftab[3] = {"GET", "POST", "DELETE"};
-	if (Root == "/")
-		tmp = "." + Server_Request.getRequestURI();
-	else
-		tmp = Root + Server_Request.getRequestURI();
-	std::cout << "\nC0 = '" << tmp << "'\n" << std::endl;
-	if (tmp.size() == 3 && tmp.find(".//") != std::string::npos)
-	{
-		// tmp.erase();
-		std::cout << "\nC1\n" << std::endl;
-		tmp += "index.html";
-	}
-	if (tmp[tmp.size() - 1] == '/')
-		tmp.erase(tmp.size() - 1, 1);//+= "index.html";
-
+	
 	for (; n < 4; n++)
 	{
 		if (n != 3 && ftab[n] == Server_Request.getMethod()) // OK 
@@ -170,19 +376,18 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 	{
 		case GET :
 		{
-			std::cout << "TMP = " << tmp << std::endl;
 			if (_status_code == 200)
 			{
-				if (access(tmp.c_str(), F_OK) && tmp != "./")
+				if (access(FinalPath.c_str(), F_OK) && FinalPath != "./")
 					_status_code = 404;
 				else
 				{
 					std::stringstream buffer;
-					if (is_dir(tmp.c_str(), *this)) // && auto index no specifie ou on --> demander a Mathieu comment gerer ce parsing dans le fichier de conf car le autoindex peut etre dans une location ou non
-						buffer << list_dir(tmp);
+					if (is_dir(FinalPath.c_str(), *this)) // && auto index no specifie ou on --> demander a Mathieu comment gerer ce parsing dans le fichier de conf car le autoindex peut etre dans une location ou non
+						buffer << list_dir(FinalPath);
 					else if (_status_code == 200)
 					{
-						std::ifstream file(tmp.c_str());
+						std::ifstream file(FinalPath.c_str());
 						if (!file.is_open())
 							_status_code = 403;
 						else
@@ -196,8 +401,9 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 			std::cout << std::endl << "SERVER RESPONSE CONSTRUITE -> " << std::endl << _ServerResponse << std::endl << std::endl;
 			send(conn_sock, _ServerResponse.c_str() , _ServerResponse.size(), 0);
 			std::cerr << "\nREPONSE SEND :\n";
-			std::cerr << this->_ServerResponse << std::endl;
+			std::cerr << this->_ServerResponse << std::endl;			
 			break ;
+
 		}
 		case POST :
 		{
@@ -222,9 +428,7 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 			// outputFile.close();
 
 			/*OK 1*/
-			std::string tmp = "./site/42.jpg";
-            std::cout << "\nC0bis = '" << tmp << "'\n" << std::endl;
-            std::ifstream file(tmp.c_str(), std::ifstream::binary);
+            std::ifstream file(FinalPath.c_str(), std::ifstream::binary);
             // std::stringstream buffer;
             std::filebuf* pbuf = file.rdbuf();
             std::size_t size = pbuf->pubseekoff(0, file.end, file.in);
@@ -267,8 +471,7 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 		}
 		case DELETE :
 		{
-			std::cout << "\ntmp.c_str() = " << tmp << "\n" << std::endl;
-			this->delete_dir(tmp.c_str());
+			this->delete_dir(FinalPath.c_str());
 			if (_status_code == 200)
 				_content = server->getErrorPage()[STATUS200].second;
 			createResponse(server, _content, Server_Request);

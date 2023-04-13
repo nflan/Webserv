@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:03:12 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/13 14:11:02 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/13 14:19:46 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,9 @@ class server_configuration
 	std::string _ConfigFile;
 	std::string _ServerName;
 	std::string	_Root;
+	std::string _Index;
 	std::map<std::string, std::string>	_cgi;
-	int			_Port;
+	std::vector<int> _Port;
 	int			_StatusCode;
 	size_t		_ClientMaxBodySize;
 	std::map<std::string, std::pair<std::string, std::string> >	_ErrorPage;
@@ -52,8 +53,9 @@ class server_configuration
 	server_configuration &operator=(server_configuration const &obj);
 
 	std::string findServerName();
-	int findPort();
+	std::vector<int> findPort();
 	std::string findRoot();
+	std::string findIndex();
 	std::map<std::string, std::string> findLocation();
 	void	setCgi();
 	void	setErrorPage();
@@ -74,10 +76,13 @@ class server_configuration
 	std::map<std::string, std::string>	getCgi();
 	std::map<std::string, std::pair<std::string, std::string> >	getErrorPage();
 	std::map<std::string, std::pair<std::string, std::string> >&	getDefErrorPage();
-	std::map<std::string, class server_location_configuration*>& getLoc();
+	std::map<std::string, class server_location_configuration*>* getLoc();
 	std::string getRoot();
-	int getPort();
-
+	std::string getIndex();
+	
+	
+	std::vector<int> getPort();
+	
 	class CgiException: public std::exception {
 		public:
 			virtual const char *	what() const throw();

@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:26 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/12 16:58:32 by nflan            ###   ########.fr       */
+/*   Updated: 2023/04/13 14:25:57 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,18 +22,21 @@
 #include <stdlib.h>
 #include <netinet/in.h>
 #include <string.h>
-#include <iostream>
 #include <string>
-#include <iostream>
 #include <vector>
 #include <iterator>
 #include <arpa/inet.h>
 #include <fcntl.h>
 #include <csignal>
+#include <fstream>
+#include <sstream>
+#include <cstring>
+#include <ftw.h>
+#include <filesystem>
 #include <errno.h>
 #include <iostream>
-#include <sstream>
-#include <ftw.h>
+#include <sys/stat.h>
+
 #include "server_configuration.hpp"
 #include "server_request.hpp"
 
@@ -61,7 +64,12 @@ class server_response
 	std::string	list_dir(std::string path);
 	std::string	addHeader(std::string statusMsg, std::pair<std::string, std::string> statusContent, const server_request& Server_Request);
 	std::string	addBody(std::string body);
-
+	int checkConfFile(std::string MethodUsed, server_configuration *server, std::string RequestURI);
+	std::string getRealPath(std::string MethodUsed, server_configuration *server, std::string RequestURI);
+	std::string getRealPathIndex(std::string MethodUsed, server_configuration *server, std::string RequestURI);
+	std::string getPathToStore(std::string MethodUsed, server_configuration *server, std::string RequestURI);
+	bool isRedir(std::string MethodUsed, server_configuration *server, std::string RequestURI);
+	std::string getRedir(std::string MethodUsed, server_configuration *server, std::string RequestURI);
 	// Définition de la méthode pour obtenir le corps de la réponse
 	std::string get_body() const { return _body; }
 

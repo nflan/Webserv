@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 14:31:36 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/13 14:04:20 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/13 14:19:54 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,11 @@ std::string server_request::getVersion() const
 std::string server_request::getBody() const
 {
 	return (_body);
+}
+
+std::string server_request::getHost() const
+{
+	return (_host);
 }
 
 unsigned long long server_request::getContentLength() const

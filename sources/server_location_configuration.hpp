@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 17:07:36 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/05 16:44:22 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/08 15:51:30 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ class server_location_configuration
 {
 	private:
 	std::vector<std::string>	_HttpMethodAccepted;
-	std::string	_HttpRedirection; // A VOIR CAR PAS COMPRIS
+	std::string	_HttpRedirection;
 	std::string	_Root;
 	std::string	_DirectoryListing;
 	std::string	_DirectoryRequest;
@@ -41,6 +41,7 @@ class server_location_configuration
 	server_location_configuration &operator=(server_location_configuration const &obj);
 
 	std::vector<std::string> findHttpMethodAccepted(std::string location_conf);
+	std::string findHttpRedirection(std::string location_conf);
 	std::string findRoot(std::string location_conf);
 	std::string findDirectoryListing(std::string location_conf);
 	std::string findDirectoryRequest(std::string location_conf);
