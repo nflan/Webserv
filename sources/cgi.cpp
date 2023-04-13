@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/27 15:47:23 by nflan             #+#    #+#             */
-/*   Updated: 2023/04/07 19:30:11 by chillion         ###   ########.fr       */
+/*   Updated: 2023/04/11 13:20:25 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,6 +145,51 @@ void	exeCgi(Cgi & cgi)
 			throw ExecveException();
 	}
 	waitpid(cgi.getPid(), &status, 0);
+	if (WIFEXITED(status))
+		status = WEXITSTATUS(status);
+	std::cerr << "EXIT STATUS = " << status << std::endl;
+}
+
+std::string	cgi_type(std::string const &type)
+{
+	enum	status { PHP, PYTHON, AUTRE};
+
+	const std::string ftab[3] = {"php", ".py", "others"};
+	// const std::string ftab[3] = {"/usr/bin/php-cgi", "/usr/bin/python3", "/usr/bin/autre"};
+	int n = 0;
+	for (; n < 4; n++)
+	{
+		if (n != 3 && ftab[n] == type) // OK 
+		{
+			break ;
+		}
+	}
+	switch (n)
+	{
+		case PHP:
+		{
+			std::cout << "JE SUIS DANS CGI PHP" << std::endl;
+			return ("/usr/bin/php-cgi");
+			break;
+		}
+		case PYTHON:
+		{
+			std::cout << "JE SUIS DANS CGI PYTHON" << std::endl;
+			return ("/usr/bin/python3");
+			break;
+		}
+		case AUTRE:
+		{
+			std::cout << "JE SUIS DANS CGI AUTRE" << std::endl;
+			return ("/usr/bin/autre");
+			break;
+		}
+		default :
+		{
+			return ("NONE");
+			break ;
+		}
+	}
 }
 
 int	main(int ac, char **av, char **envp)
@@ -154,7 +199,7 @@ int	main(int ac, char **av, char **envp)
 	std::vector<std::string>	env;
 	for (size_t i = 0; envp[i]; i++)
 		env.push_back(envp[i]);
-	std::string a("/usr/bin/php-cgi");
+	std::string a = cgi_type("php");
 	std::string cmd(av[1]);
 	try {
 		//ajout d'une commande conditionnee pour voir si on fait un cgi ou pas (si le cgi en question est precise dans le fichier de configue. Sinon, on renvoie la reponse en dur, sans traitement)
