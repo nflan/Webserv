@@ -6,7 +6,7 @@
 /*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:46 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/12 18:27:53 by nflan            ###   ########.fr       */
+/*   Updated: 2023/04/13 12:21:46 by nflan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,7 +125,7 @@ std::string	server_response::list_dir(std::string path)
 		return ("");
 	}
 	path.erase(0,1);
-	response << "<html><head><meta name=\"viewport\" content=\"width=device-width, minimum-scale=0.1\"><title>" << path << "</title></head><body style=\"height: 100%;\"><h1 style=\"text-align: center; font-size:3em;\">List directory to this path:</h1><p style=\"text-align: center;\">" << path << "</p></br><ul>";
+	response << "<html><head><meta name=\"viewport\" content=\"width=device-width, minimum-scale=0.1\"><title>" << path << "</title></head><body style=\"height: 100%;\"><h1 style=\"padding-top:0.5em;font-size:3em;\">Index of " << path << "/</h1></br><ul style=\"margin-top:10px;margin-bottom:10px;padding-top:10px;padding-bottom:10px;border-size:0.5em;border-top-style:solid;border-bottom-style:solid;\">";
 	while (send)
 	{
 		response << "<li><a href=\"" << path << "/" << send->d_name << "\">" << send->d_name << "</a></li>";
@@ -178,7 +178,7 @@ void	server_response::todo(const server_request& Server_Request, int conn_sock, 
 				else
 				{
 					std::stringstream buffer;
-					if (is_dir(tmp.c_str(), *this))
+					if (is_dir(tmp.c_str(), *this)) // && auto index no specifie ou on --> demander a Mathieu comment gerer ce parsing dans le fichier de conf car le autoindex peut etre dans une location ou non
 						buffer << list_dir(tmp);
 					else if (_status_code == 200)
 					{
