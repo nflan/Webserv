@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 15:39:03 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/12 17:59:03 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/04/13 13:50:57 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,8 @@
 #include <fcntl.h>
 #include <csignal>
 #include <utility>
+#include <arpa/inet.h>
+#include <netinet/in.h>
 
 #include "server_configuration.hpp"
 #include "server_response.hpp"
@@ -179,7 +181,10 @@ int StartServer(std::vector<server_configuration*> servers, std::vector<int> Por
 		}
 		memset(&addr[i], 0, sizeof(addr[i]));
 		addr[i].sin_family = AF_INET;
+		// if ()
 		addr[i].sin_addr.s_addr = htonl(INADDR_ANY);
+		// else
+			// inet_pton(AF_INET, "", &addr[i].sin_addr);
 		addr[i].sin_port = htons(Ports[i]);
 		StorePort.insert(std::pair<int, int>(Ports[i], listen_sock[i]));
 		int val = 1;
