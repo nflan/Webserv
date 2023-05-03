@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/26 15:32:29 by nflan             #+#    #+#             */
-/*   Updated: 2023/05/03 23:10:22 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/05/03 23:38:26 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,15 +18,16 @@ extern volatile std::sig_atomic_t	g_code;
 
 int	setnonblocking(int sockfd)
 {
-	int flags;
-	flags = fcntl(sockfd, F_GETFL, 0);
-	if (flags == -1) {
-		return -1;
-	}
-	flags |= O_NONBLOCK;
-	if (fcntl(sockfd, F_SETFL, flags) == -1) {
-		return -1;
-	}
+	(void)sockfd;
+	// int flags;
+	// flags = fcntl(sockfd, F_GETFL, 0);
+	// if (flags == -1) {
+	// 	return -1;
+	// }
+	// flags |= O_NONBLOCK;
+	// if (fcntl(sockfd, F_SETFL, flags) == -1) {
+	// 	return -1;
+	// }
 	return 0;
 }
 
@@ -177,7 +178,7 @@ int	handle_connection(std::vector<server_configuration*> servers, int conn_sock,
 	errno = 0;
 	
 	std::cout << "\nPASSE LA " << conn_sock << std::endl;
-	n = read(conn_sock, buffer, 2048);
+	n = recv(conn_sock, buffer, 2048, MSG_DONTWAIT);
 	if (n <= 0)
 	{
 		std::cout << "ERRNO : " << errno << std::endl;
@@ -190,17 +191,12 @@ int	handle_connection(std::vector<server_configuration*> servers, int conn_sock,
 	while (n >= 2048)
 	{
 		std::cout << "\nN VALUE : " << n << std::endl;
-		n = read(conn_sock, buffer, n);
+		n = recv(conn_sock, buffer, n, MSG_DONTWAIT);
 		std::cout << "\nN VALUE after read : " << n << std::endl;
 		if (n > 0)
 		{
 			request.append(buffer, n);
 			memset(buffer, 0, n);
-		}
-		else if (n < 0) 
-		{
-			std::cout << "ERRNO 2 : " << errno << std::endl;
-			return 1;
 		}
 	}
 	
@@ -417,7 +413,7 @@ int isNotPort(int fd, int* listen_sock, size_t len)
 	size_t i = 0;
 	while(i < len)
 	{
-		std::cout << "LISTEN IS NOT PORT " << listen_sock[i] << std::endl;
+		// std::cout << "LISTEN IS NOT PORT " << listen_sock[i] << std::endl;
 		if (fd == listen_sock[i])
 			return 0;
 		i++;
@@ -504,7 +500,7 @@ int	StartServer(std::vector<server_configuration*> servers, std::vector<int> Por
 	{
 		ev.events = EPOLLIN;
 		ev.data.fd = listen_sock[i];
-		std::cout << "\nLISTEN " << i << " : " << listen_sock[i] << std::endl;
+		// std::cout << "\nLISTEN " << i << " : " << listen_sock[i] << std::endl;
  		if (epoll_ctl(epollfd, EPOLL_CTL_ADD, listen_sock[i], &ev) == -1) 
 		{
 			std::fprintf(stderr, "Error: epoll_ctl: listen_sock, %s\n", strerror(errno));
@@ -517,19 +513,19 @@ int	StartServer(std::vector<server_configuration*> servers, std::vector<int> Por
 			std::fprintf(stderr, "Error: epoll_wait: %s\n", strerror(errno));
 			return(CloseSockets(listen_sock, addr, Ports), EXIT_FAILURE);
 		}
-		std::cout << "\nWAIT TIME" << std::endl;
+		// std::cout << "\nWAIT TIME" << std::endl;
 		for (int n = 0; n < nfds; ++n)
 		{
 			for (size_t i = 0; i < Ports.size(); i++)
 			{
 				if (events[n].data.fd == listen_sock[i])
 				{
-					std::cout << "\nACCEPT SOCKET : " << events[n].data.fd << " + " << listen_sock[i] <<  std::endl;
+					// std::cout << "\nACCEPT SOCKET : " << events[n].data.fd << " + " << listen_sock[i] <<  std::endl;
 					CodeStatus = 200; // a voir comment on gère le code status après envoi ds le handle connection
 					// std::fprintf(stderr, "\nEVENTS I = %d ET N = %d\n", i, n);
 					conn_sock = accept(events[n].data.fd, (struct sockaddr *) &addr[i], &addrlen[i]);
 					// std::cout << "EPOLL_WAIT : " << std::endl;
-					std::cout << "CON SOCK : " << conn_sock << std::endl;
+					// std::cout << "CON SOCK : " << conn_sock << std::endl;
 					// std::cout << "listen_sock[i] : " << listen_sock[i] << std::endl;
 					// std::cout << "Ports[i] : " << Ports[i] << std::endl;
 					open_ports.push_back(conn_sock);
@@ -553,7 +549,7 @@ int	StartServer(std::vector<server_configuration*> servers, std::vector<int> Por
 			}
 			if ((events[n].events & EPOLLIN) && isNotPort(events[n].data.fd, listen_sock, Ports.size()))
 			{
-				std::cout << "\nEPOLLIN : " << events[n].data.fd << " + " << events[n].data.fd << std::endl;
+				// std::cout << "\nEPOLLIN : " << events[n].data.fd << " + " << events[n].data.fd << std::endl;
 				// std::cout << "\nSENT : " << events[n].data.fd << std::endl;
 				// ev.events = EPOLLOUT;
 				// epoll_ctl(epollfd, EPOLL_CTL_MOD, events[n].data.fd, &ev);
@@ -571,12 +567,12 @@ int	StartServer(std::vector<server_configuration*> servers, std::vector<int> Por
 			if ((events[n].events & EPOLLOUT) && isNotPort(events[n].data.fd, listen_sock, Ports.size()))
 			{
 				// epoll_ctl(epollfd, EPOLL_CTL_MOD, events[n].data.fd, &ev);
-				std::cout << "\nEPOLLOUT : " << events[n].data.fd << std::endl;
+				// std::cout << "\nEPOLLOUT : " << events[n].data.fd << std::endl;
 				for (std::vector<std::pair<int, std::string> >::iterator it = MsgToSent.begin(); it != MsgToSent.end(); it++)
 				{
 					if (events[n].data.fd == it->first)
 					{
-						std::cout << "\nAS-TU ENVOYE? " << it->second.c_str() << std::endl;
+						// std::cout << "\nAS-TU ENVOYE? " << it->second.c_str() << std::endl;
 						if (it->second.size() < 500000)
 						{
 							// std::cout << "\n< 500000 " << std::endl;

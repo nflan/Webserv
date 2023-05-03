@@ -1,5 +1,5 @@
 HTTP/1.1 200 OK
-Content-Length: 6631
+Content-Length: 5233
 Content-type: text/html; charset=UTF-8
 
 <!DOCTYPE html>
@@ -158,10 +158,10 @@ Content-type: text/html; charset=UTF-8
 	</header>
 	<h1>Liste des fichiers uploadés</h1>
 	<div id="files">
-	<table style='margin-left: 10px; border-collapse: collapse;'><tr><td style='padding: 5px; text-align: center; border: 1px solid black; font-weight: bold;'>42.jpg</td><td style='padding: 5px; text-align: center; border: 1px solid black;'><a href='upload/42.jpg' download><button style='color: green;'>Télécharger</button></a></td></tr><tr><td style='padding: 5px; text-align: center; border: 1px solid black; font-weight: bold;'>index.html</td><td style='padding: 5px; text-align: center; border: 1px solid black;'><a href='upload/index.html' download><button style='color: green;'>Télécharger</button></a></td></tr><tr><td style='padding: 5px; text-align: center; border: 1px solid black; font-weight: bold;'>index2.html</td><td style='padding: 5px; text-align: center; border: 1px solid black;'><a href='upload/index2.html' download><button style='color: green;'>Télécharger</button></a></td></tr><tr><td style='padding: 5px; text-align: center; border: 1px solid black; font-weight: bold;'>site2</td><td style='padding: 5px; text-align: center; border: 1px solid black;'><a href='upload/site2' download><button style='color: green;'>Télécharger</button></a></td></tr><tr><td style='padding: 5px; text-align: center; border: 1px solid black; font-weight: bold;'>teSTEUR.txt</td><td style='padding: 5px; text-align: center; border: 1px solid black;'><a href='upload/teSTEUR.txt' download><button style='color: green;'>Télécharger</button></a></td></tr><tr><td style='padding: 5px; text-align: center; border: 1px solid black; font-weight: bold;'>upload.cgi</td><td style='padding: 5px; text-align: center; border: 1px solid black;'><a href='upload/upload.cgi' download><button style='color: green;'>Télécharger</button></a></td></tr></table>	</div>
+	<table style='margin-left: 10px; border-collapse: collapse;'><tr><td style='padding: 5px; text-align: center; border: 1px solid black; font-weight: bold;'>teSTEUR.txt</td><td style='padding: 5px; text-align: center; border: 1px solid black;'><a href='upload/teSTEUR.txt' download><button style='color: green;'>Télécharger</button></a></td></tr></table>	</div>
 	<hr>
 	<h2 style="margin-left: 10px;">Envoyer un fichier</h2>
-	<form action="up.php" method="POST" enctype="multipart/form-data" style="margin-left: 10px;">
+	<form action="pg1.php" method="POST" enctype="multipart/form-data" style="margin-left: 10px;">
 		<input type="file" name="file">
 		<input type="submit" value="Envoyer">
 	</form>
