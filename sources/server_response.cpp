@@ -6,22 +6,20 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:46 by mgruson           #+#    #+#             */
-/*   Updated: 2023/05/02 16:01:59 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/05/03 20:16:21 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "server_response.hpp"
 
 extern volatile std::sig_atomic_t	g_code;
-
-server_response::server_response() : _status_code(200), _cgiFd(-1), _header(""), _body(""), _content(""), _contentLength(0), _ServerResponse(""), _finalPath(""), _req(NULL), _isCgi(0)
+server_response::server_response() : _status_code(200), _cgiFd(-1), _header(""), _bodyName(".tmp-post.txt"), _body(""), _content(""), _contentLength(0), _ServerResponse(""), _finalPath(""), _env(), _req(NULL), _isCgi(0)
 {
 	this->addType();
 	if (0)
 		std::cout << "server_response Default Constructor called" << std::endl;
 }
-
-server_response::server_response(int stat, std::vector<std::string> env, server_request* req) : _status_code(stat), _cgiFd(-1), _header(""), _body(""), _content(""), _contentLength(0), _ServerResponse(""), _finalPath(""), _env(env), _req(req), _isCgi(0)
+server_response::server_response(int stat, server_request* req) : _status_code(stat), _cgiFd(-1), _header(""), _bodyName(".tmp-post.txt"), _body(req->getBody()), _content(""), _contentLength(0), _ServerResponse(""), _finalPath(""), _env(), _req(req), _isCgi(0)
 {
 	this->addType();
 	if (0)
@@ -46,6 +44,7 @@ server_response	&server_response::operator=(server_response const &obj)
 	_status_code = obj.getStatusCode();
 	_cgiFd = obj.getCgiFd();
 	_header = obj.getHeader();
+	_bodyName = obj.getBodyName();
 	_body = obj.getBody();
 	_content = obj.getContent();
 	_contentLength = obj.getContentLength();
@@ -107,12 +106,9 @@ std::string server_response::getType(std::string type)
 
 std::string findFileName(std::string FinalPath)
 {
-
 	size_t pos = 0;
 	while (FinalPath.find("/", pos + 1) != std::string::npos)
-	{
 		pos = FinalPath.find("/", pos + 1);
-	}
 	return (FinalPath.substr(pos + 1));
 }
 
@@ -151,7 +147,7 @@ std::string	server_response::list_dir(std::string path)
 		closedir(dir);
 		return ("");
 	}
-	response << "<html><head><meta name=\"viewport\" content=\"width=device-width, minimum-scale=0.1\"><title>" << path << "</title></head><body style=\"height: 100%;\"><h1 style=\"padding-top:0.5em;font-size:3em;\">Index of " << path << "</h1></br><ul style=\"margin-top:10px;margin-bottom:10px;padding-top:10px;padding-bottom:10px;border-size:0.5em;border-top-style:solid;border-bottom-style:solid;\">";
+	response << "<html><head><meta name=\"viewport\" content=\"width=device-width, minimum-scale=0.1\"><title>" << path << "</title></head><body style=\"padding:0;margin:0;\"><main style=\"margin-top:62px;padding-bottom:60px\"><h1 style=\"padding-top:0.5em;font-size:3em;\">Index of " << path << "</h1></br><ul style=\"margin-top:10px;margin-bottom:10px;padding-top:10px;padding-bottom:10px;border-size:0.5em;border-top-style:solid;border-bottom-style:solid;\">";
 	while (send)
 	{
 		testDir = path + send->d_name;
@@ -168,7 +164,7 @@ std::string	server_response::list_dir(std::string path)
 		send = readdir(dir);
 	}
 	closedir(dir);
-	response << "</ul><footer style=\"position:fixed;bottom:0;left:0;right:0;background-color:#111;color:white;text-align:center;padding:10px 0;font-size:0.8em;\">Site web créé par Nicolas, Mathieu et Cyril</footer></body></html>";
+	response << "</ul></main><footer style=\"position:fixed;bottom:0;left:0;right:0;background-color:#111;color:white;text-align:center;padding:10px 0;font-size:0.8em;\">🐑 Site web créé par Nicolas, Mathieu et Cyril 🐑</footer></body></html>";
 	return (response.str());
 }
 
@@ -355,7 +351,7 @@ int		server_response::getIdSessionOrSetError401(const server_request& Server_Req
 		int j = 0;
 		while (infile >> j)
 			SessionIdGiven.push_back(j);
-		for (size_t i = 0; i <= SessionIdGiven.size(); i++)
+		for (size_t i = 0; i < SessionIdGiven.size(); i++)
 		{
 			// std::cout << "i : " << i << std::endl;
 			// std::cout << "SessionIdGiven.size() : " << SessionIdGiven.size() << std::endl;
@@ -378,7 +374,7 @@ int		server_response::getIdSessionOrSetError401(const server_request& Server_Req
 
 bool	server_response::manageCgi(const server_request& Server_Request, server_configuration *server)
 {
-	std::cerr << "HELLO JE SUIS DANS LE CGI" << std::endl;
+	// std::cerr << "HELLO JE SUIS DANS LE CGI" << std::endl;
 	if (access(server->getCgi().find("." + Server_Request.getType())->second.data(), X_OK))
 		_status_code = 502;
 	else
@@ -410,7 +406,7 @@ bool	server_response::AnswerGet(const server_request& Server_Request, server_con
 {
 	if (access(_finalPath.c_str(), F_OK) && _finalPath != "./")
 	{
-		std::cout << "d0 " << std::endl;
+		// std::cout << "d0 " << std::endl;
 		std::cerr << _finalPath << std::endl;
 		_status_code = 404;
 	}
@@ -419,7 +415,7 @@ bool	server_response::AnswerGet(const server_request& Server_Request, server_con
 		std::stringstream buffer;
 		if (is_dir(_finalPath.c_str(), *this) && autoindex_is_on(Server_Request.getMethod(), server, Server_Request.getRequestURI())) // && auto index no specifie ou on --> demander a Mathieu comment gerer ce parsing dans le fichier de conf car le autoindex peut etre dans une location ou non
 		{
-			std::cout << "AUTOLISTING ON" << std::endl;
+			// std::cout << "AUTOLISTING ON" << std::endl;
 			buffer << list_dir(_finalPath);
 		}
 		else if (is_dir(_finalPath.c_str(), *this) && !autoindex_is_on(Server_Request.getMethod(), server, Server_Request.getRequestURI())) // && auto index no specifie ou on --> demander a Mathieu comment gerer ce parsing dans le fichier de conf car le autoindex peut etre dans une location ou non
@@ -432,78 +428,32 @@ bool	server_response::AnswerGet(const server_request& Server_Request, server_con
 			if (!file.is_open())
 				_status_code = 403;
 			else
-				buffer << file.rdbuf();
+			{
+				std::size_t chunk_size = 4096;
+				char chunk[chunk_size];
+				while(true)
+				{
+					file.read(chunk, chunk_size);
+					std::streamsize bytes_read = file.gcount();
+        			if (bytes_read == 0) {
+        			    break; // end of file
+        			}
+        			buffer.write(chunk, bytes_read);
+					if (g_code == 42)
+					{
+						_status_code = 500;
+						return (1);
+					}
+				}
+				// buffer << file.rdbuf();
+			}
 		}
 		_content = buffer.str();
 	}
 	return (1);
 }
 
-struct thread_args {
-	int* conn_sock;
-    std::string* Response;
-};
-
-void *server_response::download_file(void *arg)
-{
-	struct thread_args *args = (struct thread_args *)arg;
-
-	std::cout.write(args->Response->c_str(), 20);
-	std::cout << "\n\nTEST THREAD : " << *args->conn_sock << std::endl;
-	// std::string ServerResponse = *args->Response;
-	// int conn_sock = *args->conn_sock;
-
-	std::string ServerResponse = *args->Response;
-	int conn_sock = *args->conn_sock;
-	std::cout << "\n\nTEST THREAD SOCK: " << conn_sock << std::endl;
-	std::cout << "\n\nTEST THREAD SIZE : " << ServerResponse.size() << std::endl;
-	while (ServerResponse.size() > 0)
-	{
-		// std::cout << "c3\n" << std::endl;
-		static std::string StockResponse;
-		// std::cout << "TEST UPLOAD 0\n" << ServerResponse.size() << std::endl;
-		static int i = 0;
-		// std::cout << "c3.1\n" << std::endl;
-		if (ServerResponse.size() >= 500000)
-		{
-			// std::cout << "c3.2\n" << std::endl;
-			StockResponse = ServerResponse.substr(500000);
-			// std::cout << "c3.3\n" << std::endl;
-			ServerResponse = ServerResponse.erase(500000);
-			// std::cout << "c3.4\n" << std::endl;
-		}
-		std::cout << "\nTEST SERVERREPONSE SIZE for " << conn_sock << " : " << ServerResponse.size() << std::endl;
-		// if (ServerResponse.size() < 2000000)
-		// {
-			
-		// }
-		// if (i < 1 || ServerResponse.size() < 2000000)
-		// {
-		// 	std::cout << "\nTEST UPLOAD \n" << std::endl;
-		// 	std::cout.write(ServerResponse.c_str(), ServerResponse.size());
-		// }
-		// std::cout << "RESPONSE SIZE : " << ServerResponse.size() << std::endl;
-		// std::cout << "STOCK SIZE : " << StockResponse.size() << std::endl;
-		// std::cout << "c4\n" << std::endl;
-		usleep(2000);
-		send(conn_sock, ServerResponse.c_str() , ServerResponse.size(), 0);
-		
-		// if (ServerResponse.size() < 2000000)
-		// {
-		// 	StockResponse.clear();
-		// }	
-		// std::cout << "c5\n" << std::endl;
-		ServerResponse = StockResponse;
-		StockResponse.clear();
-		i++;
-	}
-	delete args->Response;
-	delete args->conn_sock;
-	delete args;
-	return NULL;
-}
-
-void	server_response::SendingResponse(const server_request& Server_Request, int conn_sock, server_configuration *server,  int StatusCodeTmp)
+void	server_response::SendingResponse(const server_request& Server_Request, int conn_sock, server_configuration *server,  int StatusCodeTmp, std::vector<std::pair<int, std::string> >* MsgToSent)
 {
 	if (StatusCodeTmp != 200)
 		_status_code = StatusCodeTmp;
@@ -529,8 +479,7 @@ void	server_response::SendingResponse(const server_request& Server_Request, int 
 			<< getRedir(Server_Request.getMethod(), server, Server_Request.getRequestURI()) << "\r\n";
 			std::string response_str = response.str();
 			errno = 0;
-			if (send(conn_sock, response_str.c_str() , response_str.size(), 0) == -1)
-				std::cout << "\nError for " << conn_sock << " : " << errno << std::endl;
+			MsgToSent->push_back(std::pair<int, std::string>(conn_sock, response_str)); // remplace sent
 			errno = 0;
 	}
 	/*********************************************************************/
@@ -549,7 +498,7 @@ void	server_response::SendingResponse(const server_request& Server_Request, int 
 	// PathToStore = getPathToStore(Server_Request.getMethod(), server, Server_Request.getRequestURI());
 	// while (PathToStore.find("//") != std::string::npos)
 	// 	PathToStore = PathToStore.erase(PathToStore.find("//"), 1);
-	if (1)
+	if (0)
 	{
 		std::cout << "RealPath : " << RealPath << std::endl;
 		std::cout << "RealPathIndex : " << RealPathIndex << std::endl;
@@ -601,103 +550,26 @@ void	server_response::SendingResponse(const server_request& Server_Request, int 
 		manageCgi(Server_Request, server);
 	}
 	
-	
+	// std::cout << "\n TEST : " << Server_Request.getMethod() << std::endl;
 	std::stringstream response;
-	if (Server_Request.getMethod() == "GET")
+	if ((Server_Request.getMethod() == "GET" || Server_Request.getMethod() == "POST") && _status_code != 500)
 	{
+		// std::cout << "\nGETMETHOD SERVER_RESPONSE\n" << std::endl;
 		if (_status_code == 200)
 			AnswerGet(Server_Request, server);
-		std::cout << "c10 " << std::endl;
 		createResponse(server, _content, Server_Request, id_session);
-		if (_ServerResponse.size() > 2000000)
-		{
-			pthread_t download_thread;
-			struct thread_args *args = (struct thread_args *)malloc(sizeof(struct thread_args));
-			std::cout << "c1\n" << std::endl;
-			args->Response = new std::string(_ServerResponse);
-			args->conn_sock = new int(conn_sock);
-			std::cout << "\nTHREAD\n" << std::endl;
-			if (pthread_create(&download_thread, NULL, &server_response::download_file, (void *)args) != 0) 
-			{
-				perror("Error creating thread");
-				return ;
-			}
-			if (pthread_detach(download_thread) != 0)
-			{
-				perror("Error detaching thread");
-				return ;
-			}
-		}
-		else
-			send(conn_sock, _ServerResponse.c_str() , _ServerResponse.size(), 0);
+		MsgToSent->push_back(std::pair<int, std::string>(conn_sock, _ServerResponse)); // remplace sent
 		return ;
 	}
-	else if (Server_Request.getMethod() == "POST" || _status_code == 201)
-	{
-		std::cout << "POST POST POST" << std::endl;
-			// std::cout << "BODY\n" << Server_Request.getBody() << std::endl;
-
-			// std::string FileName = "./" + findFileName(_finalPath);
-			// // std::cout << "FILENAME : " << FileName << std::endl;
-			// std::string outfilename = FileName.c_str(); // PATH DU FICHIER DE SORTIE
-			
-			// std::ofstream outputFile(outfilename.c_str(), std::ios::binary); // OK 1
-
-			// std::ifstream file(_finalPath.c_str(), std::ifstream::binary);
-			// std::stringstream buffer;
-			// std::filebuf* pbuf = file.rdbuf();
-			// std::size_t size = pbuf->pubseekoff(0, file.end, file.in);
-			// pbuf->pubseekpos (0,file.in);
-			// // std::cout << "\nC2\n" << std::endl;
-			// char *buffer= new char[size];
-			// pbuf->sgetn(buffer, size);
-			// file.close();
-			// std::string content(buffer, size);
-
-			response << "HTTP/1.1 200 OK\r\n";
-			
-			// response << _contentType.find(Server_Request.getType())->second;
-			response << "Content-Type: text/plain; charset=UTF-8\r\n";
-			// response << "content-Length: " << size << "\r\n";
-			if (_status_code == 201)
-			{
-				response << "content-Length: " << 16 << "\r\n";
-				response << "\r\nUpload succeed\r\n";
-			}
-			else
-			{
-				response << "content-Length: " << 11 << "\r\n";
-				response << "\r\nUploading\r\n";
-			}
-			// response << content << '\0' << "\r\n";
-			// outputFile << content;
-			// outputFile.close();
-			// std::cerr << "AFTER RESPONSE IFSTREAM\r\n" << std::endl;
-			// std::cout << buffer << std::endl;
-			// delete [] buffer;
-			_ServerResponse = response.str();
-			send(conn_sock, _ServerResponse.c_str() , _ServerResponse.size(), 0);
-			std::cout << "\ne10\n" << std::endl;
-			// return ;
-			// /**
-			//  If one or more resources has been created on the origin server as a result of successfully 
-			//  processing a POST request, the origin server SHOULD send a 201 (Created) response containing 
-			//  a Location header field that provides an identifier for the primary resource created 
-			//  (Section 10.2.2) and a representation that describes the status of the request while referring to 
-			//  the new resource(s).
-			//  https://httpwg.org/specs/rfc9110.html#POST => A LIRE
-			//  * 
-			// */
-			return ;
-	}
-	else if (Server_Request.getMethod() == "DELETE")
+	else if (Server_Request.getMethod() == "DELETE" && _status_code != 500)
 	{
 		if (_status_code == 200)
 			this->delete_dir(_finalPath.c_str());
 		if (_status_code == 200)
 			_content = server->getErrorPage()[STATUS200].second;
 		createResponse(server, _content, Server_Request, id_session);
-		send(conn_sock, _ServerResponse.c_str() , _ServerResponse.size(), 0);
+		MsgToSent->push_back(std::pair<int, std::string>(conn_sock, _ServerResponse)); // remplace sent
+
 		return ;
 	}
 	else
@@ -705,7 +577,7 @@ void	server_response::SendingResponse(const server_request& Server_Request, int 
 		response << addHeader(STATUS500, server->getErrorPage().find(STATUS500)->second, Server_Request, server, id_session);
 		response << addBody(server->getErrorPage()[STATUS500].second);
 		_ServerResponse = response.str();
-		send(conn_sock, _ServerResponse.c_str() , _ServerResponse.size(), 0);
+		MsgToSent->push_back(std::pair<int, std::string>(conn_sock, _ServerResponse)); // remplace sent
 		return ;
 	}
 	if (_isCgi)
@@ -828,7 +700,9 @@ void	server_response::createResponse(server_configuration * server, std::string 
 				{
 					if (_isCgi == 0)
 						response << addHeader(STATUS200, server->getErrorPage().find(STATUS200)->second, Server_Request, server, IdSession);
+					// std::cout <<"\nTEST PR WARNING" << std::endl;
 					response << addBody(file);
+					// std::cout <<"\nTEST FIN" << std::endl;
 					break;
 				}
 				case 201:
@@ -1127,23 +1001,38 @@ int server_response::doCgi(std::string toexec, server_configuration * server) //
 	_env.push_back("SCRIPT_FILENAME=" + cwd + toexec.substr(1));
 	cgiPath = server->getCgi().find("." + _req->getType())->second;
 	_env.push_back("SCRIPT_NAME=" + toexec.substr(1));
-	_env.push_back("QUERY_STRING=" + _req->getQuery()); // TODO
-	// _env.push_back("QUERY_STRING=dir=OUAIS");// + _req->getQuery());// a pas l'info dans la requete ->The query information from requested URL (i.e., the data following "?").
-	_env.push_back("PATH_INFO=" + cgiPath);
-	_env.push_back("REQUEST_URI=/");// + _req->getRequestURI());
+	_env.push_back("QUERY_STRING=" + _req->getQuery());
+	_env.push_back("PATH_INFO=/");
+	_env.push_back("REQUEST_URI=" + _req->getRequestURI());
 	_env.push_back("REDIRECT_STATUS=1");
 	if (_body.find(std::string("content-length")) != std::string::npos)
 		_env.push_back(std::string("CONTENT_LENGTH=") + itos(_contentLength));
+	// std::cerr << "CONTENT_TYPE = '" << this->getType(_req->getType()).substr(14, 500) << "'" << std::endl;
 	if (this->getType(_req->getType()) != "")
-		_env.push_back(std::string("CONTENT_TYPE=") + this->getType(_req->getType()).substr(14, 500));
-	if (_body.size() > 0)
+	 	_env.push_back(std::string("CONTENT_TYPE=") + this->getType(_req->getType()).substr(14, 500));
+	//_env.push_back("CONTENT_TYPE=application/x-www-form-urlencoded");
+	// std::cerr << "_body = '" << _body << "'" << std::endl;
+	if (_req->getIsBody())
 	{
-		this->_cgiFd = open(this->_req->getBody().data(), O_RDONLY);
-		if (this->_cgiFd < 0)
-		{
-			_status_code = 500;
-			return (-1);
+		// std::cerr << "PPPPPP" << std::endl;
+		std::ofstream file(getBodyName().c_str());
+		if (file) {
+			file << _req->getBody();
+			file.close();
 		}
+		//ecrire ce qu'il y a dans _body, dans _bodyName ?
+		//_cgiFd = open de _bodyName;
+		//--> check dans cgi si on ferme bien le fd
+		//supprimer _bodyName;
+		_cgiFd = open(getBodyName().data(), O_RDONLY);
+		if (_cgiFd < 0)
+		{
+			std::cerr << "FAIL TO OPEN CGIFD" << std::endl;
+			_status_code = 500;
+			return (1);
+		}
+		std::remove(getBodyName().data());
+		// std::cerr << "cgi fd = '" << _cgiFd << "'" << "_req->getBody().size() = " << _req->getBody().size() << std::endl;
 	}
 	try
 	{

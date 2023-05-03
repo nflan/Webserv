@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/15 15:39:03 by mgruson           #+#    #+#             */
-/*   Updated: 2023/04/26 19:34:44 by chillion         ###   ########.fr       */
+/*   Updated: 2023/05/03 14:59:37 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ void sigint_handler(int signum)
 	{
 		close(open_ports[i]);
 	}
+	g_code = 42;
 	// close(8083); // Port 1
 	// close(8086); // Port 2
 	// close(3); // listen_socket 1
@@ -35,7 +36,7 @@ void sigint_handler(int signum)
 	// close(1); // nfds
 }
 
-int main(int argc, char const **argv, const char **envp)
+int main(int argc, char const **argv)
 {
 	try 
 	{
@@ -51,7 +52,7 @@ int main(int argc, char const **argv, const char **envp)
 			config = std::string(argv[1]);
 		else
 			config = std::string("server {\nlisten 8080;\nroot ./;\n}\n");
-		std::vector<server_configuration*> servers = SetupNewServers(config, argc, envp);
+		std::vector<server_configuration*> servers = SetupNewServers(config, argc);
 		if (servers.size() == 0)
 			return (1);
 //		PrintServer(servers);
@@ -63,5 +64,6 @@ int main(int argc, char const **argv, const char **envp)
 		std::cerr << "Webserv error : " << e.what() << '\n';
 		return (1);
 	}
+	std::cout << "\nFIN DU PROGRAMME" << std::endl;
 	return 0;
 }
