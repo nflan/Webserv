@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/26 15:32:29 by nflan             #+#    #+#             */
-/*   Updated: 2023/05/03 23:38:26 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/05/04 11:34:08 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -245,9 +245,19 @@ int	handle_connection(std::vector<server_configuration*> servers, int conn_sock,
 		if (((ServerRequest.getMethod() == "GET" || ServerRequest.getMethod() == "DELETE") || (ServerRequest.getMethod() == "POST" && request.find("WebKitFormBoundary") == std::string::npos)) && CodeStatus == 200)
 		{
 			// std::cout << "\na1.4\n" << std::endl;
-			server_response	ServerResponse(GoodServerConf->getStatusCode(), &ServerRequest);
-			ServerResponse.SendingResponse(ServerRequest, conn_sock, GoodServerConf, 200, MsgToSent);
-			return 0;
+			if (GoodServerConf->getClientMaxBodySize() < ServerRequest.getContentLength())
+			{
+				// std::cout << "\na1.6\n" << std::endl;
+				server_response	ServerResponse(GoodServerConf->getStatusCode(), &ServerRequest);
+				ServerResponse.SendingResponse(ServerRequest, conn_sock, GoodServerConf, 413, MsgToSent);
+				return 0;
+			}
+			else
+			{
+				server_response	ServerResponse(GoodServerConf->getStatusCode(), &ServerRequest);
+				ServerResponse.SendingResponse(ServerRequest, conn_sock, GoodServerConf, 200, MsgToSent);
+				return 0;
+			}
 		}
 		else if (ServerRequest.getMethod() == "POST")
 		{
