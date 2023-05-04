@@ -244,20 +244,14 @@ int	handle_connection(std::vector<server_configuration*> servers, int conn_sock,
 		// std::cout << "\nROOT " << GoodServerConf->getRoot() << std::endl;
 		if (((ServerRequest.getMethod() == "GET" || ServerRequest.getMethod() == "DELETE") || (ServerRequest.getMethod() == "POST" && request.find("WebKitFormBoundary") == std::string::npos)) && CodeStatus == 200)
 		{
+			server_response	ServerResponse(GoodServerConf->getStatusCode(), &ServerRequest);
 			// std::cout << "\na1.4\n" << std::endl;
 			if (GoodServerConf->getClientMaxBodySize() < ServerRequest.getContentLength())
-			{
-				// std::cout << "\na1.6\n" << std::endl;
-				server_response	ServerResponse(GoodServerConf->getStatusCode(), &ServerRequest);
 				ServerResponse.SendingResponse(ServerRequest, conn_sock, GoodServerConf, 413, MsgToSent);
-				return 0;
-			}
 			else
-			{
-				server_response	ServerResponse(GoodServerConf->getStatusCode(), &ServerRequest);
 				ServerResponse.SendingResponse(ServerRequest, conn_sock, GoodServerConf, 200, MsgToSent);
-				return 0;
-			}
+			return 0;
+
 		}
 		else if (ServerRequest.getMethod() == "POST")
 		{
