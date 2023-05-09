@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   initServ.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
+/*   By: chillion <chillion@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/26 15:32:29 by nflan             #+#    #+#             */
-/*   Updated: 2023/05/08 13:04:15 by nflan            ###   ########.fr       */
+/*   Updated: 2023/05/09 12:03:50 by chillion         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,10 @@ server_configuration*	getGoodServer(std::vector<server_configuration*> servers, 
 }
 
 int isMethodAuthorised(std::string MethodUsed, server_configuration *server, std::string RequestURI)
-{	
+{
+	std::cout << "\nMethodUsed : " << MethodUsed << std::endl;
+	std::cout << "\nSERVER CONF : " << std::endl;
+	std::cout << *server << std::endl;
 	for (std::map<std::string, class server_location_configuration*>::reverse_iterator it = server->getLoc().rbegin(); it != server->getLoc().rend(); it++)
 	{
 		if (it->first == RequestURI.substr(0, it->first.size()))
@@ -95,14 +98,6 @@ std::string getPathToStore(std::string MethodUsed, server_configuration *server,
 	return (server->getRoot());
 }
 
-bool isNotBinaryData(std::map<int, std::string> SocketUploadFile, int conn_sock)
-{
-	for (std::map<int, std::string>::iterator it = SocketUploadFile.begin(); it != SocketUploadFile.end(); it++)
-		if (it->first == conn_sock)
-			return 0;
-	return 1;
-}
-
 bool	isNotinUnauthorizedSocket(std::vector<int> UnauthorizedSocket, int conn_sock)
 {
 	for (std::vector<int>::iterator it = UnauthorizedSocket.begin(); it != UnauthorizedSocket.end(); it++)
@@ -146,18 +141,264 @@ std::string UpdateFileNameifAlreadyExist(std::string UploadFileName)
 	return (UploadFileName);
 }
 
+#include <cctype>
+#include <algorithm>
+
+bool check_Header_Size(const std::string& str)
+{
+	std::string::size_type header_end = str.find("\r\n\r\n");
+	std::string header = str.substr(0, header_end);
+	if (header.size() >= 4096)
+		return (1);
+	return (0);
+}
+
+bool check_End_Line(const std::string& str)
+{
+	if (str.find("\r\n\r\n") == std::string::npos)
+		return (1);
+	return (0);
+}
+
+int check_Host_Line(const std::string& str)
+{
+    std::string word;
+    std::string tmpStr;
+    std::string line;
+    int count = 0;
+    int status = 0;
+
+	std::string::size_type host_start = str.find("HTTP/1.1\r\n");
+	std::string::size_type host_end = str.find("\r\n\r\n", host_start);
+	tmpStr = str.substr(host_start + 8, host_end);
+	std::transform(tmpStr.begin(), tmpStr.end(), tmpStr.begin(), ::tolower);
+	if (tmpStr.find("host:") == std::string::npos)
+	{
+		std::cerr << "\nNO HOST IN ALL\n" << std::endl;
+		if (check_End_Line(tmpStr))
+			return(1);
+		return (2);
+	}
+	std::cerr << "\nREPAIR NO EOF AND HOST FIND\n" << std::endl;
+	std::istringstream ss(tmpStr);
+	std::istringstream iss(tmpStr);
+	while (std::getline(ss, line)) {
+		// if (line.size() < 3)
+		// 	return (2);
+		if (line.size() >= 5 && line.substr(0, 5) == "host:")
+		{
+			std::getline(iss, line);
+			std::cerr << "\nLINE BEGin BY HOST\n" << std::endl;
+			while (iss >> word)
+			{
+				std::cerr << "\nWORD END = " << word << std::endl;
+				if (count == 2)
+					break ;
+				if (count == 0)
+				{
+					if (word.size() > 5 && word.substr(0, 5) == "host:")
+						return (0);
+					if (word.size() == 5 && word.substr(0, 5) == "host:")
+						status = 1;
+					status = 1;
+				}
+				if (count == 1 && status == 1){
+					return(0);}
+				count++;
+			}
+			count = 0;
+		}
+		count = 0;
+	}
+	if (!check_End_Line(tmpStr))
+		return (2);
+	if (ss.eof()) {
+		return (1);
+	}
+	return (1);
+}
+
+int check_First_Line(const std::string& str)
+{
+    std::istringstream ss(str);
+	std::string line;
+    std::string word;
+	int count = 0;
+
+	if (std::getline(ss,line))
+	{
+		std::istringstream iss(line);
+		while (iss >> word)
+		{
+			if (count > 2)
+				return (2);
+			if ((count == 0) && (word != "GET" && word != "POST" && word != "DELETE"))
+				return (2);
+			if (count == 1 && word[0] != '/')
+				return (2);
+			if (count == 2 && word != "HTTP/1.1")
+				return (2);
+			count++;
+		}
+	}
+	if (count == 3)
+		return (0);
+	if (count < 3 && str.size() > 2)
+	{
+		return (2);
+	}
+	return (1);
+}
+
+int check_Request_Value(const std::string& request, const int status)
+{
+	int status_Ref = 0;
+
+	if (status == 0){
+		status_Ref = check_First_Line(request);}
+		std::cerr << "\nWARNING 1\n" << status_Ref << std::endl;
+	if (status == 1){
+		status_Ref = check_Host_Line(request);
+		std::cerr << "\nWARNING 2\n" << status_Ref << std::endl;
+	}
+	if (status == 2){
+		status_Ref = check_End_Line(request);}
+		std::cerr << "\nWARNING 3\n" << status_Ref << std::endl;
+	// if (status == 1 && request.find("Host: ") == std::string::npos)
+	// 	return (1);
+	return (status_Ref);
+}
+
+void	add_Request_To_File(int conn_sock, std::string request)
+{
+	char str[10];
+	sprintf(str, "%d", conn_sock);
+	std::ofstream file(str, std::ios::app);
+	if (file) {
+		file << request;
+		file.close();
+	}
+}
+
+std::string get_file_contents(int conn_sock)
+{
+	char str[10];
+	sprintf(str, "%d", conn_sock);
+    std::ifstream file(str);
+    std::string content;
+
+    if (file.is_open()) {
+        std::string line;
+        while (getline(file, line)) {
+            content += line + "\n";
+        }
+        file.close();
+    }
+    return content;
+}
+
+int pre_Request_Parser(std::map<int, int>& RequestSocketStatus, int conn_sock, std::string request)
+{
+	int status_Ref = 0;
+	int index_Status = 0;
+	std::string new_Request;
+	
+	for (std::map<int, int>::iterator it = RequestSocketStatus.begin(); it != RequestSocketStatus.end(); ++it) {
+		if (it->first == conn_sock && it->second == 0)
+		{
+			if (request.size() < 3)
+				return (0);
+			index_Status = 1;
+			add_Request_To_File(conn_sock, request);
+			new_Request = get_file_contents(conn_sock);
+			if (check_Header_Size(new_Request) == 1)
+				return (2);
+			status_Ref = check_Request_Value(new_Request, it->second);
+			if (status_Ref == 0)
+			{
+				std::cerr << "\nPHASE 1 IS OK\n" << std::endl;
+				it->second = 1;
+			}
+			if (status_Ref == 2)
+				return (status_Ref);
+		}
+		if (it->first == conn_sock && it->second == 1)
+		{
+			if (index_Status == 0)
+				add_Request_To_File(conn_sock, request);
+			index_Status = 1;
+			new_Request = get_file_contents(conn_sock);
+			if (check_Header_Size(new_Request) == 1)
+				return (2);
+			status_Ref = check_Request_Value(new_Request, it->second);
+			if (status_Ref == 0)
+			{
+				std::cerr << "\nPHASE 2 IS OK\n" << std::endl;
+				it->second = 2;
+			}
+			if (status_Ref == 2)
+				return (status_Ref);
+		}
+		if (it->first == conn_sock && it->second == 2)
+		{
+			if (index_Status == 0)
+				add_Request_To_File(conn_sock, request);
+			new_Request = get_file_contents(conn_sock);
+			if (check_Header_Size(new_Request) == 1)
+				return (2);
+			status_Ref = check_Request_Value(new_Request, it->second);
+			if (status_Ref == 0)
+			{
+				std::cerr << "\nPHASE 3 IS OK\n" << std::endl;
+				it->second = 3;
+				return (1);
+			}
+			if (status_Ref == 2)
+				return (status_Ref);
+		}
+	}
+	return (0);
+}
+
+int already_In_Map(std::map<int, int>& RequestSocketStatus, int conn_sock)
+{
+	for (std::map<int, int>::iterator it = RequestSocketStatus.begin(); it != RequestSocketStatus.end(); ++it) {
+		if (it->first == conn_sock)
+			return (1);
+	}
+	return (0);
+}
+
+void add_To_map(std::map<int, int>& RequestSocketStatus, int conn_sock)
+{
+	// for (std::map<int, int>::iterator it = RequestSocketStatus.begin(); it != RequestSocketStatus.end(); ++it) {
+	// 	if (it->first == conn_sock)
+	// 		return ;
+	// }
+	RequestSocketStatus.insert(std::pair<int, int>(conn_sock, 0));
+}
+
+void print_Map(std::map<int, int>& RequestSocketStatus)
+{
+	for (std::map<int, int>::iterator it = RequestSocketStatus.begin(); it != RequestSocketStatus.end(); ++it) {
+		std::cout << "\nIN MAP" << it->first << " - "  << it->second << std::endl;
+	}
+}
 
 int	handle_connection(std::vector<server_configuration*> servers, int conn_sock, std::multimap<int, int> StorePort, int CodeStatus, std::map<int, std::pair<std::string, std::string> >* MsgToSent)
 {
 	server_configuration *GoodServerConf = NULL;
 	char buffer[2048];
-	int n = 0; 
+	int n = 0;
 	int Port = 0;
-	static std::map<int, std::string> SocketUploadFile;
+	int status = 0;
+	static std::map<int, int> RequestSocketStatus;
+	static std::map<int, std::pair<std::string, int> > SocketUploadFile;
 	static std::map<int, std::string> UploadFilePath;
+	static std::map<int, std::string> FileName;
 	static std::vector<int> UnauthorizedSocket;
 	errno = 0;
-	
+
 	// std::cout << "\nPASSE LA " << conn_sock << std::endl;
 	n = recv(conn_sock, buffer, 2048, MSG_DONTWAIT);
 	if (n == 0)
@@ -173,7 +414,7 @@ int	handle_connection(std::vector<server_configuration*> servers, int conn_sock,
 	memset(buffer, 0, n);
 	while (n >= 2048)
 	{
-		if (g_code == 42)
+				if (g_code == 42)
 			break ;
 		// std::cout << "\nN VALUE : " << n << std::endl;
 		n = recv(conn_sock, buffer, n, MSG_DONTWAIT);
@@ -184,8 +425,8 @@ int	handle_connection(std::vector<server_configuration*> servers, int conn_sock,
 			memset(buffer, 0, n);
 		}
 	}
-	
-	// std::cout << "CON SOCK " << conn_sock << std::endl;
+
+	//std::cout << "CON SOCK " << conn_sock << std::endl;
 	// static int k = 0;
 	// if (k < 5)
 	// {
@@ -194,16 +435,61 @@ int	handle_connection(std::vector<server_configuration*> servers, int conn_sock,
 	// }
 
 	// std::cout << "\na1\n" << std::endl;
-	if (isNotBinaryData(SocketUploadFile, conn_sock))
+	if (SocketUploadFile.find(conn_sock) == SocketUploadFile.end())
 	{
-		
+
 		// std::cout << "\na1.1\n" << std::endl;
 		// std::cout << "\n\nRequest :\n\n" << request << std::endl;
+				std::cout << "\na1.1\n" << std::endl;
+		std::cerr << "\n\nRequest :\n\n" << request << std::endl;
+		char str[10];
+		sprintf(str, "%d", conn_sock);
+		// std::ofstream file(str, std::ios::app);
+		// if (file) {
+		// 	file << request;
+		// 	file.close();
+		// }
+
+		// std::ifstream infile(str);
+		// if file.open() {
+		// 	std::string buffer\
+		// 	buffer << file;
+		// 	buffer.find("/r/n/r/n")
+		// 	// file << request;
+		// 	file.close();
+		// }
+		server_request ServerRequest;
+		add_To_map(RequestSocketStatus, conn_sock);
+		print_Map(RequestSocketStatus);
+		status = pre_Request_Parser(RequestSocketStatus, conn_sock, request);
+		if (status == 2)
+		{
+			MsgToSent->insert(std::make_pair(conn_sock, std::make_pair("HTTP/1.1 400 Bad Request\nContent-Type: text/html\nContent-Length: 353\r\n\r\n<html><head><meta name=\"viewport\" content=\"width=device-width, minimum-scale=0.1\"><title>400 Bad Request</title></head><body style=\"background: #0e0e0e; height: 100%;text-align:center;color:white;\"><h1>400 Bad Request</h1><img src=\"https://http.cat/400\" style=\"display: block;margin: auto;\" alt=\"400 Bad Request\"><p>webserv</p></body></html>",""))); // remplace sent
+			remove(str);
+			RequestSocketStatus.clear();
+			RequestSocketStatus.erase(conn_sock);
+			return 0;
+		}
+		if (status == 1)
+		{
+			std::string fullRequest;
+			fullRequest = get_file_contents(conn_sock);
+			ServerRequest.setRequest(fullRequest);
+			ServerRequest.add_Host_Value(fullRequest);
+			ServerRequest.request_parser();
+			remove(str);
+			RequestSocketStatus.erase(conn_sock);
+		}
+		else if (status == 0)
+			return 0;
+
+		// std::cout << "\nTEST SERVER REQUEST : " << ServerRequest.getServerRequest() << std::endl;
+		
 		/*	Cette partie permet de parser la requete afin de pouvoir travailler
 			sur chaque élément indépendemment */
-		server_request ServerRequest(request);
-		ServerRequest.request_parser();
-		/* Cette partie permet de connaitre le port utilisé afin de d'avoir les 
+		// server_request ServerRequest(request);
+		// ServerRequest.request_parser();
+		/* Cette partie permet de connaitre le port utilisé afin de d'avoir les
 		bonnes configurations de serveur */
 		for (std::map<int, int>::iterator it = StorePort.begin(); it != StorePort.end(); it++)
 		{
@@ -212,22 +498,22 @@ int	handle_connection(std::vector<server_configuration*> servers, int conn_sock,
 				Port = it->first;
 		}
 
-	//	std::cerr << "PORT apres set = '" << Port << "'" << std::endl;
+		//	std::cerr << "PORT apres set = '" << Port << "'" << std::endl;
 		GoodServerConf = getGoodServer(servers, &ServerRequest, Port);
-	//	std::cerr << "Serveur Port in initserv when checking good serv:" << std::endl;
-	//	for (std::vector<int>::iterator it = GoodServerConf->getPort().begin(); it != GoodServerConf->getPort().end(); it++)
-	//		std::cerr << *it << std::endl;
+		//	std::cerr << "Serveur Port in initserv when checking good serv:" << std::endl;
+		//	for (std::vector<int>::iterator it = GoodServerConf->getPort().begin(); it != GoodServerConf->getPort().end(); it++)
+		//		std::cerr << *it << std::endl;
 		/********************************************************************/
 
 		// std::cout << "\nREQUEST PARSED" << std::endl;
 		// std::cout << ServerRequest << std::endl;
 		// std::cout << "\nFIN REQUEST PARSED" << std::endl;
 
-		// std::cout << "\nCONF\n" << std::endl; 
+		// std::cout << "\nCONF HANDLE\n" << std::endl; 
 		// std::cout << *GoodServerConf << std::endl;
 		// std::cout << "\nFIN CONF" << std::endl;
 		// exit(0);
-		
+
 		/* Ci-dessous, on vérifie que la méthode est autorisée. On le fait ici
 		car sinon un code erreur peut être renvoyé. Je le mets ici pour etre
 		sur que le status code n'est pas modifié par la suite */
@@ -254,38 +540,37 @@ int	handle_connection(std::vector<server_configuration*> servers, int conn_sock,
 			else
 				ServerResponse.SendingResponse(ServerRequest, conn_sock, GoodServerConf, 200, MsgToSent);
 			return 0;
-
 		}
 		else if (ServerRequest.getMethod() == "POST" && checkStatus(CodeStatus))
 		{
 			// std::cout << "\na1.5\n" << std::endl;
 			// std::cout << "\nSOCKET TEST 1: " << conn_sock << std::endl;
 			if (GoodServerConf->getClientMaxBodySize() > ServerRequest.getContentLength())
-			{	
-				// std::cout << "\na1.5.1\n" << std::endl;
-				SocketUploadFile.insert (std::pair< int , std::string >(conn_sock, ""));
+			{
+				SocketUploadFile.insert(std::make_pair(conn_sock, std::make_pair("", 0)));
 				std::string PathToStore = getPathToStore(ServerRequest.getMethod(), GoodServerConf, ServerRequest.getRequestURI());
+				std::cout << "\nPathToStore : " << PathToStore << std::endl;
 				while (PathToStore.find("//") != std::string::npos)
 					PathToStore = PathToStore.erase(PathToStore.find("//"), 1);
-				UploadFilePath.insert ( std::pair< int , std::string >(conn_sock, PathToStore));
+				UploadFilePath.insert(std::pair<int, std::string>(conn_sock, PathToStore));
 			}
 			else
 			{
 				// std::cout << "\na1.6\n" << std::endl;
-				server_response	ServerResponse(GoodServerConf->getStatusCode(), &ServerRequest);
+				server_response ServerResponse(GoodServerConf->getStatusCode(), &ServerRequest);
 				ServerResponse.SendingResponse(ServerRequest, conn_sock, GoodServerConf, 413, MsgToSent);
 				return 0;
 			}
 		}
 		else if (isNotinUnauthorizedSocket(UnauthorizedSocket, conn_sock))
 		{
-			server_response	ServerResponse(GoodServerConf->getStatusCode(), &ServerRequest);
+			server_response ServerResponse(GoodServerConf->getStatusCode(), &ServerRequest);
 			ServerResponse.SendingResponse(ServerRequest, conn_sock, GoodServerConf, 200, MsgToSent);
 			return 0;
 		}
 		else
 		{
-			server_response	ServerResponse(GoodServerConf->getStatusCode(), &ServerRequest);
+			server_response ServerResponse(GoodServerConf->getStatusCode(), &ServerRequest);
 			ServerResponse.setStatusCode(CodeStatus);
 			ServerResponse.createResponse(GoodServerConf, "", ServerRequest, 0, 0);
 			MsgToSent->insert(std::make_pair(conn_sock, std::make_pair(ServerResponse.getServerResponse(), "")));
@@ -293,66 +578,108 @@ int	handle_connection(std::vector<server_configuration*> servers, int conn_sock,
 		}
 	}
 
-	for (std::map<int, std::string>::iterator it = SocketUploadFile.begin(); it != SocketUploadFile.end(); it++)
+	if (SocketUploadFile.find(conn_sock) != SocketUploadFile.end())
 	{
-		if (g_code == 42)
-			break ;
-		// std::cout << "\na1.6\n" << std::endl;
-		if (it->first == conn_sock)
+		// std::cout << "\nSOCKET TEST 2: " << conn_sock << std::endl;
+		if (SocketUploadFile[conn_sock].first.empty())
 		{
-			// std::cout << "\nSOCKET TEST 2: " << conn_sock << std::endl;
-			it->second = it->second + request;
-			size_t pos = 0;
-			size_t found = 0;
-			if (request.find("WebKitFormBoundary") != std::string::npos)
+			srand(time(0));
+			int random_num = rand() % 100000000 + 1;
+			std::string temp_filename = ".up" + itos(random_num);
+			std::ofstream temp_file(temp_filename.c_str(), std::ios::binary);
+			if (!temp_file.is_open())
 			{
-				while (it->second.find("WebKitFormBoundary", pos) != std::string::npos)
+				SocketUploadFile.erase(SocketUploadFile.find(conn_sock));
+				return 1;
+			}
+			// Store the temporary file path in the map
+			SocketUploadFile[conn_sock].first = temp_filename;
+		}
+		
+		std::ofstream temp_file(SocketUploadFile[conn_sock].first.c_str(), std::ios::binary | std::ios::app);
+		if (!temp_file.is_open())
+		{
+			std::remove(SocketUploadFile[conn_sock].first.c_str());
+			SocketUploadFile.erase(SocketUploadFile.find(conn_sock));
+			return 1;
+		}
+
+		size_t pos = 0;
+		size_t found = 0;
+		while (request.find("WebKitFormBoundary", pos) != std::string::npos)
+		{
+			pos = request.find("WebKitFormBoundary", pos) + strlen("WebKitFormBoundary");
+			found++;
+			// std::cout << "\nSOCKET TEST 3 found for " <<  conn_sock << " : " << found << std::endl;
+		}
+
+		SocketUploadFile[conn_sock].second = SocketUploadFile[conn_sock].second + found;
+
+		if (FileName.find(conn_sock) == FileName.end() || temp_file.tellp() > 0)
+		{
+			if (temp_file.tellp() == 0)
+			{
+				size_t SaveFilePos = request.find("\r\n\r\n", request.find("filename=\""));
+				if (SaveFilePos != std::string::npos)
 				{
-					if (g_code == 42)
-						break ;
-					pos = it->second.find("WebKitFormBoundary", pos) + strlen("WebKitFormBoundary");
-					found++;
-					// std::cout << "\nSOCKET TEST 3 found for " <<  conn_sock << " : " << found << std::endl;
+					int FileNamePos = request.find("filename=\"") + strlen("filename=\"");
+					// std::cout << "\nREQUEST FOR FILENAME : " << request << std::endl;
+					// std::cout << "\nFILENAMEPOS : " << FileNamePos << std::endl;
+					FileName.insert(std::make_pair(SocketUploadFile.find(conn_sock)->first, request.substr(FileNamePos, request.find("\"", FileNamePos) - FileNamePos)));
+					std::cout << "\nFILENAME : " << FileName[conn_sock] << std::endl;
+					request = request.substr(SaveFilePos + 4);
+					temp_file.write(request.c_str(), request.size());
+					temp_file.close();
 				}
 			}
-			if (found >= 3)
+			else
 			{
-				// std::cout << "\nSOCKET TEST 4" << std::endl;
-				// std::cout << "\ncontenu du fichier\n" << std::endl;
-				// std::cout.write(it->second.c_str(), it->second.size());
-				int posfilename = it->second.find("filename=\"") + strlen("filename=\"");
-				// std::cout << "\nPOST FILE NAME \n" << posfilename <<
-				std::string UploadFileName = it->second.substr(posfilename, it->second.find("\"", posfilename) - posfilename);
-				// std::cout << "\nUPLOADNAME : " << UploadFileName << " FIN" << std::endl;
-				for (std::map<int, std::string>::iterator it = UploadFilePath.begin(); it != UploadFilePath.end(); it++)
-				{
-					if (it->first == conn_sock)
-						UploadFileName = it->second + "/" + UploadFileName;
-					// std::cout << " TEST UPLOADFILE PATH : " << UploadFileName << std::cout;
-				}
-				UploadFileName = UpdateFileNameifAlreadyExist(UploadFileName);
-				std::ofstream file(UploadFileName.c_str(), std::ios::binary);
-				// std::cout << "\nTEST POUR POSIINIT " << it->second.substr(posfilename, 50) << std::endl;
-				pos = it->second.find("\r\n\r\n", posfilename) + strlen("\r\n\r\n");
-				size_t end_pos = it->second.find("------WebKitFormBoundary", pos);
-				it->second = it->second.substr(pos, (end_pos - pos));
-				file.write(it->second.c_str(), it->second.size());
-				file.close();
-				// std::cout << "\nC0" << std::endl;
-				MsgToSent->insert(std::make_pair(conn_sock, std::make_pair("HTTP/1.1 200 OK\nContent-Length: 0\n\n", "")));
-				SocketUploadFile.erase(it);
-				// server_response	ServerResponse(GoodServerConf->getStatusCode(), GoodServerConf->getEnv(), ServerRequest);
-				// ServerResponse.SendingResponse(*ServerRequest, conn_sock, GoodServerConf, 201);
-				// std::cout << "\ne9\n" << std::cout;
-				break ;
+				temp_file.write(request.c_str(), request.size());
+				temp_file.close();
 			}
 		}
+
+		if (SocketUploadFile[conn_sock].second >= 3)
+		{
+			std::ifstream file(SocketUploadFile[conn_sock].first.c_str());
+			if (!file.is_open())
+			{
+				std::remove(SocketUploadFile[conn_sock].first.c_str());
+				SocketUploadFile.erase(SocketUploadFile.find(conn_sock));
+				FileName.erase(FileName.find(conn_sock));
+				return 1;
+			}
+
+			std::cout << "\nAVANT NOUVEAU NOM : " << FileName[conn_sock].c_str() << std::endl;
+			if (UploadFilePath.find(conn_sock) != UploadFilePath.end())
+			{
+				FileName[conn_sock] = UploadFilePath[conn_sock] + "/" + FileName[conn_sock];
+			}
+
+			std::cout << "\nNOUVEAU NOM : " << FileName[conn_sock].c_str() << std::endl;
+			FileName[conn_sock] = UpdateFileNameifAlreadyExist(FileName[conn_sock].c_str());
+			std::cout << "\nANCIENn NOM : " << SocketUploadFile[conn_sock].first.c_str() << "\nNOUVEAU NOM : " << FileName[conn_sock].c_str() << std::endl;
+			int result = std::rename(SocketUploadFile[conn_sock].first.c_str(), FileName[conn_sock].c_str());
+			if (result != 0)
+			{
+				std::remove(SocketUploadFile[conn_sock].first.c_str());
+				SocketUploadFile.erase(SocketUploadFile.find(conn_sock));
+				FileName.erase(FileName.find(conn_sock));
+				return 1;
+			}
+			std::cout << "\nPASSE ICI" << std::endl;
+			MsgToSent->insert(std::make_pair(conn_sock, std::make_pair("HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nContent-Length: 312\r\n\r\n<html><head><meta name=\"viewport\" content=\"width=device-width, minimum-scale=0.1\"><title>200 OK</title></head><body style=\"background: #0e0e0e; height: 100%;text-align:center;color:white;\"><h1>200 OK</h1><img src=\"https://http.cat/200\" style=\"display: block;margin: auto;\" alt=\"200 OK\"g><p>webserv</p></body></html>", "")));
+			SocketUploadFile.erase(SocketUploadFile.find(conn_sock));
+			FileName.erase(FileName.find(conn_sock));
+			UploadFilePath.erase(UploadFilePath.find(conn_sock));
+
+		}
 	}
-	// std::cout << "\na1.7\n" << std::endl;
+
 	return 0;
 }
 
-void	ChangePort(std::map<int, int>& StorePort, int conn_sock, int listen_sock)
+void ChangePort(std::map<int, int> &StorePort, int conn_sock, int listen_sock)
 {
 	for (std::map<int, int>::iterator it = StorePort.begin(); it != StorePort.end(); it++)
 	{
@@ -365,60 +692,23 @@ void	ChangePort(std::map<int, int>& StorePort, int conn_sock, int listen_sock)
 	}
 }
 
-std::multimap<int, int>	ChangeOrKeepPort(std::multimap<int, int>* StorePort, int conn_sock, int Port)
+std::multimap<int, int> ChangeOrKeepPort(std::multimap<int, int> *StorePort, int NewConnSock, int PortSock)
 {
-	// std::cout << "\nINSIDE CHANGE OR KEEP\n" << std::endl;
-	
+
 	for (std::multimap<int, int>::iterator it = StorePort->begin(); it != StorePort->end(); it++)
 	{
-		// std::cout << "\nChangeOrKeep normal : " << std::endl;
-		// std::cout << "it->second con sock : " << it->second << std::endl;
-		// std::cout << "Port : " << Port << std::endl;
-		// std::cout << "conn_sock : " << conn_sock << std::endl;
-		/* DERNIERE MODIFICATION */
-		// if (it->first == Port)
-		// {
-		// 	it->second = conn_sock;
-		// 	return ;
-		// }
-		/*************************/
-		if (it->second == conn_sock)
+		if (it->second == PortSock)
 		{
-			// std::cout << "RETURN CHANGE OR KEEP" << std::endl;
+			StorePort->insert(std::make_pair(it->first, NewConnSock));
 			return (*StorePort);
 		}
 	}
-	// std::cout << "shoud insert" << std::endl;
-	StorePort->insert(std::pair<int, int>(Port, conn_sock));
-
-	// std::cout << "\nSTART TEST" << std::endl;
-	// int i = 0;
-	for (std::multimap<int, int>::iterator it = StorePort->begin(); it != StorePort->end(); it++) // on fait quoi avec ca ?
-	{
-		// std::cout << "\n TEST ChangeOrKeep element : " << i << std::endl;
-		// std::cout << "it->second con sock : " << it->second << std::endl;
-		// std::cout << "Port : " << Port << std::endl;
-		// std::cout << "conn_sock : " << conn_sock << std::endl;
-		/* DERNIERE MODIFICATION */
-		// if (it->first == Port)
-		// {
-		// 	it->second = conn_sock;
-		// 	return ;
-		// }
-		/*************************/
-		if (it->second == conn_sock)
-		{
-			// std::cout << "RETURN CHANGE OR KEEP" << std::endl;
-			// return (*StorePort);
-		}
-	}
-	// std::cout << "\nEND TEST" << std::endl;
-	
 	return (*StorePort);
 }
 
-int isNotPort(int fd, std::vector<int> listen_sock)
+int isNotPort(int fd, std::vector<int> listen_sock, size_t len)
 {
+	(void)len;
 	for (size_t i = 0; i < listen_sock.size(); i++)
 	{
 		// std::cout << "LISTEN IS NOT PORT " << listen_sock[i] << std::endl;
@@ -494,13 +784,16 @@ int	StartServer(std::vector<server_configuration*> servers, std::vector<int> Por
 						std::cerr << "Error: listen failed: " << strerror(errno) << std::endl;
 					}
 					else
+					{
 						listen_sock.push_back(socktmp);
+						StorePort.insert(std::make_pair(Ports[i], socktmp));
+					}
 				}
 			}
 		}
 	}
 	if(!listen_sock.size()) // si listen_sock vide, erreur system call lors de la creation des sockets
-		return(1);
+		return(EXIT_FAILURE);
 
 	// std::cout << "STOREMAP" << std::endl;
 	// for (std::map<int, int>::iterator it = StorePort.begin(); it != StorePort.end(); it++)
@@ -511,7 +804,7 @@ int	StartServer(std::vector<server_configuration*> servers, std::vector<int> Por
 	epollfd = epoll_create1(0);
 	if (epollfd == -1) {
 		std::cerr << "Error: epoll_create1: " << strerror(errno) << std::endl;
-		return(CloseListenSockets(listen_sock), 1);
+		return(CloseListenSockets(listen_sock), EXIT_FAILURE);
 	}
 	errno = 0;
 	open_ports.push_back(epollfd);
@@ -526,19 +819,18 @@ int	StartServer(std::vector<server_configuration*> servers, std::vector<int> Por
  		if (epoll_ctl(epollfd, EPOLL_CTL_ADD, *it, &ev) == -1) 
 		{
 			std::cerr << "Error: epoll_ctl: listen_sock, " << strerror(errno) << std::endl;
-			return(CloseListenSockets(listen_sock), 1);
+			return(CloseListenSockets(listen_sock), EXIT_FAILURE);
 		}
 	}
 	for (;;) {
-		std::cerr << "CONN_SOCK = " << conn_sock << std::endl;
-		CodeStatus = 200; // a voir comment on gère le code status après envoi ds le handle connection
+	//	std::cerr << "CONN_SOCK = " << conn_sock << std::endl;
 		nfds = epoll_wait(epollfd, events, MAX_EVENTS, -1);
 		if (nfds == -1) {
 			std::cerr << "Error: epoll_wait: " << strerror(errno) << std::endl;
-			return(CloseListenSockets(listen_sock), 1);
+			return(CloseListenSockets(listen_sock), EXIT_FAILURE);
 		}
 		if (g_code == 42) //check ctrl c
-			return(CloseListenSockets(listen_sock), 1);
+			return(CloseListenSockets(listen_sock), EXIT_FAILURE);
 		// std::cout << "\nWAIT TIME" << std::endl;
 		for (int n = 0; n < nfds; ++n)
 		{
@@ -546,12 +838,17 @@ int	StartServer(std::vector<server_configuration*> servers, std::vector<int> Por
 			{
 				if (events[n].data.fd == listen_sock[i])
 				{
+					CodeStatus = 200; // a voir comment on gère le code status après envoi ds le handle connection
+
 					// std::cout << "\nACCEPT SOCKET : " << events[n].data.fd << " + " << listen_sock[i] <<  std::endl;
 					// std::fprintf(stderr, "\nEVENTS I = %d ET N = %d\n", i, n);
 					if (sockets.size() > 100)
 					{
 						close(*(sockets.begin()));
 						sockets.erase(sockets.begin());
+						for (std::multimap<int, int>::iterator it = StorePort.begin(); it != StorePort.end(); it++)
+							if (it->second == *(sockets.begin()))
+								StorePort.erase(it);
 					}
 					conn_sock = accept(events[n].data.fd, (struct sockaddr *) &addr[i], &addrlen[i]);
 					if (conn_sock != -1)
@@ -567,16 +864,17 @@ int	StartServer(std::vector<server_configuration*> servers, std::vector<int> Por
 						else
 						{
 							sockets.push_back(conn_sock);
-							StorePort = ChangeOrKeepPort(&StorePort, conn_sock, Ports[i]);
+							std::cout << "ACCEPT PORT : " << Ports[i] << " SOCK : " << conn_sock << std::endl;
+							StorePort = ChangeOrKeepPort(&StorePort, conn_sock, events[n].data.fd);
 						}
 					}
 					else
 						j++;
 					if (j == 1000) // si le accept bug 1000 fois, on finit par fermer le serveur car probleme d'alloc fd
-						return(CloseListenSockets(listen_sock), 1);
+						return(CloseListenSockets(listen_sock), EXIT_FAILURE);
 				}
 			}
-			if ((events[n].events & EPOLLIN) && isNotPort(events[n].data.fd, listen_sock))
+			if ((events[n].events & EPOLLIN) && isNotPort(events[n].data.fd, listen_sock, listen_sock.size()))
 			{
 				// std::cout << "\nEPOLLIN : " << events[n].data.fd << " + " << events[n].data.fd << std::endl;
 				// std::cout << "\nSENT : " << events[n].data.fd << std::endl;
@@ -602,7 +900,7 @@ int	StartServer(std::vector<server_configuration*> servers, std::vector<int> Por
 				// 	perror("epoll_ctl1");
 				// }
 			}
-			if ((events[n].events & EPOLLOUT) && isNotPort(events[n].data.fd, listen_sock))
+			if ((events[n].events & EPOLLOUT) && isNotPort(events[n].data.fd, listen_sock, listen_sock.size()))
 			{
 				// epoll_ctl(epollfd, EPOLL_CTL_MOD, events[n].data.fd, &ev);
 				// std::cout << "\nEPOLLOUT : " << events[n].data.fd << std::endl;
@@ -707,7 +1005,6 @@ int	StartServer(std::vector<server_configuration*> servers, std::vector<int> Por
 					}
 				}
 			}
-			
 		}
 	}
 	return 0;
