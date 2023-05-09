@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/26 15:32:29 by nflan             #+#    #+#             */
-/*   Updated: 2023/05/09 18:46:28 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/05/09 18:58:24 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -162,6 +162,27 @@ bool check_Header_Size(const std::string& str)
 	return (0);
 }
 
+int nbr_Host_line(const std::string& request)
+{
+	int count = 0;
+	std::string tmpStr;
+	std::string line;
+	std::string::size_type host_start = request.find("HTTP/1.1\r\n");
+	std::string::size_type host_end = request.find("\r\n\r\n", host_start);
+
+	tmpStr = request.substr(host_start + 8, host_end);
+	std::transform(tmpStr.begin(), tmpStr.end(), tmpStr.begin(), ::tolower);
+	
+	std::istringstream ss(tmpStr);
+	while (std::getline(ss, line)) {
+		if (line.size() >= 5 && line.substr(0, 5) == "host:")
+			count++;
+		if (count == 2)
+			return (2);
+	}
+	return (0);
+}
+
 bool check_End_Line(const std::string& str)
 {
 	if (str.find("\r\n\r\n") == std::string::npos)
@@ -264,19 +285,22 @@ int check_Request_Value(const std::string& request, const int status)
 	int status_Ref = 0;
 
 	if (status == 0){
-		status_Ref = check_First_Line(request);}
 		std::cerr << "\nWARNING 1\n" << status_Ref << std::endl;
+		status_Ref = check_First_Line(request);}
 	if (status == 1){
 		status_Ref = check_Host_Line(request);
 		std::cerr << "\nWARNING 2\n" << status_Ref << std::endl;
 	}
 	if (status == 2){
-		status_Ref = check_End_Line(request);}
 		std::cerr << "\nWARNING 3\n" << status_Ref << std::endl;
+		if (nbr_Host_line(request) == 2)
+			return (2);
+		status_Ref = check_End_Line(request);}
 	// if (status == 1 && request.find("Host: ") == std::string::npos)
 	// 	return (1);
 	return (status_Ref);
 }
+
 
 void	add_Request_To_File(int conn_sock, std::string request)
 {
@@ -730,6 +754,7 @@ int isNotPort(int fd, std::vector<int> listen_sock)
 	}
 	return 1;
 }
+
 int	StartServer(std::vector<server_configuration*> servers, std::vector<int> Ports, std::vector<std::string> Hosts)
 {
 	struct sockaddr_in addr[Ports.size()];

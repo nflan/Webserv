@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:46 by mgruson           #+#    #+#             */
-/*   Updated: 2023/05/09 18:44:21 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/05/09 19:00:28 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -417,10 +417,10 @@ int		server_response::getIdSessionOrSetError401(const server_request& Server_Req
 		infile.close();
 		for (size_t i = 0; i < SessionIdGiven.size(); i++)
 		{
-			std::cout << "i : " << i << std::endl;
-			std::cout << "SessionIdGiven.size() : " << SessionIdGiven.size() << std::endl;
-			std::cout << "SessionID : " << SessionID << std::endl;
-			std::cout << "SessionID[i] : " << SessionIdGiven[i] << std::endl;
+			// std::cout << "i : " << i << std::endl;
+			// std::cout << "SessionIdGiven.size() : " << SessionIdGiven.size() << std::endl;
+			// std::cout << "SessionID : " << SessionID << std::endl;
+			// std::cout << "SessionID[i] : " << SessionIdGiven[i] << std::endl;
 			if (SessionIdGiven.size() > 0 && SessionIdGiven[i] == SessionID)
 			{
 				break;
