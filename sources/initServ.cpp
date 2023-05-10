@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/26 15:32:29 by nflan             #+#    #+#             */
-/*   Updated: 2023/05/10 15:05:38 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/05/10 16:46:09 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -794,8 +794,13 @@ int	StartServer(std::vector<server_configuration*> servers, std::vector<int> Por
 						close(*(sockets.begin()));
 						sockets.erase(sockets.begin());
 						for (std::multimap<int, int>::iterator it = StorePort.begin(); it != StorePort.end(); it++)
+						{
 							if (it->second == *(sockets.begin()))
+							{
 								StorePort.erase(it);
+								break;
+							}
+						}
 					}
 					conn_sock = accept(events[n].data.fd, (struct sockaddr *) &addr[i], &addrlen[i]);
 					if (conn_sock != -1)
