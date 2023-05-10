@@ -9,7 +9,7 @@ server {
 		cgi .php /usr/bin/php-cgi .py /usr/bin/python3;
 		autoindex on;
 		add_header Set-Cookie "unboncorrecteur=mgruson; Path=/; MBAPPE=BALLONDOR;";
-		upload_store ./site/upload/upload_file/;
+		upload_store ./site/upload_file/;
 
 		location /upload/ {
 
@@ -130,4 +130,27 @@ server {
 		autoindex off;
 
 		allow_methods GET;
+}
+
+server {
+		listen localhost:8093;
+
+		root ./site3/;
+		index index.html
+		autoindex on;
+		client_max_body_size 20;
+
+		allow_methods GET POST;
+}
+
+server {
+		listen localhost:8094;
+
+		root ./site2/;
+		index index.html
+		autoindex on;
+		upload_store ./site2/upload/upoad_file/;
+		client_max_body_size 20;
+
+		allow_methods GET POST;
 }
