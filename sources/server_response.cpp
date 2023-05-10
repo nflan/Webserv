@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 15:09:46 by mgruson           #+#    #+#             */
-/*   Updated: 2023/05/10 13:30:08 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/05/10 16:07:24 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -503,11 +503,11 @@ void	server_response::SendingResponse(const server_request& Server_Request, int 
 	{
 		std::stringstream response;
 			response << "HTTP/1.1 301 Moved Permanently\r\nLocation: " \
-			<< getRedir(Server_Request.getMethod(), server, Server_Request.getRequestURI()) << "\r\n";
+			<< getRedir(Server_Request.getMethod(), server, Server_Request.getRequestURI()) << "\r\n\r\n\r\n\r\n";
 			std::string response_str = response.str();
-			errno = 0;
 			MsgToSent->insert(std::make_pair(conn_sock, std::make_pair(response_str, "")));
 			errno = 0;
+			return ;
 	}
 	/*********************************************************************/
 	

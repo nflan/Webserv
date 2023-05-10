@@ -1,7 +1,6 @@
 server {
 	server_name webserv.com;
 		listen 8083;
-		listen [::]:8080;
 
 		root ./site;
 		index index.html;
@@ -9,8 +8,8 @@ server {
 		error_page 404 errorpage/404.txt 405 errorpage/405.txt 406 errorpage/406.txt;
 		cgi .php /usr/bin/php-cgi .py /usr/bin/python3;
 		autoindex on;
-		upload_store /sgoinfre/goinfre/Perso/mgruson/webserv_mgruson/site/upload/upload_file/;
 		add_header Set-Cookie "unboncorrecteur=mgruson; Path=/; MBAPPE=BALLONDOR;";
+		upload_store ./site/upload/upload_file/;
 
 		location /upload/ {
 
@@ -28,6 +27,9 @@ server {
 		}
 
 		location /password/ {
+			limit_except GET POST {
+				deny all;
+			}
 			return 301 https://www.example.com/new-page.html;
 
 			root ./site/upload/;
@@ -95,17 +97,37 @@ server {
 	root ./site2/;
 	index index.html;
 
-	allow_methods GET POST DELETE;
+	allow_methods GET POST;
 	cgi .php /usr/bin/php-cgi .py /usr/bin/python3;
 }
 
 server {
 	server_name wb1.com;
 		listen localhost:8086;
-		listen 127.0.0.1:8088;
 
 		root ./site3/;
 		index index.html
+
+	allow_methods GET POST;
+	cgi .php /usr/bin/php-cgi .py /usr/bin/python3;
+}
+
+server {
+		listen localhost:8091;
+
+		root ./site3/;
+		index 91.html
+		autoindex on;
+
+		allow_methods GET;
+}
+
+server {
+		listen localhost:8092;
+
+		root ./site3/;
+		index 92.html
+		autoindex off;
 
 		allow_methods GET;
 }

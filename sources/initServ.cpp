@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/26 15:32:29 by nflan             #+#    #+#             */
-/*   Updated: 2023/05/10 13:47:25 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/05/10 15:05:38 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -404,7 +404,7 @@ int	handle_connection(std::vector<server_configuration*> servers, int conn_sock,
 	if (n < 0)
 	{
 		MsgToSent->insert(std::make_pair(conn_sock, std::make_pair("HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html; charset=utf-8\r\nContent-Length: 383\r\n\r\n<html><head><meta name=\"viewport\" content=\"width=device-width, minimum-scale=0.1\"><title>500 Internal Server Error</title></head><body style=\"background: #0e0e0e; height: 100%;text-align:center;color:white;\"><h1>500 Internal Server Error</h1><img src=\"https://http.cat/500\" style=\"display: block;margin: auto;\" alt=\"500 Internal Server Error\"><p>webserv</p></body></html>", "")));
-		return 0;
+		return 1;
 	}
 	std::string request;
 	request.append(buffer, n);
@@ -430,11 +430,11 @@ int	handle_connection(std::vector<server_configuration*> servers, int conn_sock,
 		status = pre_Request_Parser(RequestSocketStatus, conn_sock, request);
 		if (status == 2)
 		{
-			MsgToSent->insert(std::make_pair(conn_sock, std::make_pair("HTTP/1.1 400 Bad Request\nContent-Type: text/html\nContent-Length: 353\r\n\r\n<html><head><meta name=\"viewport\" content=\"width=device-width, minimum-scale=0.1\"><title>400 Bad Request</title></head><body style=\"background: #0e0e0e; height: 100%;text-align:center;color:white;\"><h1>400 Bad Request</h1><img src=\"https://http.cat/400\" style=\"display: block;margin: auto;\" alt=\"400 Bad Request\"><p>webserv</p></body></html>",""))); // remplace sent
+			MsgToSent->insert(std::make_pair(conn_sock, std::make_pair("HTTP/1.1 400 Bad Request\r\nContent-Type: text/html; charset=utf-8\nContent-Length: 335\r\n\r\n<html><head><meta name=\"viewport\" content=\"width=device-width, minimum-scale=0.1\"><title>400 Bad Request</title></head><body style=\"background: #0e0e0e; height: 100%;text-align:center;color:white;\"><h1>400 Bad Request</h1><img src=\"https://http.cat/400\" style=\"display: block;margin: auto;\" alt=\"400 Bad Request\"><p>webserv</p></body></html>",""))); // remplace sent
 			remove(str);
 			RequestSocketStatus.clear();
 			RequestSocketStatus.erase(conn_sock);
-			return 1;
+			return 0;
 		}
 		if (status == 1)
 		{
@@ -856,7 +856,8 @@ int	StartServer(std::vector<server_configuration*> servers, std::vector<int> Por
 								close (it->first);
 								MsgToSent.erase(it);
 							}
-							PercentageSent.insert(std::make_pair(it->first, 0));
+							else
+								PercentageSent.insert(std::make_pair(it->first, 0));
 						}
 						else
 						{
@@ -903,7 +904,8 @@ int	StartServer(std::vector<server_configuration*> servers, std::vector<int> Por
 										close (it->first);
 										MsgToSent.erase(it);
 									}
-									PercentageSent[it->first] = PercentageSent[it->first] + bytes_read;
+									else
+										PercentageSent[it->first] = PercentageSent[it->first] + bytes_read;
 									file.close();
 								}
 							}
