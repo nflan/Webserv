@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/26 15:32:29 by nflan             #+#    #+#             */
-/*   Updated: 2023/05/10 16:46:09 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/05/10 17:08:50 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -497,9 +497,9 @@ int	handle_connection(std::vector<server_configuration*> servers, int conn_sock,
 				while (PathToStore.find("//") != std::string::npos)
 					PathToStore = PathToStore.erase(PathToStore.find("//"), 1);
 				struct stat path_info;
+				memset(&path_info, 0, sizeof(path_info));
 				stat(PathToStore.c_str(), &path_info);
-				int dir = S_ISDIR(path_info.st_mode);
-				if (!dir)
+				if (S_ISDIR(path_info.st_mode) == 0)
 				{
 					PathToStore = GoodServerConf->getRoot();
 				}
