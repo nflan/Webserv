@@ -6,7 +6,7 @@
 /*   By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/26 15:32:29 by nflan             #+#    #+#             */
-/*   Updated: 2023/05/10 12:38:51 by mgruson          ###   ########.fr       */
+/*   Updated: 2023/05/10 12:56:20 by mgruson          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -1006,9 +1006,9 @@ int	StartServer(std::vector<server_configuration*> servers, std::vector<int> Por
 							std::ifstream file(it->second.second.c_str(), std::ios::binary);
 							if (file.is_open())
 							{
-								char chunk[500000];
+								char chunk[4096];
 								file.seekg(PercentageSent[it->first], std::ios::beg);
-								file.read(chunk, 500000);
+								file.read(chunk, 4096);
 								// std::cout << "PERCENTAGE READ : " << PercentageSent[it->first] << std::endl;
 								std::streamsize bytes_read = file.gcount();
 								// std::cout << "bytes_read : " << bytes_read << std::endl;
