@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: chillion <chillion@student.42.fr>          +#+  +:+       +#+         #
+#    By: mgruson <mgruson@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/09/01 12:07:22 by chillion          #+#    #+#              #
-#    Updated: 2023/05/08 18:47:37 by chillion         ###   ########.fr        #
+#    Updated: 2023/05/10 13:09:17 by mgruson          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -81,19 +81,8 @@ client :
 	${CXX} $(SRC_DIR)${CLIENT} ${CXXFLAGS} -o ${CLIENT_NAME}
 
 test : all
-	$(VAL) ./${SOFT_NAME} sources/server.conf
+	$(VAL) ./${SOFT_NAME} conf/server.conf3
 
-t2 : all
-	$(VAL) ./${SOFT_NAME} sources/server.conf2
-
-t3 : all
-	$(VAL) ./${SOFT_NAME} sources/server.conf3
-
-t4 : all
-	$(VAL) ./${SOFT_NAME} sources/server.conf31
-
-t5 : all
-	$(VAL) ./${SOFT_NAME} sources/server.conf5
 	
 tc : tmp
 	$(VAL) ./${SOFT_NAME2} ./site/arbo-OLD2.php

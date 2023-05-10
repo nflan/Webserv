@@ -1,0 +1,7 @@
+server {
+		listen mathieu:8080;
+
+		root ./site/;
+		index index.html
+		allow_methods GET;
+}
