@@ -9,7 +9,7 @@ server {
 		cgi .php /usr/bin/php-cgi .py /usr/bin/python3;
 		autoindex on;
 		add_header Set-Cookie "unboncorrecteur=mgruson; Path=/; MBAPPE=BALLONDOR;";
-		upload_store ./site/upload_file/;
+		upload_store ./site/upload/;
 
 		location /upload/ {
 
